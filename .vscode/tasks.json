@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Build BlazorClient.Host",
+      "label": "BlazorClient.Host:Build",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -14,7 +14,7 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Watch BlazorClient.Host",
+      "label": "BlazorClient.Host:Watch",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -25,10 +25,12 @@
         "/consoleloggerparameters:NoSummary"
       ],
       "problemMatcher": "$msCompile",
-      "options": { "cwd": "${workspaceFolder}/src/Frontend/BlazorClient.Host" }
+      "options": {
+        "cwd": "${workspaceFolder}/src/Frontend/BlazorClient.Host"
+      }
     },
     {
-      "label": "Build GameService.Api",
+      "label": "GameService.Api:Build",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -40,7 +42,7 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Watch GameService.Api",
+      "label": "GameService.Api:Watch",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -51,11 +53,21 @@
         "/consoleloggerparameters:NoSummary"
       ],
       "problemMatcher": "$msCompile",
-      "options": { "cwd": "${workspaceFolder}/src/Backend/GameService.Api" }
+      "options": {
+        "cwd": "${workspaceFolder}/src/Backend/GameService.Api"
+      }
     },
     {
-      "label": "Build",
-      "dependsOn": ["Build BlazorClient.Host", "Build GameService.Api"]
+      "label": "daprd-debug-game-api",
+      "type": "daprd",
+      "appId": "game-api",
+      "appPort": 5101,
+      "dependsOn": ["GameService.Api:Build"]
+    },
+    {
+      "label": "daprd-down-game-api",
+      "type": "daprd-down",
+      "appId": "game-api"
     }
   ]
 }

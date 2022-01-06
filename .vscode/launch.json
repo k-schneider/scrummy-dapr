@@ -5,10 +5,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch GameService.Api",
+      "name": "Launch GameService.Api with Dapr",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "Watch GameService.Api",
+      "preLaunchTask": "daprd-debug-game-api",
       "program": "${workspaceFolder}/src/Backend/GameService.Api/bin/Debug/net6.0/Scrummy.GameService.Api.dll",
       "args": [],
       "cwd": "${workspaceFolder}/src/Backend/GameService.Api",
@@ -22,13 +22,34 @@
       },
       "sourceFileMap": {
         "/Views": "${workspaceFolder}/Views"
-      }
+      },
+      "postDebugTask": "daprd-down-game-api"
     },
     {
       "name": "Launch BlazorClient.Host",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "Watch BlazorClient.Host",
+      "preLaunchTask": "BlazorClient.Host:Build",
+      "program": "${workspaceFolder}/src/Frontend/BlazorClient.Host/bin/Debug/net6.0/Scrummy.BlazorClient.Host.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Frontend/BlazorClient.Host",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      }
+    },
+    {
+      "name": "Launch BlazorClient.Host with Watch",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "BlazorClient.Host:Watch",
       "program": "${workspaceFolder}/src/Frontend/BlazorClient.Host/bin/Debug/net6.0/Scrummy.BlazorClient.Host.dll",
       "args": [],
       "cwd": "${workspaceFolder}/src/Frontend/BlazorClient.Host",
@@ -48,12 +69,15 @@
       "name": ".NET Core Attach",
       "type": "coreclr",
       "request": "attach"
-    }
+    },
   ],
   "compounds": [
     {
-      "name": "Scrummy",
-      "configurations": ["Launch GameService.Api","Launch BlazorClient.Host"]
+      "name": "Go Go Scrummy!",
+      "configurations": [
+        "Launch GameService.Api with Dapr",
+        "Launch BlazorClient.Host"
+      ]
     }
   ]
 }
