@@ -48,27 +48,6 @@
       "name": ".NET Core Attach",
       "type": "coreclr",
       "request": "attach"
-    },
-    {
-      "name": "Launch GameService.Api with Dapr",
-      "type": "coreclr",
-      "request": "launch",
-      "preLaunchTask": "daprd-debug",
-      "program": "${workspaceFolder}/src/Backend/GameService.Api/bin/Debug/net6.0/Scrummy.GameService.Api.dll",
-      "args": [],
-      "cwd": "${workspaceFolder}/src/Backend/GameService.Api",
-      "stopAtEntry": false,
-      "serverReadyAction": {
-        "action": "openExternally",
-        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
-      },
-      "env": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "sourceFileMap": {
-        "/Views": "${workspaceFolder}/Views"
-      },
-      "postDebugTask": "daprd-down"
     }
   ],
   "compounds": [
