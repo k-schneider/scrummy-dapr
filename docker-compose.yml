@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  game-api:
+    image: ${DOCKER_REGISTRY-}game.api
+    build:
+      context: .
+      dockerfile: src/Backend/GameService.Api/Dockerfile
+
+  blazor-client:
+    image: ${DOCKER_REGISTRY-}blazor.client
+    build:
+      context: .
+      dockerfile: src/Frontend/BlazorClient.Host/Dockerfile

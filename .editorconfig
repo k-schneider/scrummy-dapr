@@ -1,0 +1,24 @@
+# EditorConfig helps developers define and maintain consistent
+# coding styles between different editors and IDEs
+# editorconfig.org
+
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = false
+
+[*.{js,ts,css,scss}]
+insert_final_newline = true
+
+[*.{config,xml,js,ts,json,html,css,scss,sql,csproj}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+# Convert to file-scoped namespace
+csharp_style_namespace_declarations = file_scoped:error

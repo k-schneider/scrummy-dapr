@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{3873251E-3C40-4A88-8973-6486BA297FDC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{C80520E7-57A3-4E46-93D7-657C8CAC47FB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorClient.Host", "src\Frontend\BlazorClient.Host\BlazorClient.Host.csproj", "{3FE82968-16E4-4E87-88C0-FBE4CCBE5263}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorClient", "src\Frontend\BlazorClient\BlazorClient.csproj", "{17C575B1-27C2-4805-A639-32677C7AAFC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameService.Api", "src\Backend\GameService.Api\GameService.Api.csproj", "{DCF7D28D-92D8-4D68-8690-BDDB86753849}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "__", "__", "{0250204A-D4D6-41D1-8B9C-ECACE85CFB7E}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.env = .env
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{C84E30A2-B9C8-425B-8B0E-854108377D20}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3FE82968-16E4-4E87-88C0-FBE4CCBE5263}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FE82968-16E4-4E87-88C0-FBE4CCBE5263}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FE82968-16E4-4E87-88C0-FBE4CCBE5263}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FE82968-16E4-4E87-88C0-FBE4CCBE5263}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17C575B1-27C2-4805-A639-32677C7AAFC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17C575B1-27C2-4805-A639-32677C7AAFC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17C575B1-27C2-4805-A639-32677C7AAFC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17C575B1-27C2-4805-A639-32677C7AAFC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCF7D28D-92D8-4D68-8690-BDDB86753849}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCF7D28D-92D8-4D68-8690-BDDB86753849}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCF7D28D-92D8-4D68-8690-BDDB86753849}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCF7D28D-92D8-4D68-8690-BDDB86753849}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C84E30A2-B9C8-425B-8B0E-854108377D20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C84E30A2-B9C8-425B-8B0E-854108377D20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C84E30A2-B9C8-425B-8B0E-854108377D20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C84E30A2-B9C8-425B-8B0E-854108377D20}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3FE82968-16E4-4E87-88C0-FBE4CCBE5263} = {3873251E-3C40-4A88-8973-6486BA297FDC}
+		{17C575B1-27C2-4805-A639-32677C7AAFC5} = {3873251E-3C40-4A88-8973-6486BA297FDC}
+		{DCF7D28D-92D8-4D68-8690-BDDB86753849} = {C80520E7-57A3-4E46-93D7-657C8CAC47FB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {89B301F8-CD8C-4DB2-9803-FA712DDCFD2E}
+	EndGlobalSection
+EndGlobal

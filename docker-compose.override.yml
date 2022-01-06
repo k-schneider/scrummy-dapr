@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  game-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+    ports:
+      - "5101:80"
+
+  blazor-client:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - GameApiUrl=http://game-api
+    ports:
+      - "5102:80"
