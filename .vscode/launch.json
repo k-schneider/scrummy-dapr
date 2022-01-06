@@ -1,0 +1,80 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch GameService.Api",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Watch GameService.Api",
+      "program": "${workspaceFolder}/src/Backend/GameService.Api/bin/Debug/net6.0/Scrummy.GameService.Api.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Backend/GameService.Api",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      }
+    },
+    {
+      "name": "Launch BlazorClient.Host",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Watch BlazorClient.Host",
+      "program": "${workspaceFolder}/src/Frontend/BlazorClient.Host/bin/Debug/net6.0/Scrummy.BlazorClient.Host.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Frontend/BlazorClient.Host",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      }
+    },
+    {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach"
+    },
+    {
+      "name": "Launch GameService.Api with Dapr",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "daprd-debug",
+      "program": "${workspaceFolder}/src/Backend/GameService.Api/bin/Debug/net6.0/Scrummy.GameService.Api.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Backend/GameService.Api",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      },
+      "postDebugTask": "daprd-down"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Scrummy",
+      "configurations": ["Launch GameService.Api","Launch BlazorClient.Host"]
+    }
+  ]
+}

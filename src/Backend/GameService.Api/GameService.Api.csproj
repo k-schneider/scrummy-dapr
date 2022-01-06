@@ -7,6 +7,8 @@
     <DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..\..</DockerfileContext>
+    <RootNamespace>Scrummy.GameService.Api</RootNamespace>
+    <AssemblyName>Scrummy.GameService.Api</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

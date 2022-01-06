@@ -1,4 +1,6 @@
 ﻿@page "/room/{roomId}"
+@inject HttpClient HttpClient;
+@inject NavigationManager NavigationManager
 
 <PageTitle>Scrummy</PageTitle>
 
@@ -39,5 +41,11 @@
         {
             return;
         }
+
+        var response = await HttpClient.PostAsync("/game-api/lobby/create", null);
+        response.EnsureSuccessStatusCode();
+        var gameId = await response.Content.ReadAsStringAsync();
+
+        NavigationManager.NavigateTo($"/room/{gameId}");
     }
 }

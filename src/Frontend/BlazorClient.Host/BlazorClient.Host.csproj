@@ -4,12 +4,12 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-	<RootNamespace>Scrummy.BlazorClient.Host</RootNamespace>
-	<AssemblyName>Scrummy.BlazorClient.Host</AssemblyName>
-	<DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
-	<UserSecretsId>4ce1e33f-ae0a-44fe-8b61-f78dc28e2278</UserSecretsId>
-	<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	<DockerfileContext>..\..\..</DockerfileContext>
+    <DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
+    <UserSecretsId>4ce1e33f-ae0a-44fe-8b61-f78dc28e2278</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..\..</DockerfileContext>
+    <RootNamespace>Scrummy.BlazorClient.Host</RootNamespace>
+    <AssemblyName>Scrummy.BlazorClient.Host</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
