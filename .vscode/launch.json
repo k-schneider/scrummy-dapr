@@ -53,6 +53,13 @@
       "name": "Launch Scrummy",
       "configurations": [
         "Launch GameService.Api with Dapr",
+        "Launch BlazorClient.Host"
+      ]
+    },
+    {
+      "name": "Launch Scrummy + Watch BlazorClient",
+      "configurations": [
+        "Launch GameService.Api with Dapr",
         "Launch BlazorClient.Host + Watch"
       ]
     }
