@@ -1,9 +1,10 @@
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.AddCustomActors();
 
+builder.Services.AddDaprClient();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -19,6 +20,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapGet("/", () => Results.LocalRedirect("~/swagger"));
+app.MapActorsHandlers();
 app.MapControllers();
 
 app.Run();
