@@ -8,17 +8,17 @@ public static class ProgramExtensions
         {
             new RouteConfig
             {
-                RouteId = "gameapi",
-                ClusterId = "gameapicluster",
+                RouteId = "gameservice",
+                ClusterId = "gameservicecluster",
                 Match = new RouteMatch
                 {
-                    Path = "/game-api/{**catch-all}"
+                    Path = "/g/{**catch-all}"
                 },
                 Transforms = new[]
                 {
                     new Dictionary<string, string>
                     {
-                        { "PathRemovePrefix", "/game-api" }
+                        { "PathRemovePrefix", "/g" }
                     },
                     new Dictionary<string, string>
                     {
@@ -51,10 +51,10 @@ public static class ProgramExtensions
         {
             new ClusterConfig
             {
-                ClusterId = "gameapicluster",
+                ClusterId = "gameservicecluster",
                 Destinations = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
                 {
-                    { "gameapicluster/destination1", new DestinationConfig { Address = builder.Configuration["GameApiUrl"] } }
+                    { "gameservicecluster/destination1", new DestinationConfig { Address = builder.Configuration["GameServiceUrl"] } }
                 }
             }
         };

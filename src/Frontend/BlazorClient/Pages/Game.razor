@@ -42,7 +42,7 @@
             return;
         }
 
-        var response = await HttpClient.PostAsync("/game-api/lobby/create", null);
+        var response = await HttpClient.PostAsync("/g/lobby/create", null);
         response.EnsureSuccessStatusCode();
         var gameId = await response.Content.ReadAsStringAsync();
 

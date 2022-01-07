@@ -1,8 +1,8 @@
 version: '3.4'
 
 services:
-  game-api:
-    image: ${DOCKER_REGISTRY-}game.api
+  game-service:
+    image: ${DOCKER_REGISTRY-}game.service
     build:
       context: .
       dockerfile: src/Backend/GameService.Api/Dockerfile

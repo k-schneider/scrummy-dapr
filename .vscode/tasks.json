@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "BlazorClient.Host:Build",
+      "label": "blazor-client-dotnet-build",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -14,7 +14,7 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "BlazorClient.Host:Watch",
+      "label": "blazor-client-dotnet-watch",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -30,7 +30,7 @@
       }
     },
     {
-      "label": "GameService.Api:Build",
+      "label": "game-service-dotnet-build",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -42,7 +42,7 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "GameService.Api:Watch",
+      "label": "game-service-dotnet-watch",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -58,16 +58,16 @@
       }
     },
     {
-      "label": "daprd-debug-game-api",
+      "label": "game-service-daprd-debug",
       "type": "daprd",
-      "appId": "game-api",
+      "appId": "game-service",
       "appPort": 5101,
-      "dependsOn": ["GameService.Api:Build"]
+      "dependsOn": ["game-service-dotnet-build"]
     },
     {
-      "label": "daprd-down-game-api",
+      "label": "game-service-daprd-down",
       "type": "daprd-down",
-      "appId": "game-api"
+      "appId": "game-service"
     }
   ]
 }

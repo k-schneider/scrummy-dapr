@@ -8,7 +8,7 @@
       "commandVersion": "1.0",
       "serviceActions": {
         "blazor-client": "StartDebugging",
-        "game-api": "StartDebugging"
+        "game-service": "StartDebugging"
       }
     }
   }
