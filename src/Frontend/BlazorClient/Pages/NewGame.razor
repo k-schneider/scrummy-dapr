@@ -1,4 +1,4 @@
-﻿@page "/room/{roomId}"
+@page "/room/create"
 @inject HttpClient HttpClient;
 @inject NavigationManager NavigationManager
 
@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="px-4 py-3 sm:px-6">
-            <button type="button" @onclick="OnCreateRoom" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+            <button type="button" @onclick="CreateRoom" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
                 Create Room
             </button>
         </div>
@@ -32,10 +32,7 @@
 @code {
     private string nickname = string.Empty;
 
-    [Parameter]
-    public string RoomId { get; set; } = null!;
-
-    private async Task OnCreateRoom()
+    private async Task CreateRoom()
     {
         if (string.IsNullOrWhiteSpace(nickname))
         {

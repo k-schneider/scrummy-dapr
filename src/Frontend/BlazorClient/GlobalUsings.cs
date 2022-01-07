@@ -1,3 +1,4 @@
-﻿global using Microsoft.AspNetCore.Components.Web;
+﻿global using Fluxor;
+global using Microsoft.AspNetCore.Components.Web;
 global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 global using Scrummy.BlazorClient;

@@ -2,13 +2,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Game Service With Dapr",
+      "name": "Launch Game Service with Dapr",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "game-service-daprd-debug",
       "program": "${workspaceFolder}/src/Backend/GameService.Api/bin/Debug/net6.0/Scrummy.GameService.Api.dll",
       "cwd": "${workspaceFolder}/src/Backend/GameService.Api",
-      "postDebugTask": "daprd-down-game-service"
+      "postDebugTask": "game-service-daprd-down"
     },
     {
       "name": "Launch Blazor Client",
@@ -52,14 +52,14 @@
     {
       "name": "Launch Scrummy",
       "configurations": [
-        "Launch Game Service With Dapr",
+        "Launch Game Service with Dapr",
         "Launch Blazor Client"
       ]
     },
     {
       "name": "Launch Scrummy with Blazor Client Watch",
       "configurations": [
-        "Launch Game Service With Dapr",
+        "Launch Game Service with Dapr",
         "Launch Blazor Client with Watch"
       ]
     }

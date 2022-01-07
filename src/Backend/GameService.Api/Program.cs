@@ -5,6 +5,7 @@ builder.AddCustomActors();
 
 builder.Services.AddDaprClient();
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -22,5 +23,6 @@ app.UseAuthorization();
 app.MapGet("/", () => Results.LocalRedirect("~/swagger"));
 app.MapActorsHandlers();
 app.MapControllers();
+app.MapHub<GameHub>("/hub/gamehub");
 
 app.Run();

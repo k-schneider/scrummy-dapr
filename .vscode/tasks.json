@@ -2,34 +2,6 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "blazor-client-dotnet-build",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "build",
-        "${workspaceFolder}/src/Frontend/BlazorClient.Host/BlazorClient.Host.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "blazor-client-dotnet-watch",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "watch",
-        "run",
-        "${workspaceFolder}/src/Frontend/BlazorClient.Host/BlazorClient.Host.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "problemMatcher": "$msCompile",
-      "options": {
-        "cwd": "${workspaceFolder}/src/Frontend/BlazorClient.Host"
-      }
-    },
-    {
       "label": "game-service-dotnet-build",
       "command": "dotnet",
       "type": "process",
@@ -68,6 +40,34 @@
       "label": "game-service-daprd-down",
       "type": "daprd-down",
       "appId": "game-service"
+    },
+    {
+      "label": "blazor-client-dotnet-build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/Frontend/BlazorClient.Host/BlazorClient.Host.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "blazor-client-dotnet-watch",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "watch",
+        "run",
+        "${workspaceFolder}/src/Frontend/BlazorClient.Host/BlazorClient.Host.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile",
+      "options": {
+        "cwd": "${workspaceFolder}/src/Frontend/BlazorClient.Host"
+      }
     }
   ]
 }

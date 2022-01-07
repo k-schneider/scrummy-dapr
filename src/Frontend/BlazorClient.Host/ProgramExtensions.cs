@@ -8,7 +8,7 @@ public static class ProgramExtensions
         {
             new RouteConfig
             {
-                RouteId = "gameservice",
+                RouteId = "gameapi",
                 ClusterId = "gameservicecluster",
                 Match = new RouteMatch
                 {
@@ -23,25 +23,26 @@ public static class ProgramExtensions
                     new Dictionary<string, string>
                     {
                         { "PathPrefix", "/api" }
+                    }
+                }
+            },
+            new RouteConfig
+            {
+                RouteId = "gamehub",
+                ClusterId = "gameservicecluster",
+                Match = new RouteMatch
+                {
+                    Path = "/h/{**catch-all}"
+                },
+                Transforms = new[]
+                {
+                    new Dictionary<string, string>
+                    {
+                        { "PathRemovePrefix", "/h" }
                     },
                     new Dictionary<string, string>
                     {
-                        { "X-Forwarded", "Append" },
-                        { "HeaderPrefix", "X-Forwarded-" }
-                    },
-                    new Dictionary<string, string>
-                    {
-                        { "Forwarded", "by,host,for,proto" },
-                        { "ByFormat", "Random" },
-                        { "ForFormat", "IpAndPort" }
-                    },
-                    new Dictionary<string, string>
-                    {
-                        { "RequestHeadersCopy", "true" }
-                    },
-                    new Dictionary<string, string>
-                    {
-                        { "RequestHeaderOriginalHost", "true" }
+                        { "PathPrefix", "/hub" }
                     }
                 }
             }
