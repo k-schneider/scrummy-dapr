@@ -4,6 +4,11 @@ public class GameHub : Hub
 {
     public override async Task OnConnectedAsync()
     {
+        if (string.IsNullOrWhiteSpace(Context.UserIdentifier))
+        {
+            throw new Exception("Request does not contain a sid");
+        }
+
         await base.OnConnectedAsync();
     }
 
@@ -15,10 +20,5 @@ public class GameHub : Hub
     public async Task JoinGame(string gameId)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
-    }
-
-    public async Task LeaveGame(string gameId)
-    {
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameId);
     }
 }

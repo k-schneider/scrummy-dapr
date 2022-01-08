@@ -2,6 +2,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.AddCustomActors();
+builder.AddCustomUserIdProvider();
 
 builder.Services.AddDaprClient();
 builder.Services.AddControllers();
@@ -23,6 +24,6 @@ app.UseAuthorization();
 app.MapGet("/", () => Results.LocalRedirect("~/swagger"));
 app.MapActorsHandlers();
 app.MapControllers();
-app.MapHub<GameHub>("/hub/gamehub");
+app.MapHubs();
 
 app.Run();

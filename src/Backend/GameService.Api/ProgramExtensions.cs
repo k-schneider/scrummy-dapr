@@ -9,4 +9,16 @@ public static class ProgramExtensions
             options.Actors.RegisterActor<GameActor>();
         });
     }
+
+    public static void AddCustomUserIdProvider(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+    }
+
+    public static void MapHubs(this IEndpointRouteBuilder builder)
+    {
+        builder.MapHub<GameHub>("/hub/gamehub", o => {
+            o.Transports = HttpTransportType.WebSockets;
+        });
+    }
 }

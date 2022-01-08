@@ -1,6 +1,7 @@
 global using Dapr.Actors;
 global using Dapr.Actors.Client;
 global using Dapr.Actors.Runtime;
+global using Microsoft.AspNetCore.Http.Connections;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.SignalR;
 global using Scrummy.GameService.Api;

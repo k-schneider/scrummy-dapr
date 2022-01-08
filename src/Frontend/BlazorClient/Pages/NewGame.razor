@@ -1,5 +1,7 @@
 @page "/room/create"
+@inject IDispatcher Dispatcher
 @inject HttpClient HttpClient;
+@inject IState<IdentityState> IdentityState;
 @inject NavigationManager NavigationManager
 
 <PageTitle>Scrummy</PageTitle>
@@ -32,12 +34,20 @@
 @code {
     private string nickname = string.Empty;
 
+    protected override Task OnInitializedAsync()
+    {
+        nickname = IdentityState.Value.Nickname;
+        return base.OnInitializedAsync();
+    }
+
     private async Task CreateRoom()
     {
         if (string.IsNullOrWhiteSpace(nickname))
         {
             return;
         }
+
+        Dispatcher.Dispatch(new RememberNicknameAction(nickname));
 
         var response = await HttpClient.PostAsync("/g/lobby/create", null);
         response.EnsureSuccessStatusCode();

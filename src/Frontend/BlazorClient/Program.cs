@@ -12,4 +12,6 @@ builder.Services.AddFluxor(options => options
 #endif
     );
 
+builder.Services.AddBlazoredLocalStorage();
+
 await builder.Build().RunAsync();
