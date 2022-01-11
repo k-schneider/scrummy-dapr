@@ -14,23 +14,11 @@ public class LobbyController : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> CreateGame(CancellationToken cancellationToken)
     {
-        string gameId = string.Empty;
+        var lobby = _actorProxyFactory.CreateActorProxy<ILobbyActor>(
+            new ActorId(Guid.Empty.ToString()),
+            typeof(LobbyActor).Name);
 
-        // Find a new game identifier and start the game
-        while (gameId == string.Empty)
-        {
-            var potentialId = GameId.Generate();
-
-            var game = _actorProxyFactory.CreateActorProxy<IGameActor>(
-                new ActorId(potentialId),
-                typeof(GameActor).Name);
-
-            if (!await game.Exists())
-            {
-                await game.Start(cancellationToken);
-                gameId = potentialId;
-            }
-        }
+        var gameId = await lobby.CreateGame(cancellationToken);
 
         return Ok(gameId);
     }

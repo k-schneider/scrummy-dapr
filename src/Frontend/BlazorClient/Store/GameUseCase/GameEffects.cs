@@ -27,7 +27,7 @@ public class GameEffects
             await _hubConnection.StartAsync();
         }
 
-        await _hubConnection.InvokeAsync("JoinGame", action.GameId);
+        await _hubConnection.InvokeAsync("JoinGame", action.GameId, _identityState.Value.Nickname);
 
         dispatcher.Dispatch(new JoinGameSuccessAction());
     }

@@ -2,16 +2,16 @@ namespace Scrummy.GameService.Api.Actors;
 
 public class GameStatus
 {
-    public static readonly GameStatus New = new(0, nameof(New));
-    public static readonly GameStatus Voting = new(1, nameof(Voting));
-    public static readonly GameStatus Results = new(2, nameof(Results));
+    public static readonly GameStatus None = new(0, nameof(None));
+    public static readonly GameStatus InProgress = new(1, nameof(InProgress));
+    public static readonly GameStatus GameOver = new(2, nameof(GameOver));
 
     public int Id { get; set; }
 
     public string Name { get; set; }
 
     public GameStatus()
-        : this(New.Id, New.Name)
+        : this(None.Id, None.Name)
     {
     }
 

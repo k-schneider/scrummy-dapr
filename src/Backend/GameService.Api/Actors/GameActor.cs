@@ -2,33 +2,49 @@ namespace Scrummy.GameService.Api.Actors;
 
 public class GameActor : Actor, IGameActor
 {
-    private const string GameStateName = "Game";
+    private readonly DaprClient _dapr;
+
+    private GameStatus _gameStatus = GameStatus.None;
+    private Dictionary<string, PlayerState> _players = new();
 
     private string GameId => Id.GetId();
 
-    public GameActor(ActorHost host)
+    public GameActor(ActorHost host, DaprClient dapr)
         : base(host)
     {
+        _dapr = dapr;
     }
 
-    public async Task<bool> Exists(CancellationToken cancellationToken = default)
+    public Task NotifyPlayerDisconnected(string playerId, CancellationToken cancellationToken = default)
     {
-        var result = await StateManager.TryGetStateAsync<GameState>(GameStateName, cancellationToken);
-        return result.HasValue;
+        _players[playerId].IsConnected = false;
+        return Task.CompletedTask;
     }
 
-    public Task<GameState> GetGameState(CancellationToken cancellationToken = default)
+    public Task NotifyPlayerJoined(string playerId, string nickname, CancellationToken cancellationToken = default)
     {
-        return StateManager.GetStateAsync<GameState>(GameStateName, cancellationToken);
-    }
-
-    public async Task Start(CancellationToken cancellationToken = default)
-    {
-        if (await Exists())
+        _players[playerId] = new PlayerState
         {
-            throw new InvalidOperationException("Game is already in progress.");
+            Nickname = nickname,
+            IsConnected = true
+        };
+        return Task.CompletedTask;
+    }
+
+    public Task NotifyPlayerLeft(string playerId, CancellationToken cancellationToken = default)
+    {
+        _players.Remove(playerId);
+        return Task.CompletedTask;
+    }
+
+    public Task Start(CancellationToken cancellationToken = default)
+    {
+        if (_gameStatus != GameStatus.None)
+        {
+            throw new InvalidOperationException("Game has already started");
         }
 
-        await StateManager.SetStateAsync<GameState>(GameStateName, new GameState(), cancellationToken);
+        _gameStatus = GameStatus.InProgress;
+        return Task.CompletedTask;
     }
 }
