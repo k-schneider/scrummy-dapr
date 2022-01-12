@@ -7,7 +7,7 @@ public static class ProgramExtensions
         builder.Services.AddActors(options =>
         {
             options.Actors.RegisterActor<GameActor>();
-            options.Actors.RegisterActor<PlayerActor>();
+            options.Actors.RegisterActor<SessionActor>();
         });
     }
 

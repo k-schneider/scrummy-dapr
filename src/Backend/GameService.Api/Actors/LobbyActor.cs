@@ -19,8 +19,7 @@ public class LobbyActor : Actor, ILobbyActor
             new ActorId(gameId),
             typeof(GameActor).Name);
 
-        await game.Start(cancellationToken);
-        _games.Add(gameId);
+        await game.StartGame(cancellationToken);
 
         return gameId;
     }

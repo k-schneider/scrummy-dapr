@@ -11,40 +11,35 @@ public class GameHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        if (string.IsNullOrWhiteSpace(Context.UserIdentifier))
+        var session = GetSessionActor();
+        var gameId = await session.GetGameId();
+
+        if (gameId is null)
         {
-            throw new Exception("Request does not contain a sid");
+            throw new InvalidOperationException("Session is not associated with a game");
         }
+
+        await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
+        await session.AddConnection(Context.ConnectionId);
 
         await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? ex)
     {
-        var player = _actorProxyFactory.CreateActorProxy<IPlayerActor>(
-            new ActorId(Context.UserIdentifier),
-            typeof(PlayerActor).Name);
-
-        await player.HandleDisconnect(Context.ConnectionId);
-
+        await GetSessionActor().RemoveConnection(Context.ConnectionId);
         await base.OnDisconnectedAsync(ex);
     }
 
-    public async Task JoinGame(string gameId, string nickname)
+    private ISessionActor GetSessionActor()
     {
-        var player = _actorProxyFactory.CreateActorProxy<IPlayerActor>(
+        if (string.IsNullOrEmpty(Context.UserIdentifier))
+        {
+            throw new UnauthorizedAccessException("Sid not provided");
+        }
+
+        return _actorProxyFactory.CreateActorProxy<ISessionActor>(
             new ActorId(Context.UserIdentifier),
-            typeof(PlayerActor).Name);
-
-        await player.JoinGame(gameId, nickname, Context.ConnectionId);
-    }
-
-    public async Task LeaveGame(string gameId)
-    {
-        var player = _actorProxyFactory.CreateActorProxy<IPlayerActor>(
-            new ActorId(Context.UserIdentifier),
-            typeof(PlayerActor).Name);
-
-        await player.LeaveGame(gameId);
+            typeof(SessionActor).Name);
     }
 }

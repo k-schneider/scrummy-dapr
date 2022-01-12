@@ -5,19 +5,32 @@ namespace Scrummy.GameService.Api.Controllers;
 public class GameEventController : ControllerBase
 {
     private readonly IActorProxyFactory _actorProxyFactory;
+    private readonly IHubContext<GameHub> _hubContext;
 
-    public GameEventController(IActorProxyFactory actorProxyFactory)
+    public GameEventController(
+        IActorProxyFactory actorProxyFactory,
+        IHubContext<GameHub> hubContext)
     {
         _actorProxyFactory = actorProxyFactory;
+        _hubContext = hubContext;
     }
 
-    [HttpPost("PlayerDisconnectedFromGame")]
-    [Topic(Constants.DaprPubSubName, "PlayerDisconnectedFromGameEvent")]
-    public Task HandleAsync(PlayerDisconnectedFromGameEvent integrationEvent)
+
+    [HttpPost("SessionConnectedEvent")]
+    [Topic(Constants.DaprPubSubName, "SessionConnectedEvent")]
+    public Task HandleAsync(SessionConnectedEvent integrationEvent)
     {
-        return GetGameActor(integrationEvent.GameId).NotifyPlayerDisconnected(integrationEvent.PlayerId);
+        return Task.CompletedTask;
     }
 
+    [HttpPost("SessionDisconnectedEvent")]
+    [Topic(Constants.DaprPubSubName, "SessionDisconnectedEvent")]
+    public Task HandleAsync(SessionDisconnectedEvent integrationEvent)
+    {
+        return Task.CompletedTask;
+    }
+
+    /*
     [HttpPost("PlayerJoinedGame")]
     [Topic(Constants.DaprPubSubName, "PlayerJoinedGameEvent")]
     public Task HandleAsync(PlayerJoinedGameEvent integrationEvent)
@@ -38,4 +51,5 @@ public class GameEventController : ControllerBase
             new ActorId(gameId),
             typeof(GameActor).Name);
     }
+    */
 }

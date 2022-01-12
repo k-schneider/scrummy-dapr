@@ -2,8 +2,7 @@ namespace Scrummy.GameService.Api.Actors;
 
 public interface IGameActor : IActor
 {
-    Task NotifyPlayerDisconnected(string playerId, CancellationToken cancellationToken = default);
-    Task NotifyPlayerJoined(string playerId, string nickname, CancellationToken cancellationToken = default);
-    Task NotifyPlayerLeft(string playerId, CancellationToken cancellationToken = default);
-    Task Start(CancellationToken cancellationToken = default);
+    Task<(string sid, int playerId)> AddPlayer(string nickname, CancellationToken cancellationToken = default);
+    Task RemovePlayer(string sid, CancellationToken cancellationToken = default);
+    Task StartGame(CancellationToken cancellationToken = default);
 }
