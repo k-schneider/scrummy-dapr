@@ -1,7 +1,7 @@
 @page "/room/create"
 @inject IDispatcher Dispatcher
 @inject HttpClient HttpClient;
-@inject IState<IdentityState> IdentityState;
+@inject IState<LobbyState> LobbyState;
 @inject NavigationManager NavigationManager
 
 <PageTitle>Scrummy</PageTitle>
@@ -36,7 +36,7 @@
 
     protected override Task OnInitializedAsync()
     {
-        nickname = IdentityState.Value.Nickname;
+        nickname = LobbyState.Value.Nickname;
         return base.OnInitializedAsync();
     }
 
@@ -49,10 +49,9 @@
 
         Dispatcher.Dispatch(new RememberNicknameAction(nickname));
 
-        var response = await HttpClient.PostAsync("/g/lobby/create", null);
+        var response = await HttpClient.PostAsJsonAsync("/g/lobby/create", new { nickname });
         response.EnsureSuccessStatusCode();
-        var gameId = await response.Content.ReadAsStringAsync();
-
-        NavigationManager.NavigateTo($"/room/{gameId}");
+        var session = await response.Content.ReadAsAsync<Session>();
+        NavigationManager.NavigateTo($"/room/{session.GameId}");
     }
 }

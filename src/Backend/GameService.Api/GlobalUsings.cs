@@ -10,4 +10,5 @@ global using Scrummy.GameService.Api;
 global using Scrummy.GameService.Api.Actors;
 global using Scrummy.GameService.Api.Controllers;
 global using Scrummy.GameService.Api.IntegrationEvents;
+global using Scrummy.GameService.Api.Models;
 global using System.Reflection;

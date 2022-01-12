@@ -21,7 +21,6 @@ public class GameHub : Hub
 
         await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
         await session.AddConnection(Context.ConnectionId);
-
         await base.OnConnectedAsync();
     }
 

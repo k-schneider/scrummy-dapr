@@ -44,12 +44,5 @@ public class GameEventController : ControllerBase
     {
         return GetGameActor(integrationEvent.GameId).NotifyPlayerLeft(integrationEvent.PlayerId);
     }
-
-    private IGameActor GetGameActor(string gameId)
-    {
-        return _actorProxyFactory.CreateActorProxy<IGameActor>(
-            new ActorId(gameId),
-            typeof(GameActor).Name);
-    }
     */
 }

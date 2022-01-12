@@ -2,32 +2,44 @@ namespace Scrummy.BlazorClient.Store.GameUseCase;
 
 public class GameEffects
 {
-    private readonly IState<IdentityState> _identityState;
+    private readonly HttpClient _httpClient;
+    private readonly IState<LobbyState> _lobbyState;
     private readonly NavigationManager _navigationManager;
     private HubConnection? _hubConnection;
 
     public GameEffects(
-        IState<IdentityState> identityState,
-        NavigationManager navigationManager
-    )
+        HttpClient httpClient,
+        IState<LobbyState> lobbyState,
+        NavigationManager navigationManager)
     {
-        _identityState = identityState;
+        _httpClient = httpClient;
+        _lobbyState = lobbyState;
         _navigationManager = navigationManager;
     }
 
     [EffectMethod]
     public async Task HandleJoinGameAction(JoinGameAction action, IDispatcher dispatcher)
     {
-        if (_hubConnection == null)
+        /*
+        var session = _lobbyState.Value.Sessions.Where(g => g.GameId == action.GameId).FirstOrDefault();
+
+        if (session is null)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/g/lobby/join", new { Nickname = _lobbyState.Value.Nickname });
+            response.EnsureSuccessStatusCode();
+            session = await JsonSerializer.DeserializeAsync<Session>(await response.Content.ReadAsStreamAsync());
+            // todo: persist session in localstorage
+        }
+
+        if (_hubConnection is null)
         {
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl(_navigationManager.ToAbsoluteUri($"/h/gamehub?sid={_identityState.Value.Sid}"))
+                .WithUrl(_navigationManager.ToAbsoluteUri($"/h/gamehub?sid={session!.Sid}"))
                 .Build();
 
             await _hubConnection.StartAsync();
         }
-
-        await _hubConnection.InvokeAsync("JoinGame", action.GameId, _identityState.Value.Nickname);
+        */
 
         dispatcher.Dispatch(new JoinGameSuccessAction());
     }

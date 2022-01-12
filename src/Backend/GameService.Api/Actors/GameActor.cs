@@ -57,10 +57,8 @@ public class GameActor : Actor, IGameActor
     private string NewSid() => Guid.NewGuid().ToString();
     private int NextPlayerId() => _playerCounter++;
 
-    private ISessionActor GetSessionActor(string sid)
-    {
-        return ProxyFactory.CreateActorProxy<ISessionActor>(
+    private ISessionActor GetSessionActor(string sid) =>
+        ProxyFactory.CreateActorProxy<ISessionActor>(
             new ActorId(sid),
             typeof(SessionActor).Name);
-    }
 }

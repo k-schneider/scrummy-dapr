@@ -1,4 +1,4 @@
-﻿namespace GameService.Api.Controllers;
+﻿namespace Scrummy.GameService.Api.Controllers;
 
 [Route("api")]
 [ApiController]
@@ -12,10 +12,10 @@ public class GameController : ControllerBase
     }
 
     [HttpPost("lobby/create")]
-    public async Task<IActionResult> CreateGame(string nickname, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateGame(CreateGameRequest request, CancellationToken cancellationToken)
     {
         var gameId = await GetLobbyActor().CreateGame(cancellationToken);
-        var (sid, playerId) = await GetGameActor(gameId).AddPlayer(nickname, cancellationToken);
+        var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);
 
         return Ok(new
         {
@@ -26,9 +26,9 @@ public class GameController : ControllerBase
     }
 
     [HttpPost("game/{gameId}/join")]
-    public async Task<IActionResult> JoinGame(string gameId, string nickname, CancellationToken cancellationToken)
+    public async Task<IActionResult> JoinGame(string gameId, JoinGameRequest request, CancellationToken cancellationToken)
     {
-        var (sid, playerId) = await GetGameActor(gameId).AddPlayer(nickname, cancellationToken);
+        var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);
 
         return Ok(new
         {
@@ -39,23 +39,19 @@ public class GameController : ControllerBase
     }
 
     [HttpPost("game/{gameId}/leave")]
-    public async Task<IActionResult> LeaveGame(string gameId, string sid, CancellationToken cancellationToken)
+    public async Task<IActionResult> LeaveGame(string gameId, LeaveGameRequest request, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).RemovePlayer(sid, cancellationToken);
+        await GetGameActor(gameId).RemovePlayer(request.Sid, cancellationToken);
         return Ok();
     }
 
-    private IGameActor GetGameActor(string gameId)
-    {
-        return _actorProxyFactory.CreateActorProxy<IGameActor>(
+    private IGameActor GetGameActor(string gameId) =>
+        _actorProxyFactory.CreateActorProxy<IGameActor>(
             new ActorId(gameId),
             typeof(GameActor).Name);
-    }
 
-    private ILobbyActor GetLobbyActor()
-    {
-        return _actorProxyFactory.CreateActorProxy<ILobbyActor>(
+    private ILobbyActor GetLobbyActor() =>
+        _actorProxyFactory.CreateActorProxy<ILobbyActor>(
             new ActorId(Guid.Empty.ToString()),
             typeof(LobbyActor).Name);
-    }
 }

@@ -1,13 +1,12 @@
-namespace Scrummy.BlazorClient.Store.IdentityUseCase;
+namespace Scrummy.BlazorClient.Store.LobbyUseCase;
 
-public class IdentityEffects
+public class LobbyEffects
 {
     private const string NicknameKey = "nickname";
-    private const string SidKey = "sid";
 
     private readonly ILocalStorageService _localStorage;
 
-    public IdentityEffects(ILocalStorageService localStorage)
+    public LobbyEffects(ILocalStorageService localStorage)
     {
         _localStorage = localStorage;
     }
@@ -15,16 +14,9 @@ public class IdentityEffects
     [EffectMethod]
     public async Task HandleStoreInitializedAction(StoreInitializedAction _, IDispatcher dispatcher)
     {
-        var sid = await _localStorage.GetItemAsync<string?>(SidKey);
         var nickname = await _localStorage.GetItemAsync<string?>(NicknameKey) ?? string.Empty;
 
-        if (string.IsNullOrWhiteSpace(sid))
-        {
-            sid = Guid.NewGuid().ToString();
-            await _localStorage.SetItemAsync(SidKey, sid);
-        }
-
-        dispatcher.Dispatch(new HydrateIdentityAction(sid, nickname));
+        dispatcher.Dispatch(new HydrateLobbyAction(nickname));
     }
 
     [EffectMethod]

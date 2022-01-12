@@ -15,11 +15,9 @@ public class LobbyActor : Actor, ILobbyActor
     {
         string gameId = GenerateGameId();
 
-        var game = ProxyFactory.CreateActorProxy<IGameActor>(
-            new ActorId(gameId),
-            typeof(GameActor).Name);
+        await GetGameActor(gameId).StartGame(cancellationToken);
 
-        await game.StartGame(cancellationToken);
+        _games.Add(gameId);
 
         return gameId;
     }
@@ -48,4 +46,9 @@ public class LobbyActor : Actor, ILobbyActor
 
         return result;
     }
+
+    private IGameActor GetGameActor(string gameId) =>
+        ProxyFactory.CreateActorProxy<IGameActor>(
+            new ActorId(gameId),
+            typeof(GameActor).Name);
 }
