@@ -1,6 +1,7 @@
 namespace Scrummy.WebBlazor.Client.Store.LobbyUseCase;
 
 public record CreateRoomAction(string Nickname);
-public record CreateRoomSuccessAction();
+public record CreateRoomSuccessAction(GameSession Game);
+public record CreateRoomFailedAction();
 
-public record HydrateLobbyAction(string Nickname);
+public record InitializeLobbyAction(string Nickname, IEnumerable<GameSession> Games);

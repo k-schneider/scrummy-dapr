@@ -12,36 +12,23 @@ public class GameController : ControllerBase
     }
 
     [HttpPost("lobby/create")]
-    [ProducesResponseType(typeof(SessionDetail), 200)]
     public async Task<IActionResult> CreateGame(CreateGameRequest request, CancellationToken cancellationToken)
     {
         var gameId = await GetLobbyActor().CreateGame(cancellationToken);
         var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);
 
-        return Ok(new SessionDetail
-        {
-            GameId = gameId,
-            PlayerId = playerId,
-            Sid = sid
-        });
+        return Ok(new GameSession(gameId, playerId, sid));
     }
 
     [HttpPost("game/{gameId}/join")]
-    [ProducesResponseType(typeof(SessionDetail), 200)]
     public async Task<IActionResult> JoinGame(string gameId, JoinGameRequest request, CancellationToken cancellationToken)
     {
         var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);
 
-        return Ok(new SessionDetail
-        {
-            GameId = gameId,
-            PlayerId = playerId,
-            Sid = sid
-        });
+        return Ok(new GameSession(gameId, playerId, sid));
     }
 
     [HttpPost("game/{gameId}/leave")]
-    [ProducesResponseType(200)]
     public async Task<IActionResult> LeaveGame(string gameId, LeaveGameRequest request, CancellationToken cancellationToken)
     {
         await GetGameActor(gameId).RemovePlayer(request.Sid, cancellationToken);

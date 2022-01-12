@@ -1,4 +1,5 @@
 @page "/room/create"
+@inherits FluxorComponent
 @inject IDispatcher Dispatcher
 @inject HttpClient HttpClient;
 @inject IState<LobbyState> LobbyState;
@@ -37,6 +38,8 @@
     protected override Task OnInitializedAsync()
     {
         nickname = LobbyState.Value.Nickname;
+        SubscribeToAction<InitializeLobbyAction>(action => nickname = action.Nickname);
+
         return base.OnInitializedAsync();
     }
 
