@@ -1,0 +1,10 @@
+﻿global using Blazored.LocalStorage;
+global using Fluxor;
+global using Microsoft.AspNetCore.Components;
+global using Microsoft.AspNetCore.Components.Web;
+global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+global using Microsoft.AspNetCore.SignalR.Client;
+global using Scrummy.WebBlazor.Client;
+global using Scrummy.WebBlazor.Client.Store.LobbyUseCase;
+global using System.Net.Http.Json;
+global using System.Text.Json;

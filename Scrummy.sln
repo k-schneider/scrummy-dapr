@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{3873251E-3C40-4A88-8973-6486BA297FDC}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebBlazor", "WebBlazor", "{3873251E-3C40-4A88-8973-6486BA297FDC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{C80520E7-57A3-4E46-93D7-657C8CAC47FB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GameService", "GameService", "{C80520E7-57A3-4E46-93D7-657C8CAC47FB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorClient.Host", "src\Frontend\BlazorClient.Host\BlazorClient.Host.csproj", "{3FE82968-16E4-4E87-88C0-FBE4CCBE5263}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBlazor.Server", "src\WebBlazor\WebBlazor.Server\WebBlazor.Server.csproj", "{3FE82968-16E4-4E87-88C0-FBE4CCBE5263}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorClient", "src\Frontend\BlazorClient\BlazorClient.csproj", "{17C575B1-27C2-4805-A639-32677C7AAFC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBlazor.Client", "src\WebBlazor\WebBlazor.Client\WebBlazor.Client.csproj", "{17C575B1-27C2-4805-A639-32677C7AAFC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameService.Api", "src\Backend\GameService.Api\GameService.Api.csproj", "{DCF7D28D-92D8-4D68-8690-BDDB86753849}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameService.Api", "src\GameService\GameService.Api\GameService.Api.csproj", "{DCF7D28D-92D8-4D68-8690-BDDB86753849}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "__", "__", "{0250204A-D4D6-41D1-8B9C-ECACE85CFB7E}"
 	ProjectSection(SolutionItems) = preProject

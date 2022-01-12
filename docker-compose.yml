@@ -5,10 +5,10 @@ services:
     image: ${DOCKER_REGISTRY-}game.service
     build:
       context: .
-      dockerfile: src/Backend/GameService.Api/Dockerfile
+      dockerfile: src/GameService/GameService.Api/Dockerfile
 
-  blazor-client:
-    image: ${DOCKER_REGISTRY-}blazor.client
+  web-blazor:
+    image: ${DOCKER_REGISTRY-}web-blazor
     build:
       context: .
-      dockerfile: src/Frontend/BlazorClient.Host/Dockerfile
+      dockerfile: src/WebBlazor/WebBlazor.Server/Dockerfile

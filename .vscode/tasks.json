@@ -7,7 +7,7 @@
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/src/Backend/GameService.Api/GameService.Api.csproj",
+        "${workspaceFolder}/src/GameService/GameService.Api/GameService.Api.csproj",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
@@ -20,13 +20,13 @@
       "args": [
         "watch",
         "run",
-        "${workspaceFolder}/src/Backend/GameService.Api/GameService.Api.csproj",
+        "${workspaceFolder}/src/GameService/GameService.Api/GameService.Api.csproj",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/src/Backend/GameService.Api"
+        "cwd": "${workspaceFolder}/src/GameService/GameService.Api"
       }
     },
     {
@@ -42,31 +42,31 @@
       "appId": "game-service"
     },
     {
-      "label": "blazor-client-dotnet-build",
+      "label": "web-blazor-dotnet-build",
       "command": "dotnet",
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/src/Frontend/BlazorClient.Host/BlazorClient.Host.csproj",
+        "${workspaceFolder}/src/WebBlazor/WebBlazor.Server/WebBlazor.Server.csproj",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "blazor-client-dotnet-watch",
+      "label": "web-blazor-dotnet-watch",
       "command": "dotnet",
       "type": "process",
       "args": [
         "watch",
         "run",
-        "${workspaceFolder}/src/Frontend/BlazorClient.Host/BlazorClient.Host.csproj",
+        "${workspaceFolder}/src/WebBlazor/WebBlazor.Server/WebBlazor.Server.csproj",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/src/Frontend/BlazorClient.Host"
+        "cwd": "${workspaceFolder}/src/WebBlazor/WebBlazor.Server"
       }
     }
   ]

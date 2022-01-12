@@ -6,38 +6,38 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "game-service-daprd-debug",
-      "program": "${workspaceFolder}/src/Backend/GameService.Api/bin/Debug/net6.0/Scrummy.GameService.Api.dll",
-      "cwd": "${workspaceFolder}/src/Backend/GameService.Api",
+      "program": "${workspaceFolder}/src/GameService/GameService.Api/bin/Debug/net6.0/Scrummy.GameService.Api.dll",
+      "cwd": "${workspaceFolder}/src/GameService/GameService.Api",
       "postDebugTask": "game-service-daprd-down"
     },
     {
-      "name": "Launch Blazor Client",
+      "name": "Launch Web Blazor",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "blazor-client-dotnet-build",
-      "program": "${workspaceFolder}/src/Frontend/BlazorClient.Host/bin/Debug/net6.0/Scrummy.BlazorClient.Host.dll",
-      "cwd": "${workspaceFolder}/src/Frontend/BlazorClient.Host"
+      "preLaunchTask": "web-blazor-dotnet-build",
+      "program": "${workspaceFolder}/src/WebBlazor/WebBlazor.Server/bin/Debug/net6.0/Scrummy.WebBlazor.Server.dll",
+      "cwd": "${workspaceFolder}/src/WebBlazor/WebBlazor.Server"
     },
     {
-      "name": "Launch Blazor Client with WASM Debugging",
+      "name": "Launch Web Blazor with WASM Debugging",
       "type": "blazorwasm",
       "request": "launch",
-      "preLaunchTask": "blazor-client-dotnet-build",
+      "preLaunchTask": "web-blazor-dotnet-build",
       "hosted": true,
-      "program": "${workspaceFolder}/src/Frontend/BlazorClient.Host/bin/Debug/net6.0/Scrummy.BlazorClient.Host.dll",
-      "cwd": "${workspaceFolder}/src/Frontend/BlazorClient",
+      "program": "${workspaceFolder}/src/WebBlazor/WebBlazor.Server/bin/Debug/net6.0/Scrummy.WebBlazor.Server.dll",
+      "cwd": "${workspaceFolder}/src/WebBlazor/WebBlazor.Client",
       "url": "http://localhost:5102"
     },
     {
-      "name": "Launch Blazor Client with Watch",
+      "name": "Launch Web Blazor with Watch",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "blazor-client-dotnet-watch",
-      "program": "${workspaceFolder}/src/Frontend/BlazorClient.Host/bin/Debug/net6.0/Scrummy.BlazorClient.Host.dll",
-      "cwd": "${workspaceFolder}/src/Frontend/BlazorClient.Host"
+      "preLaunchTask": "web-blazor-dotnet-watch",
+      "program": "${workspaceFolder}/src/WebBlazor/WebBlazor.Server/bin/Debug/net6.0/Scrummy.WebBlazor.Server.dll",
+      "cwd": "${workspaceFolder}/src/WebBlazor/WebBlazor.Server"
     },
     {
-      "name": "Blazor Client Attach",
+      "name": "Web Blazor Attach",
       "type": "blazorwasm",
       "request": "attach",
       "url": "http://localhost:5102"
@@ -53,14 +53,14 @@
       "name": "Launch Scrummy",
       "configurations": [
         "Launch Game Service with Dapr",
-        "Launch Blazor Client"
+        "Launch Web Blazor"
       ]
     },
     {
-      "name": "Launch Scrummy with Blazor Client Watch",
+      "name": "Launch Scrummy with Web Blazor Watch",
       "configurations": [
         "Launch Game Service with Dapr",
-        "Launch Blazor Client with Watch"
+        "Launch Web Blazor with Watch"
       ]
     }
   ]
