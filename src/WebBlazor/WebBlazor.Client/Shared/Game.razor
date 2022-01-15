@@ -1,0 +1,25 @@
+@inherits FluxorComponent
+@implements IDisposable
+@inject IDispatcher Dispatcher
+@inject IState<GameState> GameState
+
+<PageTitle>Scrummy - Playing</PageTitle>
+
+<div>The actual Game</div>
+<a href="/">Leave Game</a>
+
+@code {
+    [Parameter]
+    public string GameId { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Dispatcher.Dispatch(new ConnectToGameAction(GameId));
+        await base.OnInitializedAsync();
+    }
+
+    void IDisposable.Dispose()
+    {
+        Dispatcher.Dispatch(new DisconnectFromGameAction());
+    }
+}

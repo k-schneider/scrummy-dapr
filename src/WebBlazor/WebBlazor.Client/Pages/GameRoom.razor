@@ -1,31 +1,23 @@
 ﻿@page "/room/{gameId}"
 @inherits FluxorComponent
-@implements IDisposable
-@inject IDispatcher Dispatcher
-@inject IState<GameState> GameState
-@inject HttpClient HttpClient;
-@inject NavigationManager NavigationManager
+@inject IState<LobbyState> LobbyState
 
 <PageTitle>Scrummy</PageTitle>
 
-<p>Joining: @GameState.Value.Joining</p>
-<p>Leaving: @GameState.Value.Leaving</p>
+@if (GameId.Equals("create", StringComparison.OrdinalIgnoreCase))
+{
+    <CreateGame />
+}
+else if (LobbyState.Value.Games.ContainsKey(GameId))
+{
+    <Game GameId="@GameId" />
+}
+else
+{
+    <JoinGame GameId="@GameId" />
+}
 
 @code {
-    private string nickname = string.Empty;
-
     [Parameter]
     public string GameId { get; set; } = null!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        Dispatcher.Dispatch(new JoinGameAction(GameId));
-
-        await base.OnInitializedAsync();
-    }
-
-    void IDisposable.Dispose()
-    {
-        Dispatcher.Dispatch(new LeaveGameAction());
-    }
 }

@@ -27,10 +27,49 @@ public static class LobbyReducers
         };
 
     [ReducerMethod]
-    public static LobbyState ReduceCreateRoomSuccessAction(LobbyState state, CreateRoomSuccessAction action) =>
-        state with
+    public static LobbyState ReduceCreateRoomSuccessAction(LobbyState state, CreateRoomSuccessAction action)
+    {
+        var games = new Dictionary<string, GameSession>()
+            .Concat(state.Games)
+            .ToDictionary(x => x.Key, x => x.Value);
+
+        games[action.Game.GameId] = action.Game;
+
+        return state with
         {
             CreatingRoom = false,
-            Games = state.Games.Append(action.Game)
+            Games = games
         };
+    }
+
+    [ReducerMethod]
+    public static LobbyState ReduceJoinRoomAction(LobbyState state, JoinRoomAction action) =>
+        state with
+        {
+            JoiningRoom = true,
+            Nickname = action.Nickname
+        };
+
+    [ReducerMethod]
+    public static LobbyState ReducJoinRoomFailedAction(LobbyState state, JoinRoomFailedAction action) =>
+        state with
+        {
+            JoiningRoom = false
+        };
+
+    [ReducerMethod]
+    public static LobbyState ReduceJoinRoomSuccessAction(LobbyState state, JoinRoomSuccessAction action)
+    {
+        var games = new Dictionary<string, GameSession>()
+            .Concat(state.Games)
+            .ToDictionary(x => x.Key, x => x.Value);
+
+        games[action.Game.GameId] = action.Game;
+
+        return state with
+        {
+            JoiningRoom = false,
+            Games = games
+        };
+    }
 }

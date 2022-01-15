@@ -1,11 +1,8 @@
-@page "/room/create"
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
-@inject HttpClient HttpClient;
 @inject IState<LobbyState> LobbyState;
-@inject NavigationManager NavigationManager
 
-<PageTitle>Scrummy</PageTitle>
+<PageTitle>Scrummy - New Game</PageTitle>
 
 <div class="grid place-items-center h-screen">
     <div class="bg-white rounded-lg shadow-xl sm:max-w-lg mx-4">
@@ -38,8 +35,6 @@
     protected override Task OnInitializedAsync()
     {
         nickname = LobbyState.Value.Nickname;
-        SubscribeToAction<InitializeLobbyAction>(action => nickname = action.Nickname);
-
         return base.OnInitializedAsync();
     }
 

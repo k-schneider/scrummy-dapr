@@ -3,30 +3,44 @@ namespace Scrummy.WebBlazor.Client.Store.GameUseCase;
 public static class GameReducers
 {
     [ReducerMethod]
-    public static GameState ReduceJoinGameAction(GameState state, JoinGameAction _) =>
+    public static GameState ReduceConnectToGameAction(GameState state, ConnectToGameAction _) =>
         state with
         {
-            Joining = true
+            Connecting = true
         };
 
     [ReducerMethod]
-    public static GameState ReduceJoinGameSuccessAction(GameState state, JoinGameSuccessAction _) =>
+    public static GameState ReduceConnectToGameSuccessAction(GameState state, ConnectToGameSuccessAction _) =>
         state with
         {
-            Joining = false
+            Connecting = false
         };
 
     [ReducerMethod]
-    public static GameState ReduceLeaveGameAction(GameState state, LeaveGameAction _) =>
+    public static GameState ReduceConnectToGameFailedAction(GameState state, ConnectToGameFailedAction _) =>
         state with
         {
-            Leaving = true
+            Connecting = false
         };
 
     [ReducerMethod]
-    public static GameState ReduceLeaveGameSuccessAction(GameState state, LeaveGameSuccessAction _) =>
+    public static GameState ReduceDisconnectFromGameAction(GameState state, DisconnectFromGameAction _) =>
         state with
         {
-            Leaving = false
+            Disconnecting = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceDisconnectFromGameSuccessAction(GameState state, DisconnectFromGameSuccessAction _) =>
+        state with
+        {
+            Disconnecting = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceDisconnectFromGameFailedAction(GameState state, DisconnectFromGameFailedAction _) =>
+        state with
+        {
+            Disconnecting = false
         };
 }

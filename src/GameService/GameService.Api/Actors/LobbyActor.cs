@@ -22,6 +22,11 @@ public class LobbyActor : Actor, ILobbyActor
         return gameId;
     }
 
+    public Task<bool> GameExists(string gameId, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_games.Contains(gameId));
+    }
+
     public Task NotifyGameEnded(string gameId, CancellationToken cancellationToken = default)
     {
         _games.Remove(gameId);

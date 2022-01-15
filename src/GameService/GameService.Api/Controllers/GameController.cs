@@ -23,6 +23,11 @@ public class GameController : ControllerBase
     [HttpPost("game/{gameId}/join")]
     public async Task<IActionResult> JoinGame(string gameId, JoinGameRequest request, CancellationToken cancellationToken)
     {
+        if (!await GetLobbyActor().GameExists(gameId))
+        {
+            return NotFound();
+        }
+
         var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);
 
         return Ok(new GameSession(gameId, playerId, sid));

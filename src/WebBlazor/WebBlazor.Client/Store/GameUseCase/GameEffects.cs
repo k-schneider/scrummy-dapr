@@ -18,41 +18,50 @@ public class GameEffects
     }
 
     [EffectMethod]
-    public async Task HandleJoinGameAction(JoinGameAction action, IDispatcher dispatcher)
+    public async Task HandleConnectToGameAction(ConnectToGameAction action, IDispatcher dispatcher)
     {
-        /*
-        var session = _lobbyState.Value.Sessions.Where(g => g.GameId == action.GameId).FirstOrDefault();
-
-        if (session is null)
+        try
         {
-            var response = await _httpClient.PostAsJsonAsync("/g/lobby/join", new { Nickname = _lobbyState.Value.Nickname });
-            response.EnsureSuccessStatusCode();
-            session = await JsonSerializer.DeserializeAsync<Session>(await response.Content.ReadAsStreamAsync());
-            // todo: persist session in localstorage
-        }
+            var game = _lobbyState.Value.Games[action.GameId];
 
-        if (_hubConnection is null)
+            if (game is null)
+            {
+                throw new Exception("Must join game prior to connecting to it.");
+            }
+
+            if (_hubConnection is null)
+            {
+                _hubConnection = new HubConnectionBuilder()
+                    .WithUrl(_navigationManager.ToAbsoluteUri($"/h/gamehub?sid={game.Sid}"))
+                    .Build();
+
+                await _hubConnection.StartAsync();
+            }
+
+            dispatcher.Dispatch(new ConnectToGameSuccessAction());
+        }
+        catch (Exception exc)
         {
-            _hubConnection = new HubConnectionBuilder()
-                .WithUrl(_navigationManager.ToAbsoluteUri($"/h/gamehub?sid={session!.Sid}"))
-                .Build();
-
-            await _hubConnection.StartAsync();
+            dispatcher.Dispatch(new ConnectToGameFailedAction(exc.Message));
         }
-        */
-
-        dispatcher.Dispatch(new JoinGameSuccessAction());
     }
 
     [EffectMethod]
-    public async Task HandleLeaveGameAction(LeaveGameAction _, IDispatcher dispatcher)
+    public async Task HandleDisconnectFromGameAction(DisconnectFromGameAction _, IDispatcher dispatcher)
     {
-        if (_hubConnection != null)
+        try
         {
-            await _hubConnection.DisposeAsync();
-            _hubConnection = null;
-        }
+            if (_hubConnection != null)
+            {
+                await _hubConnection.DisposeAsync();
+                _hubConnection = null;
+            }
 
-        dispatcher.Dispatch(new LeaveGameSuccessAction());
+            dispatcher.Dispatch(new DisconnectFromGameSuccessAction());
+        }
+        catch (Exception exc)
+        {
+            dispatcher.Dispatch(new DisconnectFromGameFailedAction(exc.Message));
+        }
     }
 }
