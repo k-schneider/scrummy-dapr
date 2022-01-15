@@ -9,3 +9,7 @@ public record CreateRoomFailedAction(string Error);
 public record JoinRoomAction(string GameId, string Nickname);
 public record JoinRoomSuccessAction(GameSession Game);
 public record JoinRoomFailedAction(string Error);
+
+public record LeaveRoomAction(string GameId);
+public record LeaveRoomSuccessAction(GameSession Game);
+public record LeaveRoomFailedAction(string Error);

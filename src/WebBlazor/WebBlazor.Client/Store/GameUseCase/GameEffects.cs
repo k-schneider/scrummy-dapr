@@ -22,9 +22,9 @@ public class GameEffects
     {
         try
         {
-            var game = _lobbyState.Value.Games[action.GameId];
+            var gameSession = _lobbyState.Value.Games[action.GameId];
 
-            if (game is null)
+            if (gameSession is null)
             {
                 throw new Exception("Must join game prior to connecting to it.");
             }
@@ -32,7 +32,7 @@ public class GameEffects
             if (_hubConnection is null)
             {
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(_navigationManager.ToAbsoluteUri($"/h/gamehub?sid={game.Sid}"))
+                    .WithUrl(_navigationManager.ToAbsoluteUri($"/h/gamehub?sid={gameSession.Sid}"))
                     .Build();
 
                 await _hubConnection.StartAsync();

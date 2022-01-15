@@ -46,12 +46,37 @@ public class GameActor : Actor, IGameActor
             Nickname = nickname
         });
 
+        await _dapr.PublishEventAsync(
+            Constants.DaprPubSubName,
+            typeof(PlayerJoinedGameEvent).Name,
+            new PlayerJoinedGameEvent(sid, playerId, nickname),
+            cancellationToken);
+
         return (sid, playerId);
     }
 
-    public Task RemovePlayer(string sid, CancellationToken cancellationToken = default)
+    public async Task RemovePlayer(string sid, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var player = _players.Where(p => p.Sid == sid).FirstOrDefault();
+
+        if (player == null)
+        {
+            throw new InvalidOperationException("Player not found");
+        }
+
+        _players.Remove(player);
+
+        await _dapr.PublishEventAsync(
+            Constants.DaprPubSubName,
+            typeof(PlayerLeftGameEvent).Name,
+            new PlayerLeftGameEvent(player.Sid, player.PlayerId, player.Nickname),
+            cancellationToken);
+
+        // todo: considerations...
+        //   clear gameId SessionActor?
+        //   remove from hub group?
+        //   terminate connection somehow?
+        //   if no more players left, end game?
     }
 
     private string NewSid() => Guid.NewGuid().ToString();

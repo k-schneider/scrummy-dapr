@@ -1,3 +1,3 @@
 namespace Scrummy.GameService.Api.IntegrationEvents;
 
-public record PlayerLeftGameEvent(string PlayerId, string GameId) : IntegrationEvent;
+public record PlayerLeftGameEvent(string Sid, int PlayerId, string GameId) : IntegrationEvent;

@@ -77,6 +77,30 @@ public class LobbyEffects
         _navigationManager.NavigateTo($"/room/{action.Game.GameId}");
     }
 
+    [EffectMethod]
+    public async Task HandleLeaveRoomAction(LeaveRoomAction action, IDispatcher dispatcher)
+    {
+        await RememberNickname();
+
+        try
+        {
+            var gameSession = _lobbyState.Value.Games[action.GameId];
+            await _appApi.LeaveGame(action.GameId, new LeaveGameRequest(gameSession.Sid));
+            dispatcher.Dispatch(new LeaveRoomSuccessAction(gameSession));
+        }
+        catch (Exception exc)
+        {
+            dispatcher.Dispatch(new LeaveRoomFailedAction(exc.Message));
+        }
+    }
+
+    [EffectMethod]
+    public async Task HandleLeaveRoomSuccessAction(LeaveRoomSuccessAction action, IDispatcher _)
+    {
+        await RememberGames();
+        _navigationManager.NavigateTo($"/");
+    }
+
     private async Task RememberGames()
     {
         await _localStorage.SetItemAsync(GamesKey, _lobbyState.Value.Games);

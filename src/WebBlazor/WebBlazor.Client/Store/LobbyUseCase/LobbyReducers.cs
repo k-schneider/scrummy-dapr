@@ -51,7 +51,7 @@ public static class LobbyReducers
         };
 
     [ReducerMethod]
-    public static LobbyState ReducJoinRoomFailedAction(LobbyState state, JoinRoomFailedAction action) =>
+    public static LobbyState ReduceJoinRoomFailedAction(LobbyState state, JoinRoomFailedAction action) =>
         state with
         {
             JoiningRoom = false
@@ -69,6 +69,36 @@ public static class LobbyReducers
         return state with
         {
             JoiningRoom = false,
+            Games = games
+        };
+    }
+
+    [ReducerMethod]
+    public static LobbyState ReduceLeaveRoomAction(LobbyState state, LeaveRoomAction action) =>
+        state with
+        {
+            LeavingRoom = true
+        };
+
+    [ReducerMethod]
+    public static LobbyState ReduceLeaveRoomFailedAction(LobbyState state, LeaveRoomFailedAction action) =>
+        state with
+        {
+            LeavingRoom = false
+        };
+
+    [ReducerMethod]
+    public static LobbyState ReduceLeaveRoomSuccessAction(LobbyState state, LeaveRoomSuccessAction action)
+    {
+        var games = new Dictionary<string, GameSession>()
+            .Concat(state.Games)
+            .ToDictionary(x => x.Key, x => x.Value);
+
+        games.Remove(action.Game.GameId);
+
+        return state with
+        {
+            LeavingRoom = false,
             Games = games
         };
     }

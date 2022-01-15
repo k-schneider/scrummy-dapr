@@ -6,7 +6,7 @@
 <PageTitle>Scrummy - Playing</PageTitle>
 
 <div>The actual Game</div>
-<a href="/">Leave Game</a>
+<button @onclick="LeaveRoom">Leave Room</button>
 
 @code {
     [Parameter]
@@ -16,6 +16,11 @@
     {
         Dispatcher.Dispatch(new ConnectToGameAction(GameId));
         await base.OnInitializedAsync();
+    }
+
+    private void LeaveRoom()
+    {
+        Dispatcher.Dispatch(new LeaveRoomAction(GameId));
     }
 
     void IDisposable.Dispose()
