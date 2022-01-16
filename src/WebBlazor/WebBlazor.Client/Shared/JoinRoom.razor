@@ -2,7 +2,7 @@
 @inject IDispatcher Dispatcher
 @inject IState<LobbyState> LobbyState;
 
-<PageTitle>Scrummy - New Game</PageTitle>
+<PageTitle>Scrummy - Join Game</PageTitle>
 
 <div class="grid place-items-center h-screen">
     <div class="bg-white rounded-lg shadow-xl sm:max-w-lg mx-4">
@@ -22,14 +22,17 @@
             </div>
         </div>
         <div class="px-4 py-3 sm:px-6">
-            <button type="button" @onclick="CreateRoom" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                Create Room
+            <button type="button" @onclick="Join" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                Join Room
             </button>
         </div>
     </div>
 </div>
 
 @code {
+    [Parameter]
+    public string GameId { get; set; } = null!;
+
     private string nickname = string.Empty;
 
     protected override Task OnInitializedAsync()
@@ -38,13 +41,13 @@
         return base.OnInitializedAsync();
     }
 
-    private void CreateRoom()
+    private void Join()
     {
         if (string.IsNullOrWhiteSpace(nickname))
         {
             return;
         }
 
-        Dispatcher.Dispatch(new CreateRoomAction(nickname));
+        Dispatcher.Dispatch(new JoinRoomAction(GameId, nickname));
     }
 }

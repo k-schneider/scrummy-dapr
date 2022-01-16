@@ -6,7 +6,7 @@
 
 @if (GameId.Equals("create", StringComparison.OrdinalIgnoreCase))
 {
-    <CreateGame />
+    <CreateRoom />
 }
 else if (LobbyState.Value.Games.ContainsKey(GameId))
 {
@@ -14,7 +14,7 @@ else if (LobbyState.Value.Games.ContainsKey(GameId))
 }
 else
 {
-    <JoinGame GameId="@GameId" />
+    <JoinRoom GameId="@GameId" />
 }
 
 @code {
