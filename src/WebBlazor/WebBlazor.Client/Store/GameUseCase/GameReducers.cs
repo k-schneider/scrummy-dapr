@@ -43,4 +43,25 @@ public static class GameReducers
         {
             Disconnecting = false
         };
+
+    [ReducerMethod]
+    public static GameState ReduceLeaveGameAction(GameState state, LeaveGameAction action) =>
+        state with
+        {
+            Leaving = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceLeaveGameFailedAction(GameState state, LeaveGameFailedAction action) =>
+        state with
+        {
+            Leaving = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceLeaveGameSuccessAction(GameState state, LeaveGameSuccessAction action) =>
+        state with
+        {
+            Leaving = false
+        };
 }

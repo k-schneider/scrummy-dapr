@@ -2,16 +2,19 @@ namespace Scrummy.WebBlazor.Client.Store.GameUseCase;
 
 public class GameEffects
 {
+    private readonly IAppApi _appApi;
     private readonly HttpClient _httpClient;
     private readonly IState<LobbyState> _lobbyState;
     private readonly NavigationManager _navigationManager;
     private HubConnection? _hubConnection;
 
     public GameEffects(
+        IAppApi appApi,
         HttpClient httpClient,
         IState<LobbyState> lobbyState,
         NavigationManager navigationManager)
     {
+        _appApi = appApi;
         _httpClient = httpClient;
         _lobbyState = lobbyState;
         _navigationManager = navigationManager;
@@ -63,5 +66,28 @@ public class GameEffects
         {
             dispatcher.Dispatch(new DisconnectFromGameFailedAction(exc.Message));
         }
+    }
+
+    [EffectMethod]
+    public async Task HandleLeaveGameAction(LeaveGameAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            var game = _lobbyState.Value.Games[action.GameId];
+            await _appApi.LeaveGame(action.GameId, new LeaveGameRequest(game.Sid));
+            dispatcher.Dispatch(new LeaveGameSuccessAction(game.GameId));
+        }
+        catch (Exception exc)
+        {
+            dispatcher.Dispatch(new LeaveGameFailedAction(exc.Message));
+        }
+    }
+
+    [EffectMethod]
+    public Task HandleLeaveGameSuccessAction(LeaveGameSuccessAction action, IDispatcher dispatcher)
+    {
+        _navigationManager.NavigateTo($"/");
+        dispatcher.Dispatch(new ForgetGameAction(action.GameId));
+        return Task.CompletedTask;
     }
 }

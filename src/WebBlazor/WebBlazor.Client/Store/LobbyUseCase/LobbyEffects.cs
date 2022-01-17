@@ -32,7 +32,7 @@ public class LobbyEffects
     }
 
     [EffectMethod]
-    public async Task HandleCreateRoomAction(CreateRoomAction action, IDispatcher dispatcher)
+    public async Task HandleCreateGameAction(CreateGameAction action, IDispatcher dispatcher)
     {
         await RememberNickname();
 
@@ -40,23 +40,23 @@ public class LobbyEffects
         {
             var response = await _appApi.CreateGame(new CreateGameRequest(action.Nickname));
             var gameMembership = new GameMembership(response.GameId, response.PlayerId, response.Sid);
-            dispatcher.Dispatch(new CreateRoomSuccessAction(gameMembership));
+            dispatcher.Dispatch(new CreateGameSuccessAction(gameMembership));
         }
         catch (Exception exc)
         {
-            dispatcher.Dispatch(new CreateRoomFailedAction(exc.Message));
+            dispatcher.Dispatch(new CreateGameFailedAction(exc.Message));
         }
     }
 
     [EffectMethod]
-    public async Task HandleCreateRoomSuccessAction(CreateRoomSuccessAction action, IDispatcher _)
+    public async Task HandleCreateGameSuccessAction(CreateGameSuccessAction action, IDispatcher _)
     {
         await RememberGames();
         _navigationManager.NavigateTo($"/room/{action.Game.GameId}");
     }
 
     [EffectMethod]
-    public async Task HandleJoinRoomAction(JoinRoomAction action, IDispatcher dispatcher)
+    public async Task HandleJoinGameAction(JoinGameAction action, IDispatcher dispatcher)
     {
         await RememberNickname();
 
@@ -64,43 +64,25 @@ public class LobbyEffects
         {
             var response = await _appApi.JoinGame(action.GameId, new JoinGameRequest(action.Nickname));
             var game = new GameMembership(response.GameId, response.PlayerId, response.Sid);
-            dispatcher.Dispatch(new JoinRoomSuccessAction(game));
+            dispatcher.Dispatch(new JoinGameSuccessAction(game));
         }
         catch (Exception exc)
         {
-            dispatcher.Dispatch(new JoinRoomFailedAction(exc.Message));
+            dispatcher.Dispatch(new JoinGameFailedAction(exc.Message));
         }
     }
 
     [EffectMethod]
-    public async Task HandleJoinRoomSuccessAction(JoinRoomSuccessAction action, IDispatcher _)
+    public async Task HandleJoinGameSuccessAction(JoinGameSuccessAction action, IDispatcher _)
     {
         await RememberGames();
         _navigationManager.NavigateTo($"/room/{action.Game.GameId}");
     }
 
     [EffectMethod]
-    public async Task HandleLeaveRoomAction(LeaveRoomAction action, IDispatcher dispatcher)
-    {
-        await RememberNickname();
-
-        try
-        {
-            var game = _lobbyState.Value.Games[action.GameId];
-            await _appApi.LeaveGame(action.GameId, new LeaveGameRequest(game.Sid));
-            dispatcher.Dispatch(new LeaveRoomSuccessAction(game.GameId));
-        }
-        catch (Exception exc)
-        {
-            dispatcher.Dispatch(new LeaveRoomFailedAction(exc.Message));
-        }
-    }
-
-    [EffectMethod]
-    public async Task HandleLeaveRoomSuccessAction(LeaveRoomSuccessAction action, IDispatcher _)
+    public async Task HandleForgetGameAction(ForgetGameAction action, IDispatcher _)
     {
         await RememberGames();
-        _navigationManager.NavigateTo($"/");
     }
 
     private async Task RememberGames()

@@ -12,22 +12,22 @@ public static class LobbyReducers
         };
 
     [ReducerMethod]
-    public static LobbyState ReduceCreateRoomAction(LobbyState state, CreateRoomAction action) =>
+    public static LobbyState ReduceCreateGameAction(LobbyState state, CreateGameAction action) =>
         state with
         {
-            CreatingRoom = true,
+            CreatingGame = true,
             Nickname = action.Nickname
         };
 
     [ReducerMethod]
-    public static LobbyState ReduceCreateRoomFailedAction(LobbyState state, CreateRoomFailedAction action) =>
+    public static LobbyState ReduceCreateGameFailedAction(LobbyState state, CreateGameFailedAction action) =>
         state with
         {
-            CreatingRoom = false
+            CreatingGame = false
         };
 
     [ReducerMethod]
-    public static LobbyState ReduceCreateRoomSuccessAction(LobbyState state, CreateRoomSuccessAction action)
+    public static LobbyState ReduceCreateGameSuccessAction(LobbyState state, CreateGameSuccessAction action)
     {
         var games = new Dictionary<string, GameMembership>()
             .Concat(state.Games)
@@ -37,58 +37,13 @@ public static class LobbyReducers
 
         return state with
         {
-            CreatingRoom = false,
+            CreatingGame = false,
             Games = games
         };
     }
 
     [ReducerMethod]
-    public static LobbyState ReduceJoinRoomAction(LobbyState state, JoinRoomAction action) =>
-        state with
-        {
-            JoiningRoom = true,
-            Nickname = action.Nickname
-        };
-
-    [ReducerMethod]
-    public static LobbyState ReduceJoinRoomFailedAction(LobbyState state, JoinRoomFailedAction action) =>
-        state with
-        {
-            JoiningRoom = false
-        };
-
-    [ReducerMethod]
-    public static LobbyState ReduceJoinRoomSuccessAction(LobbyState state, JoinRoomSuccessAction action)
-    {
-        var games = new Dictionary<string, GameMembership>()
-            .Concat(state.Games)
-            .ToDictionary(x => x.Key, x => x.Value);
-
-        games[action.Game.GameId] = action.Game;
-
-        return state with
-        {
-            JoiningRoom = false,
-            Games = games
-        };
-    }
-
-    [ReducerMethod]
-    public static LobbyState ReduceLeaveRoomAction(LobbyState state, LeaveRoomAction action) =>
-        state with
-        {
-            LeavingRoom = true
-        };
-
-    [ReducerMethod]
-    public static LobbyState ReduceLeaveRoomFailedAction(LobbyState state, LeaveRoomFailedAction action) =>
-        state with
-        {
-            LeavingRoom = false
-        };
-
-    [ReducerMethod]
-    public static LobbyState ReduceLeaveRoomSuccessAction(LobbyState state, LeaveRoomSuccessAction action)
+    public static LobbyState ReduceForgetGameAction(LobbyState state, ForgetGameAction action)
     {
         var games = new Dictionary<string, GameMembership>()
             .Concat(state.Games)
@@ -98,7 +53,37 @@ public static class LobbyReducers
 
         return state with
         {
-            LeavingRoom = false,
+            Games = games
+        };
+    }
+
+    [ReducerMethod]
+    public static LobbyState ReduceJoinGameAction(LobbyState state, JoinGameAction action) =>
+        state with
+        {
+            JoiningGame = true,
+            Nickname = action.Nickname
+        };
+
+    [ReducerMethod]
+    public static LobbyState ReduceJoinGameFailedAction(LobbyState state, JoinGameFailedAction action) =>
+        state with
+        {
+            JoiningGame = false
+        };
+
+    [ReducerMethod]
+    public static LobbyState ReduceJoinGameSuccessAction(LobbyState state, JoinGameSuccessAction action)
+    {
+        var games = new Dictionary<string, GameMembership>()
+            .Concat(state.Games)
+            .ToDictionary(x => x.Key, x => x.Value);
+
+        games[action.Game.GameId] = action.Game;
+
+        return state with
+        {
+            JoiningGame = false,
             Games = games
         };
     }

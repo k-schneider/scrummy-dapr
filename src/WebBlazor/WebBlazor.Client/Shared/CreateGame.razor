@@ -13,7 +13,7 @@
                 </h3>
                 <div class="mt-3">
                     <p class="text-gray-500">
-                        To enter the room, choose a nickname.
+                        To enter the game, choose a nickname.
                     </p>
                 </div>
                 <div class="mt-3">
@@ -22,8 +22,8 @@
             </div>
         </div>
         <div class="px-4 py-3 sm:px-6">
-            <button type="button" @onclick="Create" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-                Create Room
+            <button type="button" @onclick="Continue" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                Create Game
             </button>
         </div>
     </div>
@@ -38,13 +38,13 @@
         return base.OnInitializedAsync();
     }
 
-    private void Create()
+    private void Continue()
     {
         if (string.IsNullOrWhiteSpace(nickname))
         {
             return;
         }
 
-        Dispatcher.Dispatch(new CreateRoomAction(nickname));
+        Dispatcher.Dispatch(new CreateGameAction(nickname));
     }
 }

@@ -7,3 +7,7 @@ public record ConnectToGameFailedAction(string Error);
 public record DisconnectFromGameAction();
 public record DisconnectFromGameSuccessAction();
 public record DisconnectFromGameFailedAction(string Error);
+
+public record LeaveGameAction(string GameId);
+public record LeaveGameSuccessAction(string GameId);
+public record LeaveGameFailedAction(string Error);
