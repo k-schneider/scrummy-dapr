@@ -32,8 +32,11 @@ public class GameActor : Actor, IGameActor
 
         await _dapr.PublishEventAsync(
             Constants.DaprPubSubName,
-            typeof(PlayerJoinedGameEvent).Name,
-            new PlayerJoinedGameEvent(sid, playerId, nickname),
+            PlayerJoinedGameIntegrationEvent.EventName,
+            new PlayerJoinedGameIntegrationEvent(
+                sid,
+                playerId,
+                nickname),
             cancellationToken);
 
         return (sid, playerId);
@@ -42,7 +45,7 @@ public class GameActor : Actor, IGameActor
     public Task<GameSnapshot> GetGameSnapshot(CancellationToken cancellationToken = default)
     {
         var players = _players.Select(p => new PlayerSnapshot(p.PlayerId, p.Nickname, p.IsConnected)).ToList();
-        return Task.FromResult(new GameSnapshot(players));
+        return Task.FromResult(new GameSnapshot(GameId, players));
     }
 
     public async Task RemovePlayer(string sid, CancellationToken cancellationToken = default)
@@ -58,8 +61,11 @@ public class GameActor : Actor, IGameActor
 
         await _dapr.PublishEventAsync(
             Constants.DaprPubSubName,
-            typeof(PlayerLeftGameEvent).Name,
-            new PlayerLeftGameEvent(player.Sid, player.PlayerId, player.Nickname),
+            PlayerLeftGameIntegrationEvent.EventName,
+            new PlayerLeftGameIntegrationEvent(
+                player.Sid,
+                player.PlayerId,
+                player.Nickname),
             cancellationToken);
 
         // todo: considerations...
@@ -80,8 +86,8 @@ public class GameActor : Actor, IGameActor
 
         await _dapr.PublishEventAsync(
             Constants.DaprPubSubName,
-            typeof(GameStartedEvent).Name,
-            new GameStartedEvent(GameId),
+            GameStartedIntegrationEvent.EventName,
+            new GameStartedIntegrationEvent(GameId),
             cancellationToken);
     }
 

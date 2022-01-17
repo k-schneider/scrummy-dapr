@@ -26,8 +26,13 @@ public class SessionActor : Actor, ISessionActor
         {
             await _dapr.PublishEventAsync(
                 Constants.DaprPubSubName,
-                typeof(PlayerConnectedEvent).Name,
-                new PlayerConnectedEvent(connectionId, Sid, _gameId, _playerId, _connectionIds.Count),
+                PlayerConnectedIntegrationEvent.EventName,
+                new PlayerConnectedIntegrationEvent(
+                    connectionId,
+                    Sid,
+                    _gameId,
+                    _playerId,
+                    _connectionIds.Count),
                 cancellationToken);
         }
     }
@@ -43,8 +48,13 @@ public class SessionActor : Actor, ISessionActor
         {
             await _dapr.PublishEventAsync(
                 Constants.DaprPubSubName,
-                typeof(PlayerDisconnectedEvent).Name,
-                new PlayerDisconnectedEvent(connectionId, Sid, _gameId!, _playerId, _connectionIds.Count),
+                PlayerDisconnectedIntegrationEvent.EventName,
+                new PlayerDisconnectedIntegrationEvent(
+                    connectionId,
+                    Sid,
+                    _gameId!,
+                    _playerId,
+                    _connectionIds.Count),
                 cancellationToken);
         }
     }

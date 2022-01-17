@@ -15,10 +15,9 @@ public class GameEventController : ControllerBase
         _hubContext = hubContext;
     }
 
-
     [HttpPost("PlayerConnected")]
-    [Topic(Constants.DaprPubSubName, "PlayerConnectedEvent")]
-    public async Task HandleAsync(PlayerConnectedEvent integrationEvent, CancellationToken cancellationToken)
+    [Topic(Constants.DaprPubSubName, PlayerConnectedIntegrationEvent.EventName)]
+    public async Task HandleAsync(PlayerConnectedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         // Send the new connection a snapshot of the current game state
         await _hubContext.Clients
@@ -43,8 +42,8 @@ public class GameEventController : ControllerBase
     }
 
     [HttpPost("PlayerDisconnected")]
-    [Topic(Constants.DaprPubSubName, "PlayerDisconnectedEvent")]
-    public async Task HandleAsync(PlayerDisconnectedEvent integrationEvent, CancellationToken cancellationToken)
+    [Topic(Constants.DaprPubSubName, PlayerDisconnectedIntegrationEvent.EventName)]
+    public async Task HandleAsync(PlayerDisconnectedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         if (integrationEvent.ConnectionCount == 0)
         {

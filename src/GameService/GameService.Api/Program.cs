@@ -6,7 +6,7 @@ builder.AddCustomUserIdProvider();
 
 builder.Services.AddDaprClient();
 builder.Services.AddControllers();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR().AddJsonProtocol();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -19,11 +19,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCloudEvents();
 app.UseAuthorization();
 
 app.MapGet("/", () => Results.LocalRedirect("~/swagger"));
 app.MapActorsHandlers();
 app.MapControllers();
 app.MapHubs();
+app.MapSubscribeHandler();
 
 app.Run();
