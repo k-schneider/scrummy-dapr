@@ -1,0 +1,10 @@
+{
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=827846
+  "recommendations": [
+    "ms-azuretools.vscode-dapr",
+    "ms-azuretools.vscode-docker",
+    "ms-dotnettools.csharp",
+    "ms-dotnettools.blazorwasm-companion",
+    "editorconfig.editorconfig"
+  ]
+}

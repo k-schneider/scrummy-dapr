@@ -26,7 +26,7 @@ public class LobbyEffects
     public async Task HandleStoreInitializedAction(StoreInitializedAction _, IDispatcher dispatcher)
     {
         var nickname = await _localStorage.GetItemAsync<string>(NicknameKey) ?? string.Empty;
-        var games = await _localStorage.GetItemAsync<Dictionary<string, GameSession>>(GamesKey) ?? new Dictionary<string, GameSession>();
+        var games = await _localStorage.GetItemAsync<Dictionary<string, GameMembership>>(GamesKey) ?? new Dictionary<string, GameMembership>();
 
         dispatcher.Dispatch(new InitializeLobbyAction(nickname, games));
     }
@@ -38,8 +38,9 @@ public class LobbyEffects
 
         try
         {
-            var gameSession = await _appApi.CreateGame(new CreateGameRequest(action.Nickname));
-            dispatcher.Dispatch(new CreateRoomSuccessAction(gameSession));
+            var response = await _appApi.CreateGame(new CreateGameRequest(action.Nickname));
+            var gameMembership = new GameMembership(response.GameId, response.PlayerId, response.Sid);
+            dispatcher.Dispatch(new CreateRoomSuccessAction(gameMembership));
         }
         catch (Exception exc)
         {
@@ -61,8 +62,9 @@ public class LobbyEffects
 
         try
         {
-            var gameSession = await _appApi.JoinGame(action.GameId, new JoinGameRequest(action.Nickname));
-            dispatcher.Dispatch(new JoinRoomSuccessAction(gameSession));
+            var response = await _appApi.JoinGame(action.GameId, new JoinGameRequest(action.Nickname));
+            var game = new GameMembership(response.GameId, response.PlayerId, response.Sid);
+            dispatcher.Dispatch(new JoinRoomSuccessAction(game));
         }
         catch (Exception exc)
         {
@@ -84,9 +86,9 @@ public class LobbyEffects
 
         try
         {
-            var gameSession = _lobbyState.Value.Games[action.GameId];
-            await _appApi.LeaveGame(action.GameId, new LeaveGameRequest(gameSession.Sid));
-            dispatcher.Dispatch(new LeaveRoomSuccessAction(gameSession));
+            var game = _lobbyState.Value.Games[action.GameId];
+            await _appApi.LeaveGame(action.GameId, new LeaveGameRequest(game.Sid));
+            dispatcher.Dispatch(new LeaveRoomSuccessAction(game.GameId));
         }
         catch (Exception exc)
         {

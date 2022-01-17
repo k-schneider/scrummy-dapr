@@ -17,7 +17,7 @@ public class GameController : ControllerBase
         var gameId = await GetLobbyActor().CreateGame(cancellationToken);
         var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);
 
-        return Ok(new GameSession(gameId, playerId, sid));
+        return Ok(new CreateGameResponse(gameId, playerId, sid));
     }
 
     [HttpPost("game/{gameId}/join")]
@@ -30,7 +30,7 @@ public class GameController : ControllerBase
 
         var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);
 
-        return Ok(new GameSession(gameId, playerId, sid));
+        return Ok(new JoinGameResponse(gameId, playerId, sid));
     }
 
     [HttpPost("game/{gameId}/leave")]

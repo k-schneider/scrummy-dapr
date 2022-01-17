@@ -1,15 +1,15 @@
 namespace Scrummy.WebBlazor.Client.Store.LobbyUseCase;
 
-public record InitializeLobbyAction(string Nickname, Dictionary<string, GameSession> Games);
+public record InitializeLobbyAction(string Nickname, Dictionary<string, GameMembership> Games);
 
 public record CreateRoomAction(string Nickname);
-public record CreateRoomSuccessAction(GameSession Game);
+public record CreateRoomSuccessAction(GameMembership Game);
 public record CreateRoomFailedAction(string Error);
 
 public record JoinRoomAction(string GameId, string Nickname);
-public record JoinRoomSuccessAction(GameSession Game);
+public record JoinRoomSuccessAction(GameMembership Game);
 public record JoinRoomFailedAction(string Error);
 
 public record LeaveRoomAction(string GameId);
-public record LeaveRoomSuccessAction(GameSession Game);
+public record LeaveRoomSuccessAction(string GameId);
 public record LeaveRoomFailedAction(string Error);
