@@ -20,6 +20,7 @@ public class GameHub : Hub
         }
 
         await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
+        await Groups.AddToGroupAsync(Context.ConnectionId, Context.UserIdentifier!);
         await session.AddConnection(Context.ConnectionId);
         await base.OnConnectedAsync();
     }

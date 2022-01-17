@@ -5,6 +5,7 @@ public class SessionActor : Actor, ISessionActor
     private readonly DaprClient _dapr;
     private HashSet<string> _connectionIds = new HashSet<string>();
     private string? _gameId { get; set; }
+    private int _playerId { get; set; }
 
     private string Sid => Id.GetId();
 
@@ -25,14 +26,9 @@ public class SessionActor : Actor, ISessionActor
         {
             await _dapr.PublishEventAsync(
                 Constants.DaprPubSubName,
-                typeof(SessionConnectedEvent).Name,
-                new SessionConnectedEvent(connectionId, Sid, _gameId),
+                typeof(PlayerConnectedEvent).Name,
+                new PlayerConnectedEvent(connectionId, Sid, _gameId, _playerId, _connectionIds.Count),
                 cancellationToken);
-
-            if (_connectionIds.Count == 1)
-            {
-                // todo: publish player online event so that game can update player state
-            }
         }
     }
 
@@ -47,18 +43,13 @@ public class SessionActor : Actor, ISessionActor
         {
             await _dapr.PublishEventAsync(
                 Constants.DaprPubSubName,
-                typeof(SessionDisconnectedEvent).Name,
-                new SessionDisconnectedEvent(connectionId, Sid, _gameId!),
+                typeof(PlayerDisconnectedEvent).Name,
+                new PlayerDisconnectedEvent(connectionId, Sid, _gameId!, _playerId, _connectionIds.Count),
                 cancellationToken);
-
-            if (_connectionIds.Count == 0)
-            {
-                // todo: publish player offline event so that game can update player state
-            }
         }
     }
 
-    public Task SetGameId(string gameId, CancellationToken cancellationToken = default)
+    public Task AssociateWithGame(string gameId, int playerId, CancellationToken cancellationToken = default)
     {
         if (_gameId is not null && _gameId != gameId)
         {
@@ -66,6 +57,7 @@ public class SessionActor : Actor, ISessionActor
         }
 
         _gameId = gameId;
+        _playerId = playerId;
         return Task.CompletedTask;
     }
 }

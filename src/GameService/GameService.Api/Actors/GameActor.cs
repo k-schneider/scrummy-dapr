@@ -16,28 +16,12 @@ public class GameActor : Actor, IGameActor
         _dapr = dapr;
     }
 
-    public async Task StartGame(CancellationToken cancellationToken = default)
-    {
-        if (_gameStatus != GameStatus.None)
-        {
-            throw new InvalidOperationException("Game has already started");
-        }
-
-        _gameStatus = GameStatus.InProgress;
-
-        await _dapr.PublishEventAsync(
-            Constants.DaprPubSubName,
-            typeof(GameStartedEvent).Name,
-            new GameStartedEvent(GameId),
-            cancellationToken);
-    }
-
     public async Task<(string sid, int playerId)> AddPlayer(string nickname, CancellationToken cancellationToken = default)
     {
         var sid = NewSid();
         var playerId = NextPlayerId();
 
-        await GetSessionActor(sid).SetGameId(GameId, cancellationToken);
+        await GetSessionActor(sid).AssociateWithGame(GameId, playerId, cancellationToken);
 
         _players.Add(new PlayerState
         {
@@ -53,6 +37,12 @@ public class GameActor : Actor, IGameActor
             cancellationToken);
 
         return (sid, playerId);
+    }
+
+    public Task<GameSnapshot> GetGameSnapshot(CancellationToken cancellationToken = default)
+    {
+        var players = _players.Select(p => new PlayerSnapshot(p.PlayerId, p.Nickname, p.IsConnected)).ToList();
+        return Task.FromResult(new GameSnapshot(players));
     }
 
     public async Task RemovePlayer(string sid, CancellationToken cancellationToken = default)
@@ -77,6 +67,22 @@ public class GameActor : Actor, IGameActor
         //   remove from hub group?
         //   terminate connection somehow?
         //   if no more players left, end game?
+    }
+
+    public async Task StartGame(CancellationToken cancellationToken = default)
+    {
+        if (_gameStatus != GameStatus.None)
+        {
+            throw new InvalidOperationException("Game has already started");
+        }
+
+        _gameStatus = GameStatus.InProgress;
+
+        await _dapr.PublishEventAsync(
+            Constants.DaprPubSubName,
+            typeof(GameStartedEvent).Name,
+            new GameStartedEvent(GameId),
+            cancellationToken);
     }
 
     private string NewSid() => Guid.NewGuid().ToString();

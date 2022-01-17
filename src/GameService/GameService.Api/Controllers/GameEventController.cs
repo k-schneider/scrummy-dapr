@@ -16,33 +16,57 @@ public class GameEventController : ControllerBase
     }
 
 
-    [HttpPost("SessionConnectedEvent")]
-    [Topic(Constants.DaprPubSubName, "SessionConnectedEvent")]
-    public Task HandleAsync(SessionConnectedEvent integrationEvent)
+    [HttpPost("PlayerConnectedEvent")]
+    [Topic(Constants.DaprPubSubName, "PlayerConnectedEvent")]
+    public async Task HandleAsync(PlayerConnectedEvent integrationEvent, CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
+        // Send the new connection a snapshot of the current game state
+        await _hubContext.Clients
+            .Client(integrationEvent.ConnectionId)
+            .SendAsync(
+                "Sync",
+                new
+                {
+                    Game = await GetGameActor(integrationEvent.GameId).GetGameSnapshot(cancellationToken)
+                },
+                cancellationToken);
+
+        if (integrationEvent.ConnectionCount == 1)
+        {
+            // Let everyone know this player is now online
+            await _hubContext.Clients
+                .GroupExcept(integrationEvent.GameId, integrationEvent.ConnectionId)
+                .SendAsync(
+                    "PlayerConnected",
+                    new
+                    {
+                        PlayerId = integrationEvent.PlayerId
+                    },
+                    cancellationToken);
+        }
     }
 
-    [HttpPost("SessionDisconnectedEvent")]
-    [Topic(Constants.DaprPubSubName, "SessionDisconnectedEvent")]
-    public Task HandleAsync(SessionDisconnectedEvent integrationEvent)
+    [HttpPost("PlayerDisconnectedEvent")]
+    [Topic(Constants.DaprPubSubName, "PlayerDisconnectedEvent")]
+    public async Task HandleAsync(PlayerDisconnectedEvent integrationEvent, CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
+        if (integrationEvent.ConnectionCount == 0)
+        {
+            // Let everyone know this player is now offline
+            await _hubContext.Clients
+                .GroupExcept(integrationEvent.GameId, integrationEvent.ConnectionId)
+                .SendAsync(
+                    "PlayerDisconnected",
+                    new
+                    {
+                        PlayerId = integrationEvent.PlayerId
+                    },
+                    cancellationToken);
+        }
     }
 
-    /*
-    [HttpPost("PlayerJoinedGame")]
-    [Topic(Constants.DaprPubSubName, "PlayerJoinedGameEvent")]
-    public Task HandleAsync(PlayerJoinedGameEvent integrationEvent)
-    {
-        return GetGameActor(integrationEvent.GameId).NotifyPlayerJoined(integrationEvent.PlayerId, integrationEvent.Nickname);
-    }
-
-    [HttpPost("PlayerLeftGame")]
-    [Topic(Constants.DaprPubSubName, "PlayerLeftGameEvent")]
-    public Task HandleAsync(PlayerLeftGameEvent integrationEvent)
-    {
-        return GetGameActor(integrationEvent.GameId).NotifyPlayerLeft(integrationEvent.PlayerId);
-    }
-    */
+    private IGameActor GetGameActor(string gameId) =>
+        _actorProxyFactory.CreateActorProxy<IGameActor>(
+            new ActorId(gameId),
+            typeof(GameActor).Name);
 }
