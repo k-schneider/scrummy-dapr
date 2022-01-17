@@ -1,4 +1,4 @@
-namespace Scrummy.GameService.Api.Actors;
+namespace Scrummy.AppContracts;
 
 public record GameSnapshot(IEnumerable<PlayerSnapshot> Players);
 public record PlayerSnapshot(int PlayerId, string Nickname, bool IsConnected);

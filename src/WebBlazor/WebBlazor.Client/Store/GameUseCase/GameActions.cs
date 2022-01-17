@@ -11,3 +11,5 @@ public record DisconnectFromGameFailedAction(string Error);
 public record LeaveGameAction(string GameId);
 public record LeaveGameSuccessAction(string GameId);
 public record LeaveGameFailedAction(string Error);
+
+public record SyncGameAction(GameSnapshot snapshot);

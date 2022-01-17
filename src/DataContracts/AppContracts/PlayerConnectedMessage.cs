@@ -1,3 +1,3 @@
 namespace Scrummy.AppContracts;
 
-public record PlayerConnectedMessage(string PlayerId);
+public record PlayerConnectedMessage(int PlayerId);

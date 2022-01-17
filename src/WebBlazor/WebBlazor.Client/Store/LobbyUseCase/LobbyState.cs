@@ -12,5 +12,5 @@ public record LobbyState
 
 public record GameMembership(string GameId, int PlayerId, string Sid)
 {
-    public long JoinedAt = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+    public long JoinedAt { get; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 };

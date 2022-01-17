@@ -16,7 +16,7 @@ public class GameEventController : ControllerBase
     }
 
 
-    [HttpPost("PlayerConnectedEvent")]
+    [HttpPost("PlayerConnected")]
     [Topic(Constants.DaprPubSubName, "PlayerConnectedEvent")]
     public async Task HandleAsync(PlayerConnectedEvent integrationEvent, CancellationToken cancellationToken)
     {
@@ -24,43 +24,36 @@ public class GameEventController : ControllerBase
         await _hubContext.Clients
             .Client(integrationEvent.ConnectionId)
             .SendAsync(
-                "Sync",
-                new
-                {
-                    Game = await GetGameActor(integrationEvent.GameId).GetGameSnapshot(cancellationToken)
-                },
+                "SyncGame",
+                new SyncGameMessage(
+                    await GetGameActor(integrationEvent.GameId)
+                        .GetGameSnapshot(cancellationToken)),
                 cancellationToken);
 
         if (integrationEvent.ConnectionCount == 1)
         {
-            // Let everyone know this player is now online
+            // Let everyone in the game know this player is now online
             await _hubContext.Clients
                 .GroupExcept(integrationEvent.GameId, integrationEvent.ConnectionId)
                 .SendAsync(
                     "PlayerConnected",
-                    new
-                    {
-                        PlayerId = integrationEvent.PlayerId
-                    },
+                    new PlayerConnectedMessage(integrationEvent.PlayerId),
                     cancellationToken);
         }
     }
 
-    [HttpPost("PlayerDisconnectedEvent")]
+    [HttpPost("PlayerDisconnected")]
     [Topic(Constants.DaprPubSubName, "PlayerDisconnectedEvent")]
     public async Task HandleAsync(PlayerDisconnectedEvent integrationEvent, CancellationToken cancellationToken)
     {
         if (integrationEvent.ConnectionCount == 0)
         {
-            // Let everyone know this player is now offline
+            // Let everyone in the game know this player is now offline
             await _hubContext.Clients
                 .GroupExcept(integrationEvent.GameId, integrationEvent.ConnectionId)
                 .SendAsync(
                     "PlayerDisconnected",
-                    new
-                    {
-                        PlayerId = integrationEvent.PlayerId
-                    },
+                    new PlayerDisconnectedMessage(integrationEvent.PlayerId),
                     cancellationToken);
         }
     }
