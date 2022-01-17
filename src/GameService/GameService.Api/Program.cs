@@ -2,7 +2,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.AddCustomActors();
-builder.AddCustomUserIdProvider();
+builder.AddCustomApplicationServices();
+
 
 builder.Services.AddDaprClient();
 builder.Services.AddControllers();

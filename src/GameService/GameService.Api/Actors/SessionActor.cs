@@ -2,17 +2,17 @@ namespace Scrummy.GameService.Api.Actors;
 
 public class SessionActor : Actor, ISessionActor
 {
-    private readonly DaprClient _dapr;
+    private readonly IEventBus _eventBus;
     private HashSet<string> _connectionIds = new HashSet<string>();
     private string? _gameId { get; set; }
     private int _playerId { get; set; }
 
     private string Sid => Id.GetId();
 
-    public SessionActor(ActorHost host, DaprClient dapr)
+    public SessionActor(ActorHost host, IEventBus eventBus)
         : base(host)
     {
-        _dapr = dapr;
+        _eventBus = eventBus;
     }
 
     public async Task AddConnection(string connectionId, CancellationToken cancellationToken = default)
@@ -24,9 +24,7 @@ public class SessionActor : Actor, ISessionActor
 
         if (_connectionIds.Add(connectionId))
         {
-            await _dapr.PublishEventAsync(
-                Constants.DaprPubSubName,
-                PlayerConnectedIntegrationEvent.EventName,
+            await _eventBus.PublishAsync(
                 new PlayerConnectedIntegrationEvent(
                     connectionId,
                     Sid,
@@ -46,9 +44,7 @@ public class SessionActor : Actor, ISessionActor
     {
         if (_connectionIds.Remove(connectionId))
         {
-            await _dapr.PublishEventAsync(
-                Constants.DaprPubSubName,
-                PlayerDisconnectedIntegrationEvent.EventName,
+            await _eventBus.PublishAsync(
                 new PlayerDisconnectedIntegrationEvent(
                     connectionId,
                     Sid,

@@ -12,8 +12,9 @@ public static class ProgramExtensions
         });
     }
 
-    public static void AddCustomUserIdProvider(this WebApplicationBuilder builder)
+    public static void AddCustomApplicationServices(this WebApplicationBuilder builder)
     {
+        builder.Services.AddScoped<IEventBus, DaprEventBus>();
         builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
     }
 

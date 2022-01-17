@@ -2,7 +2,7 @@ namespace Scrummy.GameService.Api.Actors;
 
 public class GameActor : Actor, IGameActor
 {
-    private readonly DaprClient _dapr;
+    private readonly IEventBus _eventBus;
 
     private GameStatus _gameStatus = GameStatus.None;
     private int _playerCounter = 0;
@@ -10,10 +10,10 @@ public class GameActor : Actor, IGameActor
 
     private string GameId => Id.GetId();
 
-    public GameActor(ActorHost host, DaprClient dapr)
+    public GameActor(ActorHost host, IEventBus eventBus)
         : base(host)
     {
-        _dapr = dapr;
+        _eventBus = eventBus;
     }
 
     public async Task<(string sid, int playerId)> AddPlayer(string nickname, CancellationToken cancellationToken = default)
@@ -30,9 +30,7 @@ public class GameActor : Actor, IGameActor
             Nickname = nickname
         });
 
-        await _dapr.PublishEventAsync(
-            Constants.DaprPubSubName,
-            PlayerJoinedGameIntegrationEvent.EventName,
+        await _eventBus.PublishAsync(
             new PlayerJoinedGameIntegrationEvent(
                 sid,
                 playerId,
@@ -59,9 +57,7 @@ public class GameActor : Actor, IGameActor
 
         _players.Remove(player);
 
-        await _dapr.PublishEventAsync(
-            Constants.DaprPubSubName,
-            PlayerLeftGameIntegrationEvent.EventName,
+        await _eventBus.PublishAsync(
             new PlayerLeftGameIntegrationEvent(
                 player.Sid,
                 player.PlayerId,
@@ -84,9 +80,7 @@ public class GameActor : Actor, IGameActor
 
         _gameStatus = GameStatus.InProgress;
 
-        await _dapr.PublishEventAsync(
-            Constants.DaprPubSubName,
-            GameStartedIntegrationEvent.EventName,
+        await _eventBus.PublishAsync(
             new GameStartedIntegrationEvent(GameId),
             cancellationToken);
     }

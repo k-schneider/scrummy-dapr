@@ -4,6 +4,8 @@ namespace Scrummy.GameService.Api.Controllers;
 [ApiController]
 public class GameEventController : ControllerBase
 {
+    private const string DAPR_PUBSUB_NAME = "pubsub";
+
     private readonly IActorProxyFactory _actorProxyFactory;
     private readonly IHubContext<GameHub> _hubContext;
 
@@ -16,7 +18,7 @@ public class GameEventController : ControllerBase
     }
 
     [HttpPost("PlayerConnected")]
-    [Topic(Constants.DaprPubSubName, PlayerConnectedIntegrationEvent.EventName)]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerConnectedIntegrationEvent")]
     public async Task HandleAsync(PlayerConnectedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         // Send the new connection a snapshot of the current game state
@@ -42,7 +44,7 @@ public class GameEventController : ControllerBase
     }
 
     [HttpPost("PlayerDisconnected")]
-    [Topic(Constants.DaprPubSubName, PlayerDisconnectedIntegrationEvent.EventName)]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerDisconnectedIntegrationEvent")]
     public async Task HandleAsync(PlayerDisconnectedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         if (integrationEvent.ConnectionCount == 0)

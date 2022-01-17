@@ -1,4 +1,4 @@
-namespace Scrummy.GameService.Api.IntegrationEvents;
+namespace Scrummy.BuildingBlocks.EventBus.Events;
 
 public record IntegrationEvent
 {

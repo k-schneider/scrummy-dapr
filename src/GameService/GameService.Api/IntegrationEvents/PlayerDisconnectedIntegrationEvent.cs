@@ -5,7 +5,4 @@ public record PlayerDisconnectedIntegrationEvent(
     string Sid,
     string GameId,
     int PlayerId,
-    int ConnectionCount) : IntegrationEvent
-{
-    public const string EventName = "PlayerDisconnected";
-}
+    int ConnectionCount) : IntegrationEvent;
