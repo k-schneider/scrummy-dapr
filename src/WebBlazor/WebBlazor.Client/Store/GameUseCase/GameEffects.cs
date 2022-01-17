@@ -38,8 +38,16 @@ public class GameEffects
                     .WithUrl(_navigationManager.ToAbsoluteUri($"/h/gamehub?sid={game.Sid}"))
                     .Build();
 
-                _hubConnection.On<SyncGameMessage>("SyncGame", message =>
+                _hubConnection.On<SyncGameMessage>(GameHubMethods.SyncGame, message =>
                     dispatcher.Dispatch(new SyncGameAction(message.Snapshot)));
+
+                /* todo:
+                _hubConnection.On<PlayerConnectedMessage>(GameHubMethods.PlayerConnected, message =>
+                    dispatcher.Dispatch(new PlayerConnectedAction(message.PlayerId)));
+
+                _hubConnection.On<PlayerDisconnectedMessage>(GameHubMethods.PlayerDisconnected, message =>
+                    dispatcher.Dispatch(new PlayerDisconnectedAction(message.PlayerId)));
+                */
 
                 await _hubConnection.StartAsync();
             }

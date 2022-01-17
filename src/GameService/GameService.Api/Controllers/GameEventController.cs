@@ -25,7 +25,7 @@ public class GameEventController : ControllerBase
         await _hubContext.Clients
             .Client(integrationEvent.ConnectionId)
             .SendAsync(
-                "SyncGame",
+                GameHubMethods.SyncGame,
                 new SyncGameMessage(
                     await GetGameActor(integrationEvent.GameId)
                         .GetGameSnapshot(cancellationToken)),
@@ -37,7 +37,7 @@ public class GameEventController : ControllerBase
             await _hubContext.Clients
                 .GroupExcept(integrationEvent.GameId, integrationEvent.ConnectionId)
                 .SendAsync(
-                    "PlayerConnected",
+                    GameHubMethods.PlayerConnected,
                     new PlayerConnectedMessage(integrationEvent.PlayerId),
                     cancellationToken);
         }
@@ -53,7 +53,7 @@ public class GameEventController : ControllerBase
             await _hubContext.Clients
                 .GroupExcept(integrationEvent.GameId, integrationEvent.ConnectionId)
                 .SendAsync(
-                    "PlayerDisconnected",
+                    GameHubMethods.PlayerDisconnected,
                     new PlayerDisconnectedMessage(integrationEvent.PlayerId),
                     cancellationToken);
         }
