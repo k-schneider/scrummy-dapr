@@ -7,6 +7,20 @@ public class GameActor : Actor, IGameActor
     private GameStatus _gameStatus = GameStatus.None;
     private int _playerCounter = 0;
     private List<PlayerState> _players = new();
+    private HashSet<string> _deck = new()
+    {
+        "0",
+        "1",
+        "2",
+        "3",
+        "5",
+        "8",
+        "13",
+        "20",
+        "40",
+        "100",
+        "?"
+    };
 
     private string GameId => Id.GetId();
 
@@ -44,7 +58,7 @@ public class GameActor : Actor, IGameActor
     public Task<GameSnapshot> GetGameSnapshot(CancellationToken cancellationToken = default)
     {
         var players = _players.Select(p => new PlayerSnapshot(p.PlayerId, p.Nickname, p.IsConnected)).ToList();
-        return Task.FromResult(new GameSnapshot(GameId, players));
+        return Task.FromResult(new GameSnapshot(GameId, players, _deck));
     }
 
     public Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)

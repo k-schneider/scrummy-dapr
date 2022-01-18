@@ -6,6 +6,13 @@
 <PageTitle>Scrummy - Playing</PageTitle>
 
 <div>The actual Game</div>
+<div>
+    @foreach (var card in GameState.Value.Deck)
+    {
+        <button>@card</button>
+    }
+</div>
+
 <button @onclick="LeaveGame">Leave Game</button>
 
 <hr>

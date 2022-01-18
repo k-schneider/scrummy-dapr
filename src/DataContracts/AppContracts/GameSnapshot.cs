@@ -4,14 +4,19 @@ public record GameSnapshot
 {
     public string GameId { get; init; } = null!;
     public IEnumerable<PlayerSnapshot> Players { get; init; } = null!;
+    public IEnumerable<string> Deck { get; init; } = null!;
 
     // Needed for SignalR serialization
     private GameSnapshot() { }
 
-    public GameSnapshot(string gameId, IEnumerable<PlayerSnapshot> players)
+    public GameSnapshot(
+        string gameId,
+        IEnumerable<PlayerSnapshot> players,
+        IEnumerable<string> deck)
     {
         GameId = gameId;
         Players = players;
+        Deck = deck;
     }
 };
 

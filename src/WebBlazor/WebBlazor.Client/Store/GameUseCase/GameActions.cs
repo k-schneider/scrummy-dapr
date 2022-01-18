@@ -14,6 +14,7 @@ public record LeaveGameFailedAction(string Error);
 
 public record PlayerConnectedAction(int PlayerId);
 public record PlayerDisconnectedAction(int PlayerId);
+
 public record PlayerJoinedGameAction(int PlayerId, string Nickname);
 public record PlayerLeftGameAction(int PlayerId);
 

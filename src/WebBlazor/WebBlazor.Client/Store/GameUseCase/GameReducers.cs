@@ -129,6 +129,7 @@ public static class GameReducers
     public static GameState ReduceSyncGameAction(GameState state, SyncGameAction action) =>
         state with
         {
+            Deck = action.Snapshot.Deck,
             Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsConnected)),
         };
 }
