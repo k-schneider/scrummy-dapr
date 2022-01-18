@@ -79,8 +79,8 @@ public static class GameReducers
         {
             Players = state.Players
                 .Where(p => p.PlayerId != action.PlayerId)
-                .Append(player)
-                .ToArray()
+                .Append(player),
+            Log = state.Log.Append(new LogEntry($"{player.Nickname} connected."))
         };
     }
 
@@ -98,8 +98,8 @@ public static class GameReducers
         {
             Players = state.Players
                 .Where(p => p.PlayerId != action.PlayerId)
-                .Append(player)
-                .ToArray()
+                .Append(player),
+            Log = state.Log.Append(new LogEntry($"{player.Nickname} disconnected."))
         };
     }
 
@@ -107,22 +107,23 @@ public static class GameReducers
     public static GameState ReducePlayerJoinedGameAction(GameState state, PlayerJoinedGameAction action) =>
         state with
         {
-            Players = state.Players
-                .Append(new Player(
-                    action.PlayerId,
-                    action.Nickname,
-                    false))
-                .ToArray()
+            Players = state.Players.Append(new Player(action.PlayerId, action.Nickname, false)),
+            Log = state.Log.Append(new LogEntry($"{action.Nickname} joined the game."))
         };
 
     [ReducerMethod]
-    public static GameState ReducePlayerLeftGameAction(GameState state, PlayerLeftGameAction action) =>
-        state with
+    public static GameState ReducePlayerLeftGameAction(GameState state, PlayerLeftGameAction action)
+    {
+        var player = state.Players
+            .Where(p => p.PlayerId == action.PlayerId)
+            .First();
+
+        return state with
         {
-            Players = state.Players
-                .Where(p => p.PlayerId != action.PlayerId)
-                .ToArray()
+            Players = state.Players.Where(p => p.PlayerId != action.PlayerId),
+            Log = state.Log.Append(new LogEntry($"{player.Nickname} left the game."))
         };
+    }
 
     [ReducerMethod]
     public static GameState ReduceSyncGameAction(GameState state, SyncGameAction action) =>

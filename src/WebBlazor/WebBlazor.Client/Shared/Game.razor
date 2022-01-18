@@ -8,6 +8,9 @@
 <div>The actual Game</div>
 <button @onclick="LeaveGame">Leave Game</button>
 
+<hr>
+<GameLog />
+
 @code {
     [Parameter]
     public string GameId { get; set; } = null!;
