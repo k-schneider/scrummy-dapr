@@ -41,13 +41,17 @@ public class GameEffects
                 _hubConnection.On<SyncGameMessage>(GameHubMethods.SyncGame, message =>
                     dispatcher.Dispatch(new SyncGameAction(message.Snapshot)));
 
-                /* todo:
                 _hubConnection.On<PlayerConnectedMessage>(GameHubMethods.PlayerConnected, message =>
                     dispatcher.Dispatch(new PlayerConnectedAction(message.PlayerId)));
 
                 _hubConnection.On<PlayerDisconnectedMessage>(GameHubMethods.PlayerDisconnected, message =>
                     dispatcher.Dispatch(new PlayerDisconnectedAction(message.PlayerId)));
-                */
+
+                _hubConnection.On<PlayerJoinedGameMessage>(GameHubMethods.PlayerJoinedGame, message =>
+                    dispatcher.Dispatch(new PlayerJoinedGameAction(message.PlayerId, message.Nickname)));
+
+                _hubConnection.On<PlayerLeftGameMessage>(GameHubMethods.PlayerLeftGame, message =>
+                    dispatcher.Dispatch(new PlayerLeftGameAction(message.PlayerId)));
 
                 await _hubConnection.StartAsync();
             }

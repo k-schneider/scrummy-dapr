@@ -22,9 +22,4 @@
     <ProjectReference Include="..\WebBlazor.Client\WebBlazor.Client.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-
 </Project>

@@ -12,4 +12,9 @@ public record LeaveGameAction(string GameId);
 public record LeaveGameSuccessAction(string GameId);
 public record LeaveGameFailedAction(string Error);
 
-public record SyncGameAction(GameSnapshot snapshot);
+public record PlayerConnectedAction(int PlayerId);
+public record PlayerDisconnectedAction(int PlayerId);
+public record PlayerJoinedGameAction(int PlayerId, string Nickname);
+public record PlayerLeftGameAction(int PlayerId);
+
+public record SyncGameAction(GameSnapshot Snapshot);

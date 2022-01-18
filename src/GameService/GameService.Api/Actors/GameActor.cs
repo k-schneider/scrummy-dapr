@@ -34,7 +34,8 @@ public class GameActor : Actor, IGameActor
             new PlayerJoinedGameIntegrationEvent(
                 sid,
                 playerId,
-                nickname),
+                nickname,
+                GameId),
             cancellationToken);
 
         return (sid, playerId);
@@ -44,6 +45,15 @@ public class GameActor : Actor, IGameActor
     {
         var players = _players.Select(p => new PlayerSnapshot(p.PlayerId, p.Nickname, p.IsConnected)).ToList();
         return Task.FromResult(new GameSnapshot(GameId, players));
+    }
+
+    public Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
+    {
+        _players
+            .First(p => p.PlayerId == playerId)
+            .IsConnected = true;
+
+        return Task.CompletedTask;
     }
 
     public async Task RemovePlayer(string sid, CancellationToken cancellationToken = default)
@@ -61,7 +71,7 @@ public class GameActor : Actor, IGameActor
             new PlayerLeftGameIntegrationEvent(
                 player.Sid,
                 player.PlayerId,
-                player.Nickname),
+                GameId),
             cancellationToken);
 
         // todo: considerations...

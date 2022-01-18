@@ -64,4 +64,70 @@ public static class GameReducers
         {
             Leaving = false
         };
+
+    [ReducerMethod]
+    public static GameState ReducePlayerConnectedAction(GameState state, PlayerConnectedAction action)
+    {
+        var player = state.Players
+            .Where(p => p.PlayerId == action.PlayerId)
+            .First() with
+            {
+                IsConnected = true
+            };
+
+        return state with
+        {
+            Players = state.Players
+                .Where(p => p.PlayerId != action.PlayerId)
+                .Append(player)
+                .ToArray()
+        };
+    }
+
+    [ReducerMethod]
+    public static GameState ReducePlayerDisconnectedAction(GameState state, PlayerDisconnectedAction action)
+    {
+        var player = state.Players
+            .Where(p => p.PlayerId == action.PlayerId)
+            .First() with
+            {
+                IsConnected = false
+            };
+
+        return state with
+        {
+            Players = state.Players
+                .Where(p => p.PlayerId != action.PlayerId)
+                .Append(player)
+                .ToArray()
+        };
+    }
+
+    [ReducerMethod]
+    public static GameState ReducePlayerJoinedGameAction(GameState state, PlayerJoinedGameAction action) =>
+        state with
+        {
+            Players = state.Players
+                .Append(new Player(
+                    action.PlayerId,
+                    action.Nickname,
+                    false))
+                .ToArray()
+        };
+
+    [ReducerMethod]
+    public static GameState ReducePlayerLeftGameAction(GameState state, PlayerLeftGameAction action) =>
+        state with
+        {
+            Players = state.Players
+                .Where(p => p.PlayerId != action.PlayerId)
+                .ToArray()
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceSyncGameAction(GameState state, SyncGameAction action) =>
+        state with
+        {
+            Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsConnected)),
+        };
 }

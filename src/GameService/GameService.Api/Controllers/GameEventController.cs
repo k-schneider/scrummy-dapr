@@ -21,14 +21,16 @@ public class GameEventController : ControllerBase
     [Topic(DAPR_PUBSUB_NAME, "PlayerConnectedIntegrationEvent")]
     public async Task HandleAsync(PlayerConnectedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
+        var game = GetGameActor(integrationEvent.GameId);
+
+        await game.NotifyPlayerConnected(integrationEvent.PlayerId, cancellationToken);
+
         // Send the new connection a snapshot of the current game state
         await _hubContext.Clients
             .Client(integrationEvent.ConnectionId)
             .SendAsync(
                 GameHubMethods.SyncGame,
-                new SyncGameMessage(
-                    await GetGameActor(integrationEvent.GameId)
-                        .GetGameSnapshot(cancellationToken)),
+                new SyncGameMessage(await game.GetGameSnapshot(cancellationToken)),
                 cancellationToken);
 
         if (integrationEvent.ConnectionCount == 1)
@@ -57,6 +59,30 @@ public class GameEventController : ControllerBase
                     new PlayerDisconnectedMessage(integrationEvent.PlayerId),
                     cancellationToken);
         }
+    }
+
+    [HttpPost("PlayerJoinedGame")]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerJoinedGameIntegrationEvent")]
+    public async Task HandleAsync(PlayerJoinedGameIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.PlayerJoinedGame,
+                new PlayerJoinedGameMessage(integrationEvent.PlayerId, integrationEvent.Nickname),
+                cancellationToken);
+    }
+
+    [HttpPost("PlayerLeftGame")]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerLeftGameIntegrationEvent")]
+    public async Task HandleAsync(PlayerLeftGameIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.PlayerLeftGame,
+                new PlayerLeftGameMessage(integrationEvent.PlayerId),
+                cancellationToken);
     }
 
     private IGameActor GetGameActor(string gameId) =>

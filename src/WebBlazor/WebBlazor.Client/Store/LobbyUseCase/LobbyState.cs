@@ -1,5 +1,3 @@
-namespace Scrummy.WebBlazor.Client.Store.LobbyUseCase;
-
 [FeatureState]
 public record LobbyState
 {
@@ -9,8 +7,3 @@ public record LobbyState
     public bool JoiningGame { get; init; }
     public string Nickname { get; init; } = string.Empty;
 }
-
-public record GameMembership(string GameId, int PlayerId, string Sid)
-{
-    public long JoinedAt { get; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-};
