@@ -47,6 +47,13 @@ public class GameController : ControllerBase
         return Ok();
     }
 
+    [HttpDelete("game/{gameId}/vote")]
+    public async Task<IActionResult> RecallVote(string gameId, RecallVoteRequest request, CancellationToken cancellationToken)
+    {
+        await GetGameActor(gameId).RecallVote(request.Sid, cancellationToken);
+        return Ok();
+    }
+
     private IGameActor GetGameActor(string gameId) =>
         _actorProxyFactory.CreateActorProxy<IGameActor>(
             new ActorId(gameId),

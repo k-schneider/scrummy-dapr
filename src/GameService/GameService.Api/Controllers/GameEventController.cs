@@ -85,26 +85,45 @@ public class GameEventController : ControllerBase
                 cancellationToken);
     }
 
-    [HttpPost("PlayerVoted")]
-    [Topic(DAPR_PUBSUB_NAME, "PlayerVotedIntegrationEvent")]
-    public async Task HandleAsync(PlayerVotedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    [HttpPost("PlayerVoteCast")]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerVoteCastIntegrationEvent")]
+    public async Task HandleAsync(PlayerVoteCastIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        var playerConnectionIds = await GetSessionActor(integrationEvent.Sid).GetConnectionIds();
-
-        // Send other players a notification that the player has voted
+        // Send players a notification that the player has voted
         await _hubContext.Clients
-            .GroupExcept(integrationEvent.GameId, playerConnectionIds)
+            .Group(integrationEvent.GameId)
             .SendAsync(
-                GameHubMethods.PlayerVoted,
-                new PlayerVotedMessage(integrationEvent.PlayerId),
+                GameHubMethods.PlayerVoteCast,
+                new PlayerVoteCastMessage(integrationEvent.PlayerId),
                 cancellationToken);
 
-        // Send the player a notification that their vote has been recorded
+        // Send the player a notification to sync their vote across connections
         await _hubContext.Clients
             .Group(integrationEvent.Sid)
             .SendAsync(
-                GameHubMethods.VoteRecorded,
-                new VoteRecordedMessage(integrationEvent.Vote),
+                GameHubMethods.SyncVote,
+                new SyncVoteMessage(integrationEvent.Vote),
+                cancellationToken);
+    }
+
+    [HttpPost("PlayerVoteRecalled")]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerVoteRecalledIntegrationEvent")]
+    public async Task HandleAsync(PlayerVoteRecalledIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        // Send players a notification that the player has recalled their vote
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.PlayerVoteRecalled,
+                new PlayerVoteRecalledMessage(integrationEvent.PlayerId),
+                cancellationToken);
+
+        // Send the player a notification to sync their vote across connections
+        await _hubContext.Clients
+            .Group(integrationEvent.Sid)
+            .SendAsync(
+                GameHubMethods.SyncVote,
+                new SyncVoteMessage(null),
                 cancellationToken);
     }
 

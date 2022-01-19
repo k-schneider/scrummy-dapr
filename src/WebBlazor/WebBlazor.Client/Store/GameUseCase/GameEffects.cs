@@ -55,9 +55,6 @@ public class GameEffects
                     .WithUrl(_navigationManager.ToAbsoluteUri($"/h/gamehub?sid={game.Sid}"))
                     .Build();
 
-                _hubConnection.On<SyncGameMessage>(GameHubMethods.SyncGame, message =>
-                    dispatcher.Dispatch(new SyncGameAction(message.Snapshot)));
-
                 _hubConnection.On<PlayerConnectedMessage>(GameHubMethods.PlayerConnected, message =>
                     dispatcher.Dispatch(new PlayerConnectedAction(message.PlayerId)));
 
@@ -70,11 +67,17 @@ public class GameEffects
                 _hubConnection.On<PlayerLeftGameMessage>(GameHubMethods.PlayerLeftGame, message =>
                     dispatcher.Dispatch(new PlayerLeftGameAction(message.PlayerId)));
 
-                _hubConnection.On<PlayerVotedMessage>(GameHubMethods.PlayerVoted, message =>
-                    dispatcher.Dispatch(new PlayerVotedAction(message.PlayerId)));
+                _hubConnection.On<PlayerVoteCastMessage>(GameHubMethods.PlayerVoteCast, message =>
+                    dispatcher.Dispatch(new PlayerVoteCastAction(message.PlayerId)));
 
-                _hubConnection.On<VoteRecordedMessage>(GameHubMethods.VoteRecorded, message =>
-                    dispatcher.Dispatch(new VoteRecordedAction(message.Vote)));
+                _hubConnection.On<PlayerVoteRecalledMessage>(GameHubMethods.PlayerVoteRecalled, message =>
+                    dispatcher.Dispatch(new PlayerVoteRecalledAction(message.PlayerId)));
+
+                _hubConnection.On<SyncGameMessage>(GameHubMethods.SyncGame, message =>
+                    dispatcher.Dispatch(new SyncGameAction(message.Snapshot)));
+
+                _hubConnection.On<SyncVoteMessage>(GameHubMethods.SyncVote, message =>
+                    dispatcher.Dispatch(new SyncVoteAction(message.Vote)));
 
                 await _hubConnection.StartAsync();
             }
@@ -138,5 +141,19 @@ public class GameEffects
             _navigationManager.NavigateTo($"/");
         }
         return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public async Task HandleRecallVoteAction(RecallVoteAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _appApi.RecallVote(_gameState.Value.GameId, new RecallVoteRequest(_gameState.Value.Sid));
+            dispatcher.Dispatch(new RecallVoteSuccessAction());
+        }
+        catch (Exception exc)
+        {
+            dispatcher.Dispatch(new RecallVoteFailedAction(exc.Message));
+        }
     }
 }

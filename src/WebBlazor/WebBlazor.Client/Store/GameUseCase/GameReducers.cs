@@ -155,7 +155,7 @@ public static class GameReducers
     }
 
     [ReducerMethod]
-    public static GameState ReducePlayerVotedAction(GameState state, PlayerVotedAction action)
+    public static GameState ReducePlayerVoteCastAction(GameState state, PlayerVoteCastAction action)
     {
         var player = state.Players
             .Where(p => p.PlayerId == action.PlayerId)
@@ -166,16 +166,69 @@ public static class GameReducers
             HasVoted = true
         };
 
+        var name = state.PlayerId == action.PlayerId ? "You" : player.Nickname;
+        var pronoun = state.PlayerId == action.PlayerId ? "your" : "their";
+
+        var logMessage = player.HasVoted
+            ? $"{name} changed {pronoun} vote."
+            : $"{name} voted.";
+
         return state with
         {
             Players = state.Players
                 .Where(p => p.PlayerId != player.PlayerId)
                 .Append(newPlayer),
-            Log = state.Log.Append(player.HasVoted
-                ? new LogEntry($"{player.Nickname} changed their vote.")
-                : new LogEntry($"{player.Nickname} voted."))
+            Log = state.Log.Append(new LogEntry(logMessage))
         };
     }
+
+    [ReducerMethod]
+    public static GameState ReducePlayerVoteRecalledAction(GameState state, PlayerVoteRecalledAction action)
+    {
+        var player = state.Players
+            .Where(p => p.PlayerId == action.PlayerId)
+            .First();
+
+        var newPlayer = player with
+        {
+            HasVoted = false
+        };
+
+        var name = state.PlayerId == action.PlayerId ? "You" : player.Nickname;
+        var pronoun = state.PlayerId == action.PlayerId ? "your" : "their";
+
+        return state with
+        {
+            Players = state.Players
+                .Where(p => p.PlayerId != player.PlayerId)
+                .Append(newPlayer),
+            Log = state.Log.Append(new LogEntry($"{name} recalled {pronoun} vote."))
+        };
+    }
+
+    [ReducerMethod]
+    public static GameState ReduceRecallVoteAction(GameState state, RecallVoteAction action) =>
+        state with
+        {
+            PreviousVote = state.Vote,
+            Vote = null,
+            Voting = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceRecallVoteFailedAction(GameState state, RecallVoteFailedAction _) =>
+        state with
+        {
+            Vote = state.PreviousVote,
+            Voting = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceRecallVoteSuccessAction(GameState state, RecallVoteSuccessAction _) =>
+        state with
+        {
+            Voting = false
+        };
 
     [ReducerMethod]
     public static GameState ReduceSyncGameAction(GameState state, SyncGameAction action) =>
@@ -188,26 +241,9 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReduceVoteRecordedAction(GameState state, VoteRecordedAction action)
-    {
-        var player = state.Players
-            .Where(p => p.PlayerId == state.PlayerId)
-            .First();
-
-        var newPlayer = player with
+    public static GameState ReduceSyncVoteAction(GameState state, SyncVoteAction action) =>
+        state with
         {
-            HasVoted = true
+            Vote = action.Vote
         };
-
-        return state with
-        {
-            Vote = action.Vote,
-            Players = state.Players
-                .Where(p => p.PlayerId != player.PlayerId)
-                .Append(newPlayer),
-            Log = state.Log.Append(player.HasVoted
-                ? new LogEntry($"You changed your vote.")
-                : new LogEntry($"You voted."))
-        };
-    }
 }

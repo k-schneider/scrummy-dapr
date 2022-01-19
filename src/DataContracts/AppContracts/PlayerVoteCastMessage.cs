@@ -1,13 +1,13 @@
 namespace Scrummy.AppContracts;
 
-public record PlayerVotedMessage
+public record PlayerVoteCastMessage
 {
     public int PlayerId { get; init; }
 
     // Needed for SignalR serialization
-    private PlayerVotedMessage() { }
+    private PlayerVoteCastMessage() { }
 
-    public PlayerVotedMessage(int playerId)
+    public PlayerVoteCastMessage(int playerId)
     {
         PlayerId = playerId;
     }

@@ -27,8 +27,8 @@ public record PlayerJoinedGameAction(int PlayerId, string Nickname);
 
 public record PlayerLeftGameAction(int PlayerId);
 
-public record PlayerVotedAction(int PlayerId);
+public record PlayerVoteCastAction(int PlayerId);
+public record PlayerVoteRecalledAction(int PlayerId);
 
 public record SyncGameAction(GameSnapshot Snapshot);
-
-public record VoteRecordedAction(string Vote);
+public record SyncVoteAction(string? Vote);

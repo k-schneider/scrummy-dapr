@@ -68,7 +68,7 @@ public class GameActor : Actor, IGameActor
         player.Vote = vote;
 
         await _eventBus.PublishAsync(
-            new PlayerVotedIntegrationEvent(
+            new PlayerVoteCastIntegrationEvent(
                 player.Sid,
                 player.PlayerId,
                 vote,
@@ -100,6 +100,21 @@ public class GameActor : Actor, IGameActor
             .IsConnected = true;
 
         return Task.CompletedTask;
+    }
+
+    public async Task RecallVote(string sid, CancellationToken cancellationToken = default)
+    {
+        var player = _players.First(p => p.Sid == sid);
+        var previousVote = player.Vote;
+        player.Vote = null;
+
+        await _eventBus.PublishAsync(
+            new PlayerVoteRecalledIntegrationEvent(
+                player.Sid,
+                player.PlayerId,
+                previousVote,
+                GameId),
+            cancellationToken);
     }
 
     public async Task RemovePlayer(string sid, CancellationToken cancellationToken = default)
