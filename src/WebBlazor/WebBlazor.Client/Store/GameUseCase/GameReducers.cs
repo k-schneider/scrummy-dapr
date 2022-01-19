@@ -103,7 +103,7 @@ public static class GameReducers
         return state with
         {
             Players = state.Players
-                .Where(p => p.PlayerId != action.PlayerId)
+                .Where(p => p.PlayerId != player.PlayerId)
                 .Append(player),
             Log = state.Log.Append(new LogEntry($"{player.Nickname} connected."))
         };
@@ -122,7 +122,7 @@ public static class GameReducers
         return state with
         {
             Players = state.Players
-                .Where(p => p.PlayerId != action.PlayerId)
+                .Where(p => p.PlayerId != player.PlayerId)
                 .Append(player),
             Log = state.Log.Append(new LogEntry($"{player.Nickname} disconnected."))
         };
@@ -132,7 +132,7 @@ public static class GameReducers
     public static GameState ReducePlayerJoinedGameAction(GameState state, PlayerJoinedGameAction action) =>
         state with
         {
-            Players = state.Players.Append(new Player(action.PlayerId, action.Nickname, false)),
+            Players = state.Players.Append(new Player(action.PlayerId, action.Nickname, false, false, false)),
             Log = state.Log.Append(new LogEntry($"{action.Nickname} joined the game."))
         };
 
@@ -145,7 +145,7 @@ public static class GameReducers
 
         return state with
         {
-            Players = state.Players.Where(p => p.PlayerId != action.PlayerId),
+            Players = state.Players.Where(p => p.PlayerId != player.PlayerId),
             Log = state.Log.Append(new LogEntry($"{player.Nickname} left the game."))
         };
     }
@@ -157,13 +157,13 @@ public static class GameReducers
             .Where(p => p.PlayerId == action.PlayerId)
             .First() with
             {
-                // todo: HasVoted = true
+                HasVoted = true
             };
 
         return state with
         {
             Players = state.Players
-                .Where(p => p.PlayerId != action.PlayerId)
+                .Where(p => p.PlayerId != player.PlayerId)
                 .Append(player),
             Log = state.Log.Append(new LogEntry($"{player.Nickname} voted."))
         };
@@ -175,14 +175,27 @@ public static class GameReducers
         {
             GameId = action.Snapshot.GameId,
             Deck = action.Snapshot.Deck,
-            Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsConnected)),
+            Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected, p.HasVoted)),
+            Vote = action.Snapshot.Vote
         };
 
     [ReducerMethod]
-    public static GameState ReduceVoteRecordedAction(GameState state, VoteRecordedAction action) =>
-        state with
+    public static GameState ReduceVoteRecordedAction(GameState state, VoteRecordedAction action)
+    {
+        var player = state.Players
+            .Where(p => p.PlayerId == state.PlayerId)
+            .First() with
+            {
+                HasVoted = true
+            };
+
+        return state with
         {
             Vote = action.Vote,
+            Players = state.Players
+                .Where(p => p.PlayerId != player.PlayerId)
+                .Append(player),
             Log = state.Log.Append(new LogEntry($"You voted."))
         };
+    }
 }

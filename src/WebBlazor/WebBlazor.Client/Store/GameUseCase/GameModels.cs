@@ -6,4 +6,4 @@ public record LogEntry(string Message)
     public long Timestamp { get; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 }
 
-public record Player(int PlayerId, string Nickname, bool IsConnected);
+public record Player(int PlayerId, string Nickname, bool IsHost, bool IsConnected, bool HasVoted);

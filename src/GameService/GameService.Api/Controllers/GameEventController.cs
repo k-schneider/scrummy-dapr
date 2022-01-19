@@ -30,7 +30,7 @@ public class GameEventController : ControllerBase
             .Client(integrationEvent.ConnectionId)
             .SendAsync(
                 GameHubMethods.SyncGame,
-                new SyncGameMessage(await game.GetGameSnapshot(cancellationToken)),
+                new SyncGameMessage(await game.GetGameSnapshot(integrationEvent.PlayerId, cancellationToken)),
                 cancellationToken);
 
         if (integrationEvent.ConnectionCount == 1)

@@ -58,8 +58,12 @@ public class GameActor : Actor, IGameActor
 
     public async Task CastVote(string sid, string vote, CancellationToken cancellationToken = default)
     {
-        // todo: validate vote is in deck
-        var player = _players.Single(p => p.Sid == sid);
+        if (!_deck.Contains(vote))
+        {
+            throw new InvalidOperationException("Invalid vote");
+        }
+
+        var player = _players.First(p => p.Sid == sid);
         player.Vote = vote;
 
         await _eventBus.PublishAsync(
@@ -71,18 +75,20 @@ public class GameActor : Actor, IGameActor
             cancellationToken);
     }
 
-    public Task<GameSnapshot> GetGameSnapshot(CancellationToken cancellationToken = default)
+    public Task<GameSnapshot> GetGameSnapshot(int playerId, CancellationToken cancellationToken = default)
     {
         var players = _players.Select(p => new PlayerSnapshot(
             p.PlayerId,
             p.Nickname,
             p.IsHost,
-            p.IsConnected)).ToList();
+            p.IsConnected,
+            p.Vote is not null)).ToList();
 
         return Task.FromResult(new GameSnapshot(
             GameId,
             players,
-            _deck));
+            _deck,
+            _players.First(p => p.PlayerId == playerId).Vote));
     }
 
     public Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
@@ -111,6 +117,8 @@ public class GameActor : Actor, IGameActor
                 player.PlayerId,
                 GameId),
             cancellationToken);
+
+        // todo: if player that left was host, reassign host to olded JoinDate player and send integration event
 
         // todo: considerations...
         //   clear gameId SessionActor?
