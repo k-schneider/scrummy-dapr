@@ -3,6 +3,7 @@ namespace Scrummy.WebBlazor.Client.Store.GameUseCase;
 public class GameEffects
 {
     private readonly IAppApi _appApi;
+    private readonly IState<GameState> _gameState;
     private readonly HttpClient _httpClient;
     private readonly IState<LobbyState> _lobbyState;
     private readonly NavigationManager _navigationManager;
@@ -10,14 +11,30 @@ public class GameEffects
 
     public GameEffects(
         IAppApi appApi,
+        IState<GameState> gameState,
         HttpClient httpClient,
         IState<LobbyState> lobbyState,
         NavigationManager navigationManager)
     {
         _appApi = appApi;
+        _gameState = gameState;
         _httpClient = httpClient;
         _lobbyState = lobbyState;
         _navigationManager = navigationManager;
+    }
+
+    [EffectMethod]
+    public async Task HandleCastVoteAction(CastVoteAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _appApi.CastVote(_gameState.Value.GameId, new CastVoteRequest(_gameState.Value.Sid, action.Vote));
+            dispatcher.Dispatch(new CastVoteSuccessAction());
+        }
+        catch (Exception exc)
+        {
+            dispatcher.Dispatch(new CastVoteFailedAction(exc.Message));
+        }
     }
 
     [EffectMethod]
@@ -53,10 +70,16 @@ public class GameEffects
                 _hubConnection.On<PlayerLeftGameMessage>(GameHubMethods.PlayerLeftGame, message =>
                     dispatcher.Dispatch(new PlayerLeftGameAction(message.PlayerId)));
 
+                _hubConnection.On<PlayerVotedMessage>(GameHubMethods.PlayerVoted, message =>
+                    dispatcher.Dispatch(new PlayerVotedAction(message.PlayerId)));
+
+                _hubConnection.On<VoteRecordedMessage>(GameHubMethods.VoteRecorded, message =>
+                    dispatcher.Dispatch(new VoteRecordedAction(message.Vote)));
+
                 await _hubConnection.StartAsync();
             }
 
-            dispatcher.Dispatch(new ConnectToGameSuccessAction());
+            dispatcher.Dispatch(new ConnectToGameSuccessAction(game.Sid, game.PlayerId));
         }
         catch (Exception exc)
         {

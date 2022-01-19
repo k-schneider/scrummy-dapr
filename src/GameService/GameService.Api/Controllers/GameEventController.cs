@@ -85,8 +85,36 @@ public class GameEventController : ControllerBase
                 cancellationToken);
     }
 
+    [HttpPost("PlayerVoted")]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerVotedIntegrationEvent")]
+    public async Task HandleAsync(PlayerVotedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        var playerConnectionIds = await GetSessionActor(integrationEvent.Sid).GetConnectionIds();
+
+        // Send other players a notification that the player has voted
+        await _hubContext.Clients
+            .GroupExcept(integrationEvent.GameId, playerConnectionIds)
+            .SendAsync(
+                GameHubMethods.PlayerVoted,
+                new PlayerVotedMessage(integrationEvent.PlayerId),
+                cancellationToken);
+
+        // Send the player a notification that their vote has been recorded
+        await _hubContext.Clients
+            .Group(integrationEvent.Sid)
+            .SendAsync(
+                GameHubMethods.VoteRecorded,
+                new VoteRecordedMessage(integrationEvent.Vote),
+                cancellationToken);
+    }
+
     private IGameActor GetGameActor(string gameId) =>
         _actorProxyFactory.CreateActorProxy<IGameActor>(
             new ActorId(gameId),
             typeof(GameActor).Name);
+
+    private ISessionActor GetSessionActor(string sid) =>
+        _actorProxyFactory.CreateActorProxy<ISessionActor>(
+            new ActorId(sid),
+            typeof(SessionActor).Name);
 }

@@ -2,6 +2,9 @@
 
 public interface IAppApi
 {
+    [Post("g/game/{gameId}/vote")]
+    Task<CreateGameResponse> CastVote([Path] string gameId, [Body] CastVoteRequest request, CancellationToken cancellationToken = default);
+
     [Post("g/lobby/create")]
     Task<CreateGameResponse> CreateGame([Body] CreateGameRequest request, CancellationToken cancellationToken = default);
 

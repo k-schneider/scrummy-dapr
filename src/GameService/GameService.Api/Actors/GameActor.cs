@@ -5,7 +5,7 @@ public class GameActor : Actor, IGameActor
     private readonly IEventBus _eventBus;
 
     private GameStatus _gameStatus = GameStatus.None;
-    private int _playerCounter = 0;
+    private int _playerCounter;
     private List<PlayerState> _players = new();
     private HashSet<string> _deck = new()
     {
@@ -41,7 +41,8 @@ public class GameActor : Actor, IGameActor
         {
             Sid = sid,
             PlayerId = playerId,
-            Nickname = nickname
+            Nickname = nickname,
+            IsHost = !_players.Any()
         });
 
         await _eventBus.PublishAsync(
@@ -55,10 +56,33 @@ public class GameActor : Actor, IGameActor
         return (sid, playerId);
     }
 
+    public async Task CastVote(string sid, string vote, CancellationToken cancellationToken = default)
+    {
+        // todo: validate vote is in deck
+        var player = _players.Single(p => p.Sid == sid);
+        player.Vote = vote;
+
+        await _eventBus.PublishAsync(
+            new PlayerVotedIntegrationEvent(
+                player.Sid,
+                player.PlayerId,
+                vote,
+                GameId),
+            cancellationToken);
+    }
+
     public Task<GameSnapshot> GetGameSnapshot(CancellationToken cancellationToken = default)
     {
-        var players = _players.Select(p => new PlayerSnapshot(p.PlayerId, p.Nickname, p.IsConnected)).ToList();
-        return Task.FromResult(new GameSnapshot(GameId, players, _deck));
+        var players = _players.Select(p => new PlayerSnapshot(
+            p.PlayerId,
+            p.Nickname,
+            p.IsHost,
+            p.IsConnected)).ToList();
+
+        return Task.FromResult(new GameSnapshot(
+            GameId,
+            players,
+            _deck));
     }
 
     public Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
@@ -110,7 +134,7 @@ public class GameActor : Actor, IGameActor
     }
 
     private string NewSid() => Guid.NewGuid().ToString();
-    private int NextPlayerId() => _playerCounter++;
+    private int NextPlayerId() => ++_playerCounter;
 
     private ISessionActor GetSessionActor(string sid) =>
         ProxyFactory.CreateActorProxy<ISessionActor>(

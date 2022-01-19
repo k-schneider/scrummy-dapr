@@ -35,6 +35,23 @@ public class SessionActor : Actor, ISessionActor
         }
     }
 
+    public Task AssociateWithGame(string gameId, int playerId, CancellationToken cancellationToken = default)
+    {
+        if (_gameId is not null && _gameId != gameId)
+        {
+            throw new InvalidOperationException("Session is already associated with a different game");
+        }
+
+        _gameId = gameId;
+        _playerId = playerId;
+        return Task.CompletedTask;
+    }
+
+    public Task<IEnumerable<string>> GetConnectionIds(CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(_connectionIds.AsEnumerable());
+    }
+
     public Task<string?> GetGameId(CancellationToken cancellationToken = default)
     {
         return Task.FromResult(_gameId);
@@ -53,17 +70,5 @@ public class SessionActor : Actor, ISessionActor
                     _connectionIds.Count),
                 cancellationToken);
         }
-    }
-
-    public Task AssociateWithGame(string gameId, int playerId, CancellationToken cancellationToken = default)
-    {
-        if (_gameId is not null && _gameId != gameId)
-        {
-            throw new InvalidOperationException("Session is already associated with a different game");
-        }
-
-        _gameId = gameId;
-        _playerId = playerId;
-        return Task.CompletedTask;
     }
 }

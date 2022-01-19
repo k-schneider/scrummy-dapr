@@ -9,7 +9,7 @@
 <div>
     @foreach (var card in GameState.Value.Deck)
     {
-        <button>@card</button>
+        <button class="m-2 p-3 bg-white border-2 @(card == GameState.Value.Vote ? "border-red-500" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
     }
 </div>
 
@@ -26,6 +26,23 @@
     {
         Dispatcher.Dispatch(new ConnectToGameAction(GameId));
         await base.OnInitializedAsync();
+    }
+
+    private void Vote(string card)
+    {
+        if (GameState.Value.Voting)
+        {
+            // todo: return;
+        }
+
+        if (card == GameState.Value.Vote)
+        {
+            Dispatcher.Dispatch(new ResetVoteAction());
+        }
+        else
+        {
+            Dispatcher.Dispatch(new CastVoteAction(card));
+        }
     }
 
     private void LeaveGame()

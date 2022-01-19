@@ -40,6 +40,13 @@ public class GameController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("game/{gameId}/vote")]
+    public async Task<IActionResult> CastVote(string gameId, CastVoteRequest request, CancellationToken cancellationToken)
+    {
+        await GetGameActor(gameId).CastVote(request.Sid, request.Vote, cancellationToken);
+        return Ok();
+    }
+
     private IGameActor GetGameActor(string gameId) =>
         _actorProxyFactory.CreateActorProxy<IGameActor>(
             new ActorId(gameId),

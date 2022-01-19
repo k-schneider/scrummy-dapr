@@ -3,6 +3,29 @@ namespace Scrummy.WebBlazor.Client.Store.GameUseCase;
 public static class GameReducers
 {
     [ReducerMethod]
+    public static GameState ReduceCastVoteAction(GameState state, CastVoteAction action) =>
+        state with
+        {
+            Vote = action.Vote,
+            Voting = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceCastVoteFailedAction(GameState state, CastVoteFailedAction _) =>
+        state with
+        {
+            // todo: probably need to keep track of previous vote and restore here
+            Voting = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceCastVoteSuccessAction(GameState state, CastVoteSuccessAction _) =>
+        state with
+        {
+            Voting = false
+        };
+
+    [ReducerMethod]
     public static GameState ReduceConnectToGameAction(GameState state, ConnectToGameAction _) =>
         state with
         {
@@ -10,10 +33,12 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReduceConnectToGameSuccessAction(GameState state, ConnectToGameSuccessAction _) =>
+    public static GameState ReduceConnectToGameSuccessAction(GameState state, ConnectToGameSuccessAction action) =>
         state with
         {
-            Connecting = false
+            Connecting = false,
+            Sid = action.Sid,
+            PlayerId = action.PlayerId
         };
 
     [ReducerMethod]
@@ -126,10 +151,38 @@ public static class GameReducers
     }
 
     [ReducerMethod]
+    public static GameState ReducePlayerVotedAction(GameState state, PlayerVotedAction action)
+    {
+        var player = state.Players
+            .Where(p => p.PlayerId == action.PlayerId)
+            .First() with
+            {
+                // todo: HasVoted = true
+            };
+
+        return state with
+        {
+            Players = state.Players
+                .Where(p => p.PlayerId != action.PlayerId)
+                .Append(player),
+            Log = state.Log.Append(new LogEntry($"{player.Nickname} voted."))
+        };
+    }
+
+    [ReducerMethod]
     public static GameState ReduceSyncGameAction(GameState state, SyncGameAction action) =>
         state with
         {
+            GameId = action.Snapshot.GameId,
             Deck = action.Snapshot.Deck,
             Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsConnected)),
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceVoteRecordedAction(GameState state, VoteRecordedAction action) =>
+        state with
+        {
+            Vote = action.Vote,
+            Log = state.Log.Append(new LogEntry($"You voted."))
         };
 }
