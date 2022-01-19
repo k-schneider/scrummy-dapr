@@ -64,6 +64,7 @@ public class GameActor : Actor, IGameActor
         }
 
         var player = _players.First(p => p.Sid == sid);
+        var previousVote = player.Vote;
         player.Vote = vote;
 
         await _eventBus.PublishAsync(
@@ -71,6 +72,7 @@ public class GameActor : Actor, IGameActor
                 player.Sid,
                 player.PlayerId,
                 vote,
+                previousVote,
                 GameId),
             cancellationToken);
     }
