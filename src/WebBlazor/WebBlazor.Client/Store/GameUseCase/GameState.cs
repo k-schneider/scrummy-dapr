@@ -11,6 +11,7 @@ public record GameState
     public IEnumerable<string> Deck { get; init; } = Enumerable.Empty<string>();
     public IEnumerable<LogEntry> Log { get; init; } = Enumerable.Empty<LogEntry>();
     public int PlayerId { get; init; }
+    public string? PreviousVote { get; init; }
     public string Sid { get; init; } = string.Empty;
     public string? Vote { get; init; }
     public bool Voting { get; init; }

@@ -4,9 +4,9 @@ public record CastVoteAction(string Vote);
 public record CastVoteSuccessAction();
 public record CastVoteFailedAction(string Error);
 
-public record ResetVoteAction();
-public record ResetVoteSuccessAction();
-public record ResetVoteFailedAction(string Error);
+public record RecallVoteAction();
+public record RecallVoteSuccessAction();
+public record RecallVoteFailedAction(string Error);
 
 public record ConnectToGameAction(string GameId);
 public record ConnectToGameSuccessAction(string Sid, int PlayerId);

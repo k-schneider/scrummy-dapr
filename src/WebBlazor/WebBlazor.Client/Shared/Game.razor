@@ -32,12 +32,12 @@
     {
         if (GameState.Value.Voting)
         {
-            // todo: return;
+            return;
         }
 
         if (card == GameState.Value.Vote)
         {
-            Dispatcher.Dispatch(new ResetVoteAction());
+            Dispatcher.Dispatch(new RecallVoteAction());
         }
         else
         {

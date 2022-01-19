@@ -128,4 +128,15 @@ public class GameEffects
         dispatcher.Dispatch(new ForgetGameAction(action.GameId));
         return Task.CompletedTask;
     }
+
+    [EffectMethod]
+    public Task HandlePlayerLeftGameAction(PlayerLeftGameAction action, IDispatcher dispatcher)
+    {
+        if (action.PlayerId == _gameState.Value.PlayerId)
+        {
+            // Player left on another tab so redirect this tab too
+            _navigationManager.NavigateTo($"/");
+        }
+        return Task.CompletedTask;
+    }
 }

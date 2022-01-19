@@ -6,6 +6,7 @@ public static class GameReducers
     public static GameState ReduceCastVoteAction(GameState state, CastVoteAction action) =>
         state with
         {
+            PreviousVote = state.Vote,
             Vote = action.Vote,
             Voting = true
         };
@@ -14,7 +15,7 @@ public static class GameReducers
     public static GameState ReduceCastVoteFailedAction(GameState state, CastVoteFailedAction _) =>
         state with
         {
-            // todo: probably need to keep track of previous vote and restore here
+            Vote = state.PreviousVote,
             Voting = false
         };
 
@@ -56,11 +57,8 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReduceDisconnectFromGameSuccessAction(GameState state, DisconnectFromGameSuccessAction _) =>
-        state with
-        {
-            Disconnecting = false
-        };
+    public static GameState ReduceDisconnectFromGameSuccessAction(GameState _, DisconnectFromGameSuccessAction _1) =>
+        new GameState();
 
     [ReducerMethod]
     public static GameState ReduceDisconnectFromGameFailedAction(GameState state, DisconnectFromGameFailedAction _) =>
@@ -139,6 +137,12 @@ public static class GameReducers
     [ReducerMethod]
     public static GameState ReducePlayerLeftGameAction(GameState state, PlayerLeftGameAction action)
     {
+        if (state.PlayerId == action.PlayerId)
+        {
+            // Player left on another tab, let effect handle redirect/disconnect
+            return state;
+        }
+
         var player = state.Players
             .Where(p => p.PlayerId == action.PlayerId)
             .First();
@@ -155,17 +159,21 @@ public static class GameReducers
     {
         var player = state.Players
             .Where(p => p.PlayerId == action.PlayerId)
-            .First() with
-            {
-                HasVoted = true
-            };
+            .First();
+
+        var newPlayer = player with
+        {
+            HasVoted = true
+        };
 
         return state with
         {
             Players = state.Players
                 .Where(p => p.PlayerId != player.PlayerId)
-                .Append(player),
-            Log = state.Log.Append(new LogEntry($"{player.Nickname} voted."))
+                .Append(newPlayer),
+            Log = state.Log.Append(player.HasVoted
+                ? new LogEntry($"{player.Nickname} changed their vote.")
+                : new LogEntry($"{player.Nickname} voted."))
         };
     }
 
@@ -184,18 +192,22 @@ public static class GameReducers
     {
         var player = state.Players
             .Where(p => p.PlayerId == state.PlayerId)
-            .First() with
-            {
-                HasVoted = true
-            };
+            .First();
+
+        var newPlayer = player with
+        {
+            HasVoted = true
+        };
 
         return state with
         {
             Vote = action.Vote,
             Players = state.Players
                 .Where(p => p.PlayerId != player.PlayerId)
-                .Append(player),
-            Log = state.Log.Append(new LogEntry($"You voted."))
+                .Append(newPlayer),
+            Log = state.Log.Append(player.HasVoted
+                ? new LogEntry($"You changed your vote.")
+                : new LogEntry($"You voted."))
         };
     }
 }
