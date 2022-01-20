@@ -37,6 +37,7 @@ public static class GameReducers
     public static GameState ReduceConnectToGameSuccessAction(GameState state, ConnectToGameSuccessAction action) =>
         state with
         {
+            Connected = true,
             Connecting = false,
             Sid = action.Sid,
             PlayerId = action.PlayerId
@@ -255,6 +256,7 @@ public static class GameReducers
             GameId = action.Snapshot.GameId,
             Deck = action.Snapshot.Deck,
             Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected, p.HasVoted)),
+            InSync = true,
             Vote = action.Snapshot.Vote
         };
 

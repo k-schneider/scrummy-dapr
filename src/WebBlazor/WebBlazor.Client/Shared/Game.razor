@@ -5,27 +5,63 @@
 
 <PageTitle>Scrummy - Playing</PageTitle>
 
-<div>The actual Game</div>
-<div>
-    @foreach (var card in GameState.Value.Deck)
+@if (GameState.Value.Connecting)
+{
+    <text>Connecting to game...</text>
+}
+else if (GameState.Value.Connected)
+{
+    if (GameState.Value.InSync)
     {
-        <button class="m-2 p-3 bg-white border-2 @(card == GameState.Value.Vote ? "border-red-500" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
+        <div>The actual Game</div>
+        <div>
+            @foreach (var card in GameState.Value.Deck)
+            {
+                <button class="m-2 p-3 bg-white border-2 @(card == GameState.Value.Vote ? "border-red-500" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
+            }
+        </div>
+
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="LeaveGame">Leave Game</button>
+
+        @if (IsHost)
+        {
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="ClearVotes">Clear Votes</button>
+
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="FlipCards">Flip Cards</button>
+        }
+
+        <hr>
+        <GameLog />
     }
-</div>
-
-<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="LeaveGame">Leave Game</button>
-
-<hr>
-<GameLog />
+    else
+    {
+        <text>Waiting for game state...</text>
+    }
+}
 
 @code {
     [Parameter]
     public string GameId { get; set; } = null!;
 
+    private bool IsHost => GameState.Value.Players
+        .Where(p => p.PlayerId == GameState.Value.PlayerId)
+        .First()
+        .IsHost;
+
     protected override async Task OnInitializedAsync()
     {
         Dispatcher.Dispatch(new ConnectToGameAction(GameId));
         await base.OnInitializedAsync();
+    }
+
+    private void ClearVotes()
+    {
+
+    }
+
+    private void FlipCards()
+    {
+
     }
 
     private void Vote(string card)
