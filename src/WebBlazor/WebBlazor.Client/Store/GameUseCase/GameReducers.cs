@@ -68,6 +68,24 @@ public static class GameReducers
         };
 
     [ReducerMethod]
+    public static GameState ReduceGameHostChangedAction(GameState state, GameHostChangedAction action)
+    {
+        var players = state.Players.Select(p => p with
+        {
+            IsHost = p.PlayerId == action.PlayerId
+        });
+
+        var name = state.PlayerId == action.PlayerId ? "You" : players.First(p => p.IsHost).Nickname;
+        var linkingVerb = state.PlayerId == action.PlayerId ? "are" : "is";
+
+        return state with
+        {
+            Players = players,
+            Log = state.Log.Append(new LogEntry($"{name} {linkingVerb} now the host."))
+        };
+    }
+
+    [ReducerMethod]
     public static GameState ReduceLeaveGameAction(GameState state, LeaveGameAction action) =>
         state with
         {

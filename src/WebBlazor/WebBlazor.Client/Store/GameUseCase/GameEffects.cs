@@ -55,6 +55,9 @@ public class GameEffects
                     .WithUrl(_navigationManager.ToAbsoluteUri($"/h/gamehub?sid={game.Sid}"))
                     .Build();
 
+                _hubConnection.On<GameHostChangedMessage>(GameHubMethods.GameHostChanged, message =>
+                    dispatcher.Dispatch(new GameHostChangedAction(message.PlayerId)));
+
                 _hubConnection.On<PlayerConnectedMessage>(GameHubMethods.PlayerConnected, message =>
                     dispatcher.Dispatch(new PlayerConnectedAction(message.PlayerId)));
 

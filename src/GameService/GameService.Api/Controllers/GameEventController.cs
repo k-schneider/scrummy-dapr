@@ -17,6 +17,18 @@ public class GameEventController : ControllerBase
         _hubContext = hubContext;
     }
 
+    [HttpPost("GameHostChanged")]
+    [Topic(DAPR_PUBSUB_NAME, "GameHostChangedIntegrationEvent")]
+    public async Task HandleAsync(GameHostChangedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.GameHostChanged,
+                new GameHostChangedMessage(integrationEvent.NewHostPlayerId),
+                cancellationToken);
+    }
+
     [HttpPost("PlayerConnected")]
     [Topic(DAPR_PUBSUB_NAME, "PlayerConnectedIntegrationEvent")]
     public async Task HandleAsync(PlayerConnectedIntegrationEvent integrationEvent, CancellationToken cancellationToken)

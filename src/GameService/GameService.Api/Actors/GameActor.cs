@@ -32,6 +32,8 @@ public class GameActor : Actor, IGameActor
 
     public async Task<(string sid, int playerId)> AddPlayer(string nickname, CancellationToken cancellationToken = default)
     {
+        EnsureGameInProgress();
+
         var sid = NewSid();
         var playerId = NextPlayerId();
 
@@ -58,6 +60,8 @@ public class GameActor : Actor, IGameActor
 
     public async Task CastVote(string sid, string vote, CancellationToken cancellationToken = default)
     {
+        EnsureGameInProgress();
+
         if (!_deck.Contains(vote))
         {
             throw new InvalidOperationException("Invalid vote");
@@ -95,6 +99,8 @@ public class GameActor : Actor, IGameActor
 
     public Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
     {
+        EnsureGameInProgress();
+
         _players
             .First(p => p.PlayerId == playerId)
             .IsConnected = true;
@@ -104,6 +110,8 @@ public class GameActor : Actor, IGameActor
 
     public async Task RecallVote(string sid, CancellationToken cancellationToken = default)
     {
+        EnsureGameInProgress();
+
         var player = _players.First(p => p.Sid == sid);
         var previousVote = player.Vote;
         player.Vote = null;
@@ -119,6 +127,8 @@ public class GameActor : Actor, IGameActor
 
     public async Task RemovePlayer(string sid, CancellationToken cancellationToken = default)
     {
+        EnsureGameInProgress();
+
         var player = _players.Where(p => p.Sid == sid).FirstOrDefault();
 
         if (player == null)
@@ -135,7 +145,35 @@ public class GameActor : Actor, IGameActor
                 GameId),
             cancellationToken);
 
-        // todo: if player that left was host, reassign host to olded JoinDate player and send integration event
+        // If the player was the host, pick a new host based on when they joined
+        if (player.IsHost && _players.Any())
+        {
+            var newHost = _players.OrderBy(p => p.JoinDate).First();
+            newHost.IsHost = true;
+
+            await _eventBus.PublishAsync(
+                new GameHostChangedIntegrationEvent(
+                    player.Sid,
+                    player.PlayerId,
+                    player.Nickname,
+                    newHost.Sid,
+                    newHost.PlayerId,
+                    newHost.Nickname,
+                    GameId),
+                cancellationToken);
+        }
+
+        if (!_players.Any())
+        {
+            _gameStatus = GameStatus.GameOver;
+
+            await _eventBus.PublishAsync(
+                new GameEndedIntegrationEvent(
+                    GameId),
+                cancellationToken);
+        }
+
+        // todo: if player that left was host, reassign host to oldest JoinDate player and send integration event
 
         // todo: considerations...
         //   clear gameId SessionActor?
@@ -160,6 +198,14 @@ public class GameActor : Actor, IGameActor
 
     private string NewSid() => Guid.NewGuid().ToString();
     private int NextPlayerId() => ++_playerCounter;
+
+    private void EnsureGameInProgress()
+    {
+        if (_gameStatus != GameStatus.InProgress)
+        {
+            throw new InvalidOperationException("Game is not in progress");
+        }
+    }
 
     private ISessionActor GetSessionActor(string sid) =>
         ProxyFactory.CreateActorProxy<ISessionActor>(
