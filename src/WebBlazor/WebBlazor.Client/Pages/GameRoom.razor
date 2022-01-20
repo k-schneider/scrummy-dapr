@@ -2,19 +2,20 @@
 @inherits FluxorComponent
 @inject IState<LobbyState> LobbyState
 
-<PageTitle>Scrummy</PageTitle>
-
-@if (GameId.Equals("create", StringComparison.OrdinalIgnoreCase))
+@if (LobbyState.Value.Initialized)
 {
-    <CreateGame />
-}
-else if (LobbyState.Value.Games.ContainsKey(GameId))
-{
-    <Game GameId="@GameId" />
-}
-else
-{
-    <JoinGame GameId="@GameId" />
+    if (GameId.Equals("create", StringComparison.OrdinalIgnoreCase))
+    {
+        <CreateGame />
+    }
+    else if (LobbyState.Value.Games.ContainsKey(GameId))
+    {
+        <Game GameId="@GameId" />
+    }
+    else
+    {
+        <JoinGame GameId="@GameId" />
+    }
 }
 
 @code {
