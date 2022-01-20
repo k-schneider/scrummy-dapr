@@ -8,5 +8,6 @@ public interface IGameActor : IActor
     Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default);
     Task RecallVote(string sid, CancellationToken cancellationToken = default);
     Task RemovePlayer(string sid, CancellationToken cancellationToken = default);
+    Task Reset();
     Task StartGame(CancellationToken cancellationToken = default);
 }

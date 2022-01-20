@@ -29,6 +29,14 @@ public class GameEventController : ControllerBase
                 cancellationToken);
     }
 
+    [HttpPost("GameEnded")]
+    [Topic(DAPR_PUBSUB_NAME, "GameEndedIntegrationEvent")]
+    public async Task HandleAsync(GameEndedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        await GetLobbyActor().NotifyGameEnded(integrationEvent.GameId, cancellationToken);
+        await GetGameActor(integrationEvent.GameId).Reset();
+    }
+
     [HttpPost("PlayerConnected")]
     [Topic(DAPR_PUBSUB_NAME, "PlayerConnectedIntegrationEvent")]
     public async Task HandleAsync(PlayerConnectedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
@@ -143,6 +151,11 @@ public class GameEventController : ControllerBase
         _actorProxyFactory.CreateActorProxy<IGameActor>(
             new ActorId(gameId),
             typeof(GameActor).Name);
+
+    private ILobbyActor GetLobbyActor() =>
+        _actorProxyFactory.CreateActorProxy<ILobbyActor>(
+            new ActorId(Guid.Empty.ToString()),
+            typeof(LobbyActor).Name);
 
     private ISessionActor GetSessionActor(string sid) =>
         _actorProxyFactory.CreateActorProxy<ISessionActor>(

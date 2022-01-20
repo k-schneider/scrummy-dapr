@@ -182,6 +182,19 @@ public class GameActor : Actor, IGameActor
         //   if no more players left, end game?
     }
 
+    public Task Reset()
+    {
+        if (_gameStatus != GameStatus.GameOver)
+        {
+            throw new InvalidOperationException("Game is not over");
+        }
+
+        _gameStatus = GameStatus.None;
+        _playerCounter = 0;
+        _players = new();
+        return Task.CompletedTask;
+    }
+
     public async Task StartGame(CancellationToken cancellationToken = default)
     {
         if (_gameStatus != GameStatus.None)
