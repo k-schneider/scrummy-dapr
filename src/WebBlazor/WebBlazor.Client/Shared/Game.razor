@@ -14,20 +14,37 @@ else if (GameState.Value.Connected)
     if (GameState.Value.InSync)
     {
         <div>The actual Game</div>
-        <div>
-            @foreach (var card in GameState.Value.Deck)
-            {
-                <button class="m-2 p-3 bg-white border-2 @(card == MyVote ? "border-red-500" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
-            }
-        </div>
 
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="LeaveGame">Leave Game</button>
-
-        @if (IsHost)
+        @if (GameState.Value.GamePhase == "Voting")
         {
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="ResetVotes">Reset Votes</button>
+            <div>
+                @foreach (var card in GameState.Value.Deck)
+                {
+                    <button class="m-2 p-3 bg-white border-2 @(card == MyVote ? "border-red-500" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
+                }
+            </div>
 
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="FlipCards">Flip Cards</button>
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="LeaveGame">Leave Game</button>
+
+            @if (IsHost)
+            {
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="ResetVotes">Reset Votes</button>
+
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="FlipCards">Flip Cards</button>
+            }
+        }
+
+        @if (GameState.Value.GamePhase == "Results")
+        {
+            foreach (var vote in GameState.Value.Votes)
+            {
+                <p>@vote.Key voted @vote.Value</p>
+            }
+
+            @if (IsHost)
+            {
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="PlayAgain">Play Again</button>
+            }
         }
 
         <hr>
@@ -63,14 +80,24 @@ else if (GameState.Value.Connected)
         await base.OnInitializedAsync();
     }
 
-    private void ResetVotes()
-    {
-        Dispatcher.Dispatch(new ResetVotesAction());
-    }
-
     private void FlipCards()
     {
         Dispatcher.Dispatch(new FlipCardsAction());
+    }
+
+    private void LeaveGame()
+    {
+        Dispatcher.Dispatch(new LeaveGameAction());
+    }
+
+    private void PlayAgain()
+    {
+        Dispatcher.Dispatch(new PlayAgainAction());
+    }
+
+    private void ResetVotes()
+    {
+        Dispatcher.Dispatch(new ResetVotesAction());
     }
 
     private void Vote(string card)
@@ -88,11 +115,6 @@ else if (GameState.Value.Connected)
         {
             Dispatcher.Dispatch(new CastVoteAction(card));
         }
-    }
-
-    private void LeaveGame()
-    {
-        Dispatcher.Dispatch(new LeaveGameAction());
     }
 
     void IDisposable.Dispose()

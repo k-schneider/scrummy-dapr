@@ -17,6 +17,7 @@ public record GameState
     public string GamePhase { get; init; } = string.Empty;  // Voting, Results
     public Dictionary<int, string?> Votes { get; init; } = new();
     public string? PreviousVote { get; init; }
+    public bool PlayingAgain { get; init; }
     public bool ResettingVotes { get; init; }
     public string Sid { get; init; } = string.Empty;
     public bool Voting { get; init; }

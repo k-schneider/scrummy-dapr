@@ -128,6 +128,19 @@ public class GameActor : Actor, IGameActor
         return Task.CompletedTask;
     }
 
+    public async Task PlayAgain(string sid, CancellationToken cancellationToken = default)
+    {
+        EnsureResultsPhase();
+        EnsureHost(sid, "Only host can choose to play again");
+
+        _votes.Clear();
+        _gamePhase = GamePhase.Voting;
+
+        await _eventBus.PublishAsync(
+            new NewVoteStartedIntegrationEvent(GameId),
+            cancellationToken);
+    }
+
     public async Task RecallVote(string sid, CancellationToken cancellationToken = default)
     {
         EnsureGameInProgress();
@@ -241,6 +254,16 @@ public class GameActor : Actor, IGameActor
         var player = _players.First(p => p.Sid == sid);
 
         if (!player.IsHost)
+        {
+            throw new InvalidOperationException(error);
+        }
+    }
+
+    private void EnsureResultsPhase(string error = "Game is not in results phase")
+    {
+        EnsureGameInProgress();
+
+        if (_gamePhase != GamePhase.Results)
         {
             throw new InvalidOperationException(error);
         }

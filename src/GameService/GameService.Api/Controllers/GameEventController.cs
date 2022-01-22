@@ -48,6 +48,17 @@ public class GameEventController : ControllerBase
                 cancellationToken);
     }
 
+    [HttpPost("NewVoteStarted")]
+    [Topic(DAPR_PUBSUB_NAME, "NewVoteStartedIntegrationEvent")]
+    public async Task HandleAsync(NewVoteStartedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.NewVoteStarted,
+                cancellationToken);
+    }
+
     [HttpPost("PlayerConnected")]
     [Topic(DAPR_PUBSUB_NAME, "PlayerConnectedIntegrationEvent")]
     public async Task HandleAsync(PlayerConnectedIntegrationEvent integrationEvent, CancellationToken cancellationToken)

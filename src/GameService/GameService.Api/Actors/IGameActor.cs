@@ -7,6 +7,7 @@ public interface IGameActor : IActor
     Task FlipCards(string sid, CancellationToken cancellationToken = default);
     Task<GameSnapshot> GetGameSnapshot(int playerId, CancellationToken cancellationToken = default);
     Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default);
+    Task PlayAgain(string sid, CancellationToken cancellationToken = default);
     Task RecallVote(string sid, CancellationToken cancellationToken = default);
     Task RemovePlayer(string sid, CancellationToken cancellationToken = default);
     Task ResetVotes(string sid, CancellationToken cancellationToken = default);

@@ -54,6 +54,13 @@ public class GameController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("game/{gameId}/next")]
+    public async Task<IActionResult> PlayAgain(string gameId, PlayAgainRequest request, CancellationToken cancellationToken)
+    {
+        await GetGameActor(gameId).PlayAgain(request.Sid, cancellationToken);
+        return Ok();
+    }
+
     [HttpDelete("game/{gameId}/vote")]
     public async Task<IActionResult> RecallVote(string gameId, RecallVoteRequest request, CancellationToken cancellationToken)
     {

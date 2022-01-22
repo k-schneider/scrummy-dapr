@@ -141,24 +141,59 @@ public static class GameReducers
     }
 
     [ReducerMethod]
-    public static GameState ReduceLeaveGameAction(GameState state, LeaveGameAction action) =>
+    public static GameState ReduceLeaveGameAction(GameState state, LeaveGameAction _) =>
         state with
         {
             Leaving = true
         };
 
     [ReducerMethod]
-    public static GameState ReduceLeaveGameFailedAction(GameState state, LeaveGameFailedAction action) =>
+    public static GameState ReduceLeaveGameFailedAction(GameState state, LeaveGameFailedAction _) =>
         state with
         {
             Leaving = false
         };
 
     [ReducerMethod]
-    public static GameState ReduceLeaveGameSuccessAction(GameState state, LeaveGameSuccessAction action) =>
+    public static GameState ReduceLeaveGameSuccessAction(GameState state, LeaveGameSuccessAction _) =>
         state with
         {
             Leaving = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceNewVoteStartedAction(GameState state, NewVoteStartedAction _)
+    {
+        var host = state.Players.First(p => p.IsHost);
+        var name = host.PlayerId == state.PlayerId ? "You" : host.Nickname;
+
+        return state with
+        {
+            GamePhase = "Voting",
+            Votes = new(),
+            Log = state.Log.Append(new LogEntry($"{name} started a new round of voting."))
+        };
+    }
+
+    [ReducerMethod]
+    public static GameState ReducePlayAgainAction(GameState state, PlayAgainAction _) =>
+        state with
+        {
+            PlayingAgain = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReducePlayAgainFailedAction(GameState state, PlayAgainFailedAction _) =>
+        state with
+        {
+            PlayingAgain = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReducePlayAgainSuccessAction(GameState state, PlayAgainSuccessAction _) =>
+        state with
+        {
+            PlayingAgain = false
         };
 
     [ReducerMethod]

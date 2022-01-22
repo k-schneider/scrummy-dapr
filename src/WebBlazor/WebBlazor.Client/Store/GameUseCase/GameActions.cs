@@ -24,6 +24,12 @@ public record LeaveGameAction();
 public record LeaveGameSuccessAction(string GameId);
 public record LeaveGameFailedAction(string Error);
 
+public record NewVoteStartedAction();
+
+public record PlayAgainAction();
+public record PlayAgainSuccessAction();
+public record PlayAgainFailedAction(string Error);
+
 public record PlayerConnectedAction(int PlayerId);
 public record PlayerDisconnectedAction(int PlayerId);
 

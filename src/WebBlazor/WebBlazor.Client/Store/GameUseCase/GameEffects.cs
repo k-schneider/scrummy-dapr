@@ -61,6 +61,9 @@ public class GameEffects
                 _hubConnection.On<HostChangedMessage>(GameHubMethods.HostChanged, message =>
                     dispatcher.Dispatch(new HostChangedAction(message.PlayerId)));
 
+                _hubConnection.On(GameHubMethods.NewVoteStarted, () =>
+                    dispatcher.Dispatch(new NewVoteStartedAction()));
+
                 _hubConnection.On<PlayerConnectedMessage>(GameHubMethods.PlayerConnected, message =>
                     dispatcher.Dispatch(new PlayerConnectedAction(message.PlayerId)));
 
@@ -150,6 +153,20 @@ public class GameEffects
         _navigationManager.NavigateTo($"/");
         dispatcher.Dispatch(new ForgetGameAction(action.GameId));
         return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public async Task HandlePlayAgainAction(PlayAgainAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _appApi.PlayAgain(_gameState.Value.GameId, new PlayAgainRequest(_gameState.Value.Sid));
+            dispatcher.Dispatch(new PlayAgainSuccessAction());
+        }
+        catch (Exception exc)
+        {
+            dispatcher.Dispatch(new PlayAgainFailedAction(exc.Message));
+        }
     }
 
     [EffectMethod]

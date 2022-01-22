@@ -19,6 +19,7 @@ public record GameSnapshot
         Dictionary<int, string?> votes)
     {
         GameId = gameId;
+        GamePhase = gamePhase;
         Players = players;
         Deck = deck;
         Votes = votes;
