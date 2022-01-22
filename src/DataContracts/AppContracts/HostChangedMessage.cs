@@ -1,13 +1,13 @@
 namespace Scrummy.AppContracts;
 
-public record GameHostChangedMessage
+public record HostChangedMessage
 {
     public int PlayerId { get; init; }
 
     // Needed for SignalR serialization
-    private GameHostChangedMessage() { }
+    private HostChangedMessage() { }
 
-    public GameHostChangedMessage(int playerId)
+    public HostChangedMessage(int playerId)
     {
         PlayerId = playerId;
     }

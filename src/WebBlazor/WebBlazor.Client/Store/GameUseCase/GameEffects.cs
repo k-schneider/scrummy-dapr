@@ -55,8 +55,11 @@ public class GameEffects
                     .WithUrl(_navigationManager.ToAbsoluteUri($"/h/gamehub?sid={game.Sid}"))
                     .Build();
 
-                _hubConnection.On<GameHostChangedMessage>(GameHubMethods.GameHostChanged, message =>
-                    dispatcher.Dispatch(new GameHostChangedAction(message.PlayerId)));
+                _hubConnection.On<CardsFlippedMessage>(GameHubMethods.CardsFlipped, message =>
+                    dispatcher.Dispatch(new CardsFlippedAction(message.Votes)));
+
+                _hubConnection.On<HostChangedMessage>(GameHubMethods.HostChanged, message =>
+                    dispatcher.Dispatch(new HostChangedAction(message.PlayerId)));
 
                 _hubConnection.On<PlayerConnectedMessage>(GameHubMethods.PlayerConnected, message =>
                     dispatcher.Dispatch(new PlayerConnectedAction(message.PlayerId)));
@@ -71,16 +74,13 @@ public class GameEffects
                     dispatcher.Dispatch(new PlayerLeftGameAction(message.PlayerId)));
 
                 _hubConnection.On<PlayerVoteCastMessage>(GameHubMethods.PlayerVoteCast, message =>
-                    dispatcher.Dispatch(new PlayerVoteCastAction(message.PlayerId)));
+                    dispatcher.Dispatch(new PlayerVoteCastAction(message.PlayerId, message.Vote)));
 
                 _hubConnection.On<PlayerVoteRecalledMessage>(GameHubMethods.PlayerVoteRecalled, message =>
                     dispatcher.Dispatch(new PlayerVoteRecalledAction(message.PlayerId)));
 
                 _hubConnection.On<SyncGameMessage>(GameHubMethods.SyncGame, message =>
                     dispatcher.Dispatch(new SyncGameAction(message.Snapshot)));
-
-                _hubConnection.On<SyncVoteMessage>(GameHubMethods.SyncVote, message =>
-                    dispatcher.Dispatch(new SyncVoteAction(message.Vote)));
 
                 await _hubConnection.StartAsync();
             }
@@ -113,13 +113,27 @@ public class GameEffects
     }
 
     [EffectMethod]
+    public async Task HandleFlipCardsAction(FlipCardsAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _appApi.FlipCards(_gameState.Value.GameId, new FlipCardsRequest(_gameState.Value.Sid));
+            dispatcher.Dispatch(new FlipCardsSuccessAction());
+        }
+        catch (Exception exc)
+        {
+            dispatcher.Dispatch(new FlipCardsFailedAction(exc.Message));
+        }
+    }
+
+    [EffectMethod]
     public async Task HandleLeaveGameAction(LeaveGameAction action, IDispatcher dispatcher)
     {
         try
         {
-            var game = _lobbyState.Value.Games[action.GameId];
-            await _appApi.LeaveGame(action.GameId, new LeaveGameRequest(game.Sid));
-            dispatcher.Dispatch(new LeaveGameSuccessAction(game.GameId));
+            var gameId = _gameState.Value.GameId;
+            await _appApi.LeaveGame(gameId, new LeaveGameRequest(_gameState.Value.Sid));
+            dispatcher.Dispatch(new LeaveGameSuccessAction(gameId));
         }
         catch (Exception exc)
         {

@@ -11,6 +11,13 @@ public class GameController : ControllerBase
         _actorProxyFactory = actorProxyFactory;
     }
 
+    [HttpPost("game/{gameId}/vote")]
+    public async Task<IActionResult> CastVote(string gameId, CastVoteRequest request, CancellationToken cancellationToken)
+    {
+        await GetGameActor(gameId).CastVote(request.Sid, request.Vote, cancellationToken);
+        return Ok();
+    }
+
     [HttpPost("lobby/create")]
     public async Task<IActionResult> CreateGame(CreateGameRequest request, CancellationToken cancellationToken)
     {
@@ -18,6 +25,13 @@ public class GameController : ControllerBase
         var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);
 
         return Ok(new CreateGameResponse(gameId, playerId, sid));
+    }
+
+    [HttpPost("game/{gameId}/flip")]
+    public async Task<IActionResult> FlipCards(string gameId, FlipCardsRequest request, CancellationToken cancellationToken)
+    {
+        await GetGameActor(gameId).FlipCards(request.Sid, cancellationToken);
+        return Ok();
     }
 
     [HttpPost("game/{gameId}/join")]
@@ -37,13 +51,6 @@ public class GameController : ControllerBase
     public async Task<IActionResult> LeaveGame(string gameId, LeaveGameRequest request, CancellationToken cancellationToken)
     {
         await GetGameActor(gameId).RemovePlayer(request.Sid, cancellationToken);
-        return Ok();
-    }
-
-    [HttpPost("game/{gameId}/vote")]
-    public async Task<IActionResult> CastVote(string gameId, CastVoteRequest request, CancellationToken cancellationToken)
-    {
-        await GetGameActor(gameId).CastVote(request.Sid, request.Vote, cancellationToken);
         return Ok();
     }
 

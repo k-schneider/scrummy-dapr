@@ -5,8 +5,10 @@ public class GameActor : Actor, IGameActor
     private readonly IEventBus _eventBus;
 
     private GameStatus _gameStatus = GameStatus.None;
+    private GamePhase _gamePhase = GamePhase.Voting;
     private int _playerCounter;
     private List<PlayerState> _players = new();
+    private Dictionary<int, string> _votes = new();
     private HashSet<string> _deck = new()
     {
         "0",
@@ -67,9 +69,15 @@ public class GameActor : Actor, IGameActor
             throw new InvalidOperationException("Invalid vote");
         }
 
-        var player = _players.First(p => p.Sid == sid);
-        var previousVote = player.Vote;
-        player.Vote = vote;
+        var player = _players.FirstOrDefault(p => p.Sid == sid);
+
+        if (player is null)
+        {
+            throw new InvalidOperationException("Player not found");
+        }
+
+        _votes.TryGetValue(player.PlayerId, out var previousVote);
+        _votes[player.PlayerId] = vote;
 
         await _eventBus.PublishAsync(
             new PlayerVoteCastIntegrationEvent(
@@ -81,20 +89,43 @@ public class GameActor : Actor, IGameActor
             cancellationToken);
     }
 
+    public async Task FlipCards(string sid, CancellationToken cancellationToken = default)
+    {
+        EnsureGameInProgress();
+
+        var player = _players.First(p => p.Sid == sid);
+
+        if (!player.IsHost)
+        {
+            throw new InvalidOperationException("Only host can flip cards");
+        }
+
+        _gamePhase = GamePhase.Results;
+
+        await _eventBus.PublishAsync(
+            new CardsFlippedIntegrationEvent(GameId, _votes),
+            cancellationToken);
+    }
+
     public Task<GameSnapshot> GetGameSnapshot(int playerId, CancellationToken cancellationToken = default)
     {
         var players = _players.Select(p => new PlayerSnapshot(
             p.PlayerId,
             p.Nickname,
             p.IsHost,
-            p.IsConnected,
-            p.Vote is not null)).ToList();
+            p.IsConnected)).ToList();
+
+        var votes = _votes.ToDictionary(kvp =>
+            kvp.Key,
+            // only return vote values for other players when showing results
+            kvp => kvp.Key == playerId || _gamePhase == GamePhase.Results ? kvp.Value : null);
 
         return Task.FromResult(new GameSnapshot(
             GameId,
+            _gamePhase.Name,
             players,
             _deck,
-            _players.First(p => p.PlayerId == playerId).Vote));
+            votes));
     }
 
     public Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
@@ -112,9 +143,15 @@ public class GameActor : Actor, IGameActor
     {
         EnsureGameInProgress();
 
-        var player = _players.First(p => p.Sid == sid);
-        var previousVote = player.Vote;
-        player.Vote = null;
+        var player = _players.FirstOrDefault(p => p.Sid == sid);
+
+        if (player is null)
+        {
+            throw new InvalidOperationException("Player not found");
+        }
+
+        _votes.TryGetValue(player.PlayerId, out var previousVote);
+        _votes.Remove(player.PlayerId);
 
         await _eventBus.PublishAsync(
             new PlayerVoteRecalledIntegrationEvent(
@@ -129,14 +166,15 @@ public class GameActor : Actor, IGameActor
     {
         EnsureGameInProgress();
 
-        var player = _players.Where(p => p.Sid == sid).FirstOrDefault();
+        var player = _players.FirstOrDefault(p => p.Sid == sid);
 
-        if (player == null)
+        if (player is null)
         {
             throw new InvalidOperationException("Player not found");
         }
 
         _players.Remove(player);
+        _votes.Remove(player.PlayerId);
 
         await _eventBus.PublishAsync(
             new PlayerLeftGameIntegrationEvent(
@@ -152,7 +190,7 @@ public class GameActor : Actor, IGameActor
             newHost.IsHost = true;
 
             await _eventBus.PublishAsync(
-                new GameHostChangedIntegrationEvent(
+                new HostChangedIntegrationEvent(
                     player.Sid,
                     player.PlayerId,
                     player.Nickname,
@@ -173,36 +211,24 @@ public class GameActor : Actor, IGameActor
                 cancellationToken);
         }
 
-        // todo: if player that left was host, reassign host to oldest JoinDate player and send integration event
-
         // todo: considerations...
         //   clear gameId SessionActor?
         //   remove from hub group?
         //   terminate connection somehow?
-        //   if no more players left, end game?
-    }
-
-    public Task Reset()
-    {
-        if (_gameStatus != GameStatus.GameOver)
-        {
-            throw new InvalidOperationException("Game is not over");
-        }
-
-        _gameStatus = GameStatus.None;
-        _playerCounter = 0;
-        _players = new();
-        return Task.CompletedTask;
     }
 
     public async Task StartGame(CancellationToken cancellationToken = default)
     {
-        if (_gameStatus != GameStatus.None)
+        if (_gameStatus == GameStatus.InProgress)
         {
             throw new InvalidOperationException("Game has already started");
         }
 
         _gameStatus = GameStatus.InProgress;
+        _gamePhase = GamePhase.Voting;
+        _playerCounter = 0;
+        _players = new();
+        _votes = new();
 
         await _eventBus.PublishAsync(
             new GameStartedIntegrationEvent(GameId),

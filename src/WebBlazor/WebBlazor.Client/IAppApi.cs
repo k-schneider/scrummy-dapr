@@ -8,6 +8,9 @@ public interface IAppApi
     [Post("g/lobby/create")]
     Task<CreateGameResponse> CreateGame([Body] CreateGameRequest request, CancellationToken cancellationToken = default);
 
+    [Post("g/game/{gameId}/flip")]
+    Task FlipCards([Path] string gameId, [Body] FlipCardsRequest request, CancellationToken cancellationToken = default);
+
     [Post("g/game/{gameId}/join")]
     Task<JoinGameResponse> JoinGame([Path] string gameId, [Body] JoinGameRequest request, CancellationToken cancellationToken = default);
 

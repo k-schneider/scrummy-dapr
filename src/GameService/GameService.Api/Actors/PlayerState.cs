@@ -8,5 +8,4 @@ public class PlayerState
     public DateTimeOffset JoinDate { get; set; } = DateTimeOffset.UtcNow;
     public bool IsHost { get; set; }
     public bool IsConnected { get; set; }
-    public string? Vote { get; set; }
 }

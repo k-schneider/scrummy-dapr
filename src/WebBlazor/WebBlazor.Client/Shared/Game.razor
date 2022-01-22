@@ -17,7 +17,7 @@ else if (GameState.Value.Connected)
         <div>
             @foreach (var card in GameState.Value.Deck)
             {
-                <button class="m-2 p-3 bg-white border-2 @(card == GameState.Value.Vote ? "border-red-500" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
+                <button class="m-2 p-3 bg-white border-2 @(card == MyVote ? "border-red-500" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
             }
         </div>
 
@@ -43,10 +43,19 @@ else if (GameState.Value.Connected)
     [Parameter]
     public string GameId { get; set; } = null!;
 
-    private bool IsHost => GameState.Value.Players
-        .Where(p => p.PlayerId == GameState.Value.PlayerId)
-        .First()
-        .IsHost;
+    private Player Me => GameState.Value.Players
+        .First(p => p.PlayerId == GameState.Value.PlayerId);
+
+    private bool IsHost => Me.IsHost;
+
+    private string? MyVote
+    {
+        get
+        {
+            GameState.Value.Votes.TryGetValue(Me.PlayerId, out var vote);
+            return vote;
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,7 +70,7 @@ else if (GameState.Value.Connected)
 
     private void FlipCards()
     {
-
+        Dispatcher.Dispatch(new FlipCardsAction());
     }
 
     private void Vote(string card)
@@ -71,7 +80,7 @@ else if (GameState.Value.Connected)
             return;
         }
 
-        if (card == GameState.Value.Vote)
+        if (card == MyVote)
         {
             Dispatcher.Dispatch(new RecallVoteAction());
         }
@@ -83,7 +92,7 @@ else if (GameState.Value.Connected)
 
     private void LeaveGame()
     {
-        Dispatcher.Dispatch(new LeaveGameAction(GameId));
+        Dispatcher.Dispatch(new LeaveGameAction());
     }
 
     void IDisposable.Dispose()

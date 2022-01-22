@@ -1,6 +1,6 @@
 namespace Scrummy.GameService.Api.IntegrationEvents;
 
-public record GameHostChangedIntegrationEvent(
+public record HostChangedIntegrationEvent(
     string PreviousHostSid,
     int PreviousHostPlayerId,
     string PreviousHostNickname,

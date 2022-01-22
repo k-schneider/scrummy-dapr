@@ -1,3 +1,5 @@
+namespace Scrummy.WebBlazor.Client.Store.LobbyUseCase;
+
 [FeatureState]
 public record LobbyState
 {

@@ -17,15 +17,15 @@ public class GameEventController : ControllerBase
         _hubContext = hubContext;
     }
 
-    [HttpPost("GameHostChanged")]
-    [Topic(DAPR_PUBSUB_NAME, "GameHostChangedIntegrationEvent")]
-    public async Task HandleAsync(GameHostChangedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    [HttpPost("CardsFlipped")]
+    [Topic(DAPR_PUBSUB_NAME, "CardsFlippedIntegrationEvent")]
+    public async Task HandleAsync(CardsFlippedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         await _hubContext.Clients
             .Group(integrationEvent.GameId)
             .SendAsync(
-                GameHubMethods.GameHostChanged,
-                new GameHostChangedMessage(integrationEvent.NewHostPlayerId),
+                GameHubMethods.CardsFlipped,
+                new CardsFlippedMessage(integrationEvent.Votes),
                 cancellationToken);
     }
 
@@ -34,7 +34,18 @@ public class GameEventController : ControllerBase
     public async Task HandleAsync(GameEndedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         await GetLobbyActor().NotifyGameEnded(integrationEvent.GameId, cancellationToken);
-        await GetGameActor(integrationEvent.GameId).Reset();
+    }
+
+    [HttpPost("HostChanged")]
+    [Topic(DAPR_PUBSUB_NAME, "HostChangedIntegrationEvent")]
+    public async Task HandleAsync(HostChangedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.HostChanged,
+                new HostChangedMessage(integrationEvent.NewHostPlayerId),
+                cancellationToken);
     }
 
     [HttpPost("PlayerConnected")]
@@ -109,20 +120,23 @@ public class GameEventController : ControllerBase
     [Topic(DAPR_PUBSUB_NAME, "PlayerVoteCastIntegrationEvent")]
     public async Task HandleAsync(PlayerVoteCastIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        // Send players a notification that the player has voted
+        var session = GetSessionActor(integrationEvent.Sid);
+        var connectionIds = await session.GetConnectionIds(cancellationToken);
+
+        // Send players a notification that the player has voted excluding the vote value
         await _hubContext.Clients
-            .Group(integrationEvent.GameId)
+            .GroupExcept(integrationEvent.GameId, connectionIds)
             .SendAsync(
                 GameHubMethods.PlayerVoteCast,
-                new PlayerVoteCastMessage(integrationEvent.PlayerId),
+                new PlayerVoteCastMessage(integrationEvent.PlayerId, null),
                 cancellationToken);
 
         // Send the player a notification to sync their vote across connections
         await _hubContext.Clients
-            .Group(integrationEvent.Sid)
+            .Clients(connectionIds)
             .SendAsync(
-                GameHubMethods.SyncVote,
-                new SyncVoteMessage(integrationEvent.Vote),
+                GameHubMethods.PlayerVoteCast,
+                new PlayerVoteCastMessage(integrationEvent.PlayerId, integrationEvent.Vote),
                 cancellationToken);
     }
 
@@ -136,14 +150,6 @@ public class GameEventController : ControllerBase
             .SendAsync(
                 GameHubMethods.PlayerVoteRecalled,
                 new PlayerVoteRecalledMessage(integrationEvent.PlayerId),
-                cancellationToken);
-
-        // Send the player a notification to sync their vote across connections
-        await _hubContext.Clients
-            .Group(integrationEvent.Sid)
-            .SendAsync(
-                GameHubMethods.SyncVote,
-                new SyncVoteMessage(null),
                 cancellationToken);
     }
 

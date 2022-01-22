@@ -3,21 +3,48 @@ namespace Scrummy.WebBlazor.Client.Store.GameUseCase;
 public static class GameReducers
 {
     [ReducerMethod]
-    public static GameState ReduceCastVoteAction(GameState state, CastVoteAction action) =>
+    public static GameState ReduceCardsFlippedAction(GameState state, CardsFlippedAction action) =>
         state with
         {
-            PreviousVote = state.Vote,
-            Vote = action.Vote,
-            Voting = true
+            GamePhase = "Results",
+            Votes = action.Votes.ToDictionary(kvp => kvp.Key, kvp => kvp.Value ?? null)
         };
 
     [ReducerMethod]
-    public static GameState ReduceCastVoteFailedAction(GameState state, CastVoteFailedAction _) =>
-        state with
+    public static GameState ReduceCastVoteAction(GameState state, CastVoteAction action)
+    {
+        var previousVote = state.Votes.ContainsKey(state.PlayerId) ? state.Votes[state.PlayerId] : null;
+        var votes = new Dictionary<int, string?>(state.Votes);
+        votes[state.PlayerId] = action.Vote;
+
+        return state with
         {
-            Vote = state.PreviousVote,
+            PreviousVote = previousVote,
+            Votes = votes,
+            Voting = true
+        };
+    }
+
+    [ReducerMethod]
+    public static GameState ReduceCastVoteFailedAction(GameState state, CastVoteFailedAction _)
+    {
+        var votes = new Dictionary<int, string?>(state.Votes);
+
+        if (state.PreviousVote is null)
+        {
+            votes.Remove(state.PlayerId);
+        }
+        else
+        {
+            votes[state.PlayerId] = state.PreviousVote;
+        }
+
+        return state with
+        {
+            Votes = votes,
             Voting = false
         };
+    }
 
     [ReducerMethod]
     public static GameState ReduceCastVoteSuccessAction(GameState state, CastVoteSuccessAction _) =>
@@ -69,7 +96,28 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReduceGameHostChangedAction(GameState state, GameHostChangedAction action)
+    public static GameState ReduceFlipCardsAction(GameState state, FlipCardsAction _) =>
+        state with
+        {
+            Flipping = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceFlipCardsFailedAction(GameState state, FlipCardsFailedAction _) =>
+        state with
+        {
+            Flipping = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceFlipCardsSuccessAction(GameState state, FlipCardsSuccessAction _) =>
+        state with
+        {
+            Flipping = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceHostChangedAction(GameState state, HostChangedAction action)
     {
         var players = state.Players.Select(p => p with
         {
@@ -149,7 +197,7 @@ public static class GameReducers
     public static GameState ReducePlayerJoinedGameAction(GameState state, PlayerJoinedGameAction action) =>
         state with
         {
-            Players = state.Players.Append(new Player(action.PlayerId, action.Nickname, false, false, false)),
+            Players = state.Players.Append(new Player(action.PlayerId, action.Nickname, false, false)),
             Log = state.Log.Append(new LogEntry($"{action.Nickname} joined the game."))
         };
 
@@ -166,9 +214,13 @@ public static class GameReducers
             .Where(p => p.PlayerId == action.PlayerId)
             .First();
 
+        var votes = new Dictionary<int, string?>(state.Votes);
+        votes.Remove(action.PlayerId);
+
         return state with
         {
             Players = state.Players.Where(p => p.PlayerId != player.PlayerId),
+            Votes = votes,
             Log = state.Log.Append(new LogEntry($"{player.Nickname} left the game."))
         };
     }
@@ -180,23 +232,19 @@ public static class GameReducers
             .Where(p => p.PlayerId == action.PlayerId)
             .First();
 
-        var newPlayer = player with
-        {
-            HasVoted = true
-        };
-
         var name = state.PlayerId == action.PlayerId ? "You" : player.Nickname;
         var pronoun = state.PlayerId == action.PlayerId ? "your" : "their";
 
-        var logMessage = player.HasVoted
+        var logMessage = state.Votes.ContainsKey(action.PlayerId)
             ? $"{name} changed {pronoun} vote."
             : $"{name} voted.";
 
+        var votes = new Dictionary<int, string?>(state.Votes);
+        votes[action.PlayerId] = action.Vote;
+
         return state with
         {
-            Players = state.Players
-                .Where(p => p.PlayerId != player.PlayerId)
-                .Append(newPlayer),
+            Votes = votes,
             Log = state.Log.Append(new LogEntry(logMessage))
         };
     }
@@ -208,39 +256,54 @@ public static class GameReducers
             .Where(p => p.PlayerId == action.PlayerId)
             .First();
 
-        var newPlayer = player with
-        {
-            HasVoted = false
-        };
-
         var name = state.PlayerId == action.PlayerId ? "You" : player.Nickname;
         var pronoun = state.PlayerId == action.PlayerId ? "your" : "their";
 
+        var votes = new Dictionary<int, string?>(state.Votes);
+        votes.Remove(action.PlayerId);
+
         return state with
         {
-            Players = state.Players
-                .Where(p => p.PlayerId != player.PlayerId)
-                .Append(newPlayer),
+            Votes = votes,
             Log = state.Log.Append(new LogEntry($"{name} recalled {pronoun} vote."))
         };
     }
 
     [ReducerMethod]
-    public static GameState ReduceRecallVoteAction(GameState state, RecallVoteAction action) =>
-        state with
+    public static GameState ReduceRecallVoteAction(GameState state, RecallVoteAction action)
+    {
+        var previousVote = state.Votes.ContainsKey(state.PlayerId) ? state.Votes[state.PlayerId] : null;
+        var votes = new Dictionary<int, string?>(state.Votes);
+        votes.Remove(state.PlayerId);
+
+        return state with
         {
-            PreviousVote = state.Vote,
-            Vote = null,
+            PreviousVote = previousVote,
+            Votes = votes,
             Voting = true
         };
+    }
 
     [ReducerMethod]
-    public static GameState ReduceRecallVoteFailedAction(GameState state, RecallVoteFailedAction _) =>
-        state with
+    public static GameState ReduceRecallVoteFailedAction(GameState state, RecallVoteFailedAction _)
+    {
+        var votes = new Dictionary<int, string?>(state.Votes);
+
+        if (state.PreviousVote is null)
         {
-            Vote = state.PreviousVote,
+            votes.Remove(state.PlayerId);
+        }
+        else
+        {
+            votes[state.PlayerId] = state.PreviousVote;
+        }
+
+        return state with
+        {
+            Votes = votes,
             Voting = false
         };
+    }
 
     [ReducerMethod]
     public static GameState ReduceRecallVoteSuccessAction(GameState state, RecallVoteSuccessAction _) =>
@@ -254,16 +317,10 @@ public static class GameReducers
         state with
         {
             GameId = action.Snapshot.GameId,
+            GamePhase = action.Snapshot.GamePhase,
             Deck = action.Snapshot.Deck,
-            Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected, p.HasVoted)),
-            InSync = true,
-            Vote = action.Snapshot.Vote
-        };
-
-    [ReducerMethod]
-    public static GameState ReduceSyncVoteAction(GameState state, SyncVoteAction action) =>
-        state with
-        {
-            Vote = action.Vote
+            Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected)),
+            Votes = action.Snapshot.Votes,
+            InSync = true
         };
 }
