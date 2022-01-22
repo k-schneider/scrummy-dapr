@@ -153,6 +153,17 @@ public class GameEventController : ControllerBase
                 cancellationToken);
     }
 
+    [HttpPost("VotesReset")]
+    [Topic(DAPR_PUBSUB_NAME, "VotesResetIntegrationEvent")]
+    public async Task HandleAsync(VotesResetIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.VotesReset,
+                cancellationToken);
+    }
+
     private IGameActor GetGameActor(string gameId) =>
         _actorProxyFactory.CreateActorProxy<IGameActor>(
             new ActorId(gameId),

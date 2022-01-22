@@ -69,12 +69,7 @@ public class GameActor : Actor, IGameActor
             throw new InvalidOperationException("Invalid vote");
         }
 
-        var player = _players.FirstOrDefault(p => p.Sid == sid);
-
-        if (player is null)
-        {
-            throw new InvalidOperationException("Player not found");
-        }
+        var player = GetRequiredPlayer(sid);
 
         _votes.TryGetValue(player.PlayerId, out var previousVote);
         _votes[player.PlayerId] = vote;
@@ -91,14 +86,8 @@ public class GameActor : Actor, IGameActor
 
     public async Task FlipCards(string sid, CancellationToken cancellationToken = default)
     {
-        EnsureGameInProgress();
-
-        var player = _players.First(p => p.Sid == sid);
-
-        if (!player.IsHost)
-        {
-            throw new InvalidOperationException("Only host can flip cards");
-        }
+        EnsureVotingPhase();
+        EnsureHost(sid, "Only host can flip cards");
 
         _gamePhase = GamePhase.Results;
 
@@ -143,12 +132,7 @@ public class GameActor : Actor, IGameActor
     {
         EnsureGameInProgress();
 
-        var player = _players.FirstOrDefault(p => p.Sid == sid);
-
-        if (player is null)
-        {
-            throw new InvalidOperationException("Player not found");
-        }
+        var player = GetRequiredPlayer(sid);
 
         _votes.TryGetValue(player.PlayerId, out var previousVote);
         _votes.Remove(player.PlayerId);
@@ -165,13 +149,7 @@ public class GameActor : Actor, IGameActor
     public async Task RemovePlayer(string sid, CancellationToken cancellationToken = default)
     {
         EnsureGameInProgress();
-
-        var player = _players.FirstOrDefault(p => p.Sid == sid);
-
-        if (player is null)
-        {
-            throw new InvalidOperationException("Player not found");
-        }
+        var player = GetRequiredPlayer(sid);
 
         _players.Remove(player);
         _votes.Remove(player.PlayerId);
@@ -217,6 +195,18 @@ public class GameActor : Actor, IGameActor
         //   terminate connection somehow?
     }
 
+    public async Task ResetVotes(string sid, CancellationToken cancellationToken = default)
+    {
+        EnsureVotingPhase();
+        EnsureHost(sid, "Only host can reset votes");
+
+        _votes.Clear();
+
+        await _eventBus.PublishAsync(
+            new VotesResetIntegrationEvent(GameId),
+            cancellationToken);
+    }
+
     public async Task StartGame(CancellationToken cancellationToken = default)
     {
         if (_gameStatus == GameStatus.InProgress)
@@ -238,12 +228,44 @@ public class GameActor : Actor, IGameActor
     private string NewSid() => Guid.NewGuid().ToString();
     private int NextPlayerId() => ++_playerCounter;
 
-    private void EnsureGameInProgress()
+    private void EnsureGameInProgress(string error = "Game is not in progress")
     {
         if (_gameStatus != GameStatus.InProgress)
         {
-            throw new InvalidOperationException("Game is not in progress");
+            throw new InvalidOperationException(error);
         }
+    }
+
+    private void EnsureHost(string sid, string error = "Not the host")
+    {
+        var player = _players.First(p => p.Sid == sid);
+
+        if (!player.IsHost)
+        {
+            throw new InvalidOperationException(error);
+        }
+    }
+
+    private void EnsureVotingPhase(string error = "Game is not in voting phase")
+    {
+        EnsureGameInProgress();
+
+        if (_gamePhase != GamePhase.Voting)
+        {
+            throw new InvalidOperationException(error);
+        }
+    }
+
+    private PlayerState GetRequiredPlayer(string sid)
+    {
+        var player = _players.FirstOrDefault(p => p.Sid == sid);
+
+        if (player is null)
+        {
+            throw new InvalidOperationException("Player not found");
+        }
+
+        return player;
     }
 
     private ISessionActor GetSessionActor(string sid) =>

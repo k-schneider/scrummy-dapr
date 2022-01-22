@@ -38,4 +38,10 @@ public record RecallVoteAction();
 public record RecallVoteSuccessAction();
 public record RecallVoteFailedAction(string Error);
 
+public record ResetVotesAction();
+public record ResetVotesSuccessAction();
+public record ResetVotesFailedAction(string Error);
+
 public record SyncGameAction(GameSnapshot Snapshot);
+
+public record VotesResetAction();

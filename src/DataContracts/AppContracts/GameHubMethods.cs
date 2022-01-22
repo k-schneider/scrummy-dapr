@@ -9,4 +9,5 @@ public static class GameHubMethods
     public const string PlayerVoteCast = "PlayerVoteCast";
     public const string PlayerVoteRecalled = "PlayerVoteRecalled";
     public const string SyncGame = "SyncGame";
+    public const string VotesReset = "VotesReset";
 }

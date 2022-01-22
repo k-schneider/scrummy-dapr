@@ -82,6 +82,9 @@ public class GameEffects
                 _hubConnection.On<SyncGameMessage>(GameHubMethods.SyncGame, message =>
                     dispatcher.Dispatch(new SyncGameAction(message.Snapshot)));
 
+                _hubConnection.On(GameHubMethods.VotesReset, () =>
+                    dispatcher.Dispatch(new VotesResetAction()));
+
                 await _hubConnection.StartAsync();
             }
 
@@ -171,6 +174,20 @@ public class GameEffects
         catch (Exception exc)
         {
             dispatcher.Dispatch(new RecallVoteFailedAction(exc.Message));
+        }
+    }
+
+    [EffectMethod]
+    public async Task HandleResetVotesAction(ResetVotesAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _appApi.ResetVotes(_gameState.Value.GameId, new ResetVotesRequest(_gameState.Value.Sid));
+            dispatcher.Dispatch(new ResetVotesSuccessAction());
+        }
+        catch (Exception exc)
+        {
+            dispatcher.Dispatch(new ResetVotesFailedAction(exc.Message));
         }
     }
 }

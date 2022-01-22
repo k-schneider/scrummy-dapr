@@ -3,12 +3,18 @@ namespace Scrummy.WebBlazor.Client.Store.GameUseCase;
 public static class GameReducers
 {
     [ReducerMethod]
-    public static GameState ReduceCardsFlippedAction(GameState state, CardsFlippedAction action) =>
-        state with
+    public static GameState ReduceCardsFlippedAction(GameState state, CardsFlippedAction action)
+    {
+        var host = state.Players.First(p => p.IsHost);
+        var name = host.PlayerId == state.PlayerId ? "You" : host.Nickname;
+
+        return state with
         {
             GamePhase = "Results",
-            Votes = action.Votes.ToDictionary(kvp => kvp.Key, kvp => kvp.Value ?? null)
+            Votes = action.Votes.ToDictionary(kvp => kvp.Key, kvp => kvp.Value ?? null),
+            Log = state.Log.Append(new LogEntry($"{name} flipped the cards."))
         };
+    }
 
     [ReducerMethod]
     public static GameState ReduceCastVoteAction(GameState state, CastVoteAction action)
@@ -313,6 +319,27 @@ public static class GameReducers
         };
 
     [ReducerMethod]
+    public static GameState ReduceResetVotesAction(GameState state, ResetVotesAction _) =>
+        state with
+        {
+            ResettingVotes = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceResetVotesFailedAction(GameState state, ResetVotesFailedAction _) =>
+        state with
+        {
+            ResettingVotes = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceResetVotesSuccessAction(GameState state, ResetVotesSuccessAction _) =>
+        state with
+        {
+            ResettingVotes = false
+        };
+
+    [ReducerMethod]
     public static GameState ReduceSyncGameAction(GameState state, SyncGameAction action) =>
         state with
         {
@@ -323,4 +350,17 @@ public static class GameReducers
             Votes = action.Snapshot.Votes,
             InSync = true
         };
+
+    [ReducerMethod]
+    public static GameState ReduceVotesResetAction(GameState state, VotesResetAction _)
+    {
+        var host = state.Players.First(p => p.IsHost);
+        var name = host.PlayerId == state.PlayerId ? "You" : host.Nickname;
+
+        return state with
+        {
+            Votes = new(),
+            Log = state.Log.Append(new LogEntry($"{name} reset the votes."))
+        };
+    }
 }

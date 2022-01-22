@@ -19,4 +19,7 @@ public interface IAppApi
 
     [Delete("g/game/{gameId}/vote")]
     Task RecallVote([Path] string gameId, [Body] RecallVoteRequest request, CancellationToken cancellationToken = default);
+
+    [Delete("g/game/{gameId}/votes")]
+    Task ResetVotes([Path] string gameId, [Body] ResetVotesRequest request, CancellationToken cancellationToken = default);
 }
