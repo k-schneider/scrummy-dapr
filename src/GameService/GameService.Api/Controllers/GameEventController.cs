@@ -65,18 +65,10 @@ public class GameEventController : ControllerBase
     {
         var game = GetGameActor(integrationEvent.GameId);
 
-        await game.NotifyPlayerConnected(integrationEvent.PlayerId, cancellationToken);
-
-        // Send the new connection a snapshot of the current game state
-        await _hubContext.Clients
-            .Client(integrationEvent.ConnectionId)
-            .SendAsync(
-                GameHubMethods.SyncGame,
-                new SyncGameMessage(await game.GetGameSnapshot(integrationEvent.PlayerId, cancellationToken)),
-                cancellationToken);
-
         if (integrationEvent.ConnectionCount == 1)
         {
+            await game.NotifyPlayerConnected(integrationEvent.PlayerId, cancellationToken);
+
             // Let everyone in the game know this player is now online
             await _hubContext.Clients
                 .GroupExcept(integrationEvent.GameId, integrationEvent.ConnectionId)
@@ -85,6 +77,14 @@ public class GameEventController : ControllerBase
                     new PlayerConnectedMessage(integrationEvent.PlayerId),
                     cancellationToken);
         }
+
+        // Send the new connection a snapshot of the current game state
+        await _hubContext.Clients
+            .Client(integrationEvent.ConnectionId)
+            .SendAsync(
+                GameHubMethods.SyncGame,
+                new SyncGameMessage(await game.GetGameSnapshot(integrationEvent.PlayerId, cancellationToken)),
+                cancellationToken);
     }
 
     [HttpPost("PlayerDisconnected")]
@@ -93,6 +93,9 @@ public class GameEventController : ControllerBase
     {
         if (integrationEvent.ConnectionCount == 0)
         {
+            var game = GetGameActor(integrationEvent.GameId);
+            await game.NotifyPlayerDisconnected(integrationEvent.PlayerId, cancellationToken);
+
             // Let everyone in the game know this player is now offline
             await _hubContext.Clients
                 .GroupExcept(integrationEvent.GameId, integrationEvent.ConnectionId)

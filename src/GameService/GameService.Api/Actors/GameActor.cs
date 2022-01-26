@@ -128,6 +128,17 @@ public class GameActor : Actor, IGameActor
         return Task.CompletedTask;
     }
 
+    public Task NotifyPlayerDisconnected(int playerId, CancellationToken cancellationToken = default)
+    {
+        EnsureGameInProgress();
+
+        _players
+            .First(p => p.PlayerId == playerId)
+            .IsConnected = false;
+
+        return Task.CompletedTask;
+    }
+
     public async Task PlayAgain(string sid, CancellationToken cancellationToken = default)
     {
         EnsureResultsPhase();
