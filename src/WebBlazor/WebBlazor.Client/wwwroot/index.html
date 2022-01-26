@@ -7,6 +7,20 @@
     <title>Scrummy</title>
     <base href="/" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              'play': ['Play', 'sans-serif']
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet">
     <style type="text/css">
       body {
         background-color: #1e132f;
@@ -15,8 +29,12 @@
     </style>
 </head>
 
-<body>
-    <div id="app">Loading...</div>
+<body class="font-play">
+    <div id="app">
+      <div class="flex h-screen justify-center items-center">
+        <p class="text-center text-white text-lg font-semibold">Loading...</p>
+      </div>
+    </div>
 
     <div id="blazor-error-ui" class="bg-yellow-100 bottom-0 left-0 hidden py-2.5 px-5 fixed w-full z-50 shadow-md">
         An unhandled error has occurred.

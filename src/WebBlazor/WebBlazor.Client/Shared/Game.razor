@@ -7,52 +7,119 @@
 
 @if (GameState.Value.Connecting)
 {
-    <text>Connecting to game...</text>
+    <div class="flex h-screen justify-center items-center">
+        <p class="text-center text-white text-lg font-semibold">Connecting to game...</p>
+    </div>
 }
 else if (GameState.Value.Connected)
 {
     if (GameState.Value.InSync)
     {
-        <div>The actual Game</div>
+        <div class="flex justify-between py-4 px-8">
+            <button class="flex justify-center items-center space-x-2 bg-orange-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md">
+                <span>Invite</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76" />
+                </svg>
+            </button>
 
-        @if (GameState.Value.GamePhase == "Voting")
-        {
-            <div>
-                @foreach (var card in GameState.Value.Deck)
+            <button class="flex justify-center items-center space-x-2 bg-orange-400 text-slate-800 text-lg font-bold py-2 px-6 border-b-4 border-orange-500 hover:bg-orange-300 hover:border-orange-400 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md">
+                <span>Kevin</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="flex">
+
+            <div class="grow p-8">
+
+                @if (GameState.Value.GamePhase == "Voting")
                 {
-                    <button class="m-2 p-3 bg-white border-2 @(card == MyVote ? "border-red-500" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
+                    <div class="flex justify-center items-center">
+                        <div class="bg-white rounded-lg text-2xl text-gray-800 py-2 px-4 font-semibold drop-shadow-md">
+                            Cast your vote...
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center mt-4">
+                        @foreach (var card in GameState.Value.Deck)
+                        {
+                            <button class="transition-all ease-in-out drop-shadow-md select-none cursor-pointer bg-white rounded-xl flex m-2 h-32 w-20 lg:h-44 lg:w-28 text-4xl lg:text-5xl text-gray-800 flex items-center justify-center focus:outline-none border-8 hover:mt-1 hover:drop-shadow-xl @(card == MyVote ? "border-orange-500 mt-1" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
+                        }
+                    </div>
+
+                    <!--<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="LeaveGame">Leave Game</button>-->
                 }
+
+                @if (GameState.Value.GamePhase == "Results")
+                {
+                    foreach (var vote in GameState.Value.Votes)
+                    {
+                        <p>@vote.Key voted @vote.Value</p>
+                    }
+                }
+
             </div>
 
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="LeaveGame">Leave Game</button>
+            <div class="shrink-0 w-96 flex flex-col space-y-4 p-8">
 
-            @if (IsHost)
-            {
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="ResetVotes">Reset Votes</button>
+                <div class="flex flex-col bg-indigo-400 p-3 pt-1 h-80 rounded-lg text-sm drop-shadow-md">
+                    <div class="text-center shrink-0 text-indigo-800 font-bold">Players</div>
+                    <div class="mt-2 grow overflow-auto rounded-lg">
+                        @foreach (var player in GameState.Value.Players)
+                        {
+                            <div>@player.Nickname</div>
+                        }
+                    </div>
+                </div>
 
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="FlipCards">Flip Cards</button>
-            }
-        }
+                <div class="flex flex-col bg-stone-400 pt-1 h-96 rounded-lg text-sm drop-shadow-md">
+                    <div class="text-center shrink-0 text-stone-800 font-bold">Game Log</div>
+                    <div class="mt-2 grow overflow-auto rounded-lg">
+                        @foreach (var logEntry in GameState.Value.Log)
+                        {
+                            <p @key="@logEntry.Id" class="leading-tight px-2 py-1 even:bg-stone-300">
+                                <span class="text-xs opacity-75">@DateTimeOffset.FromUnixTimeMilliseconds(logEntry.Timestamp).ToLocalTime().ToString("h:mm:ss tt")</span>
+                                <br>
+                                <span>@logEntry.Message</span>
+                            </p>
+                        }
+                    </div>
+                </div>
 
-        @if (GameState.Value.GamePhase == "Results")
+            </div>
+
+        </div>
+
+        @if (IsHost)
         {
-            foreach (var vote in GameState.Value.Votes)
-            {
-                <p>@vote.Key voted @vote.Value</p>
-            }
+            <div class="fixed bottom-0 flex space-x-2 py-4 px-8">
+                @if (GameState.Value.GamePhase == "Voting")
+                {
+                    <button class="flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md" @onclick="FlipCards">
+                        Flip Cards
+                    </button>
+                    <button class="flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md" @onclick="ResetVotes">
+                        Reset Votes
+                    </button>
+                }
 
-            @if (IsHost)
-            {
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="PlayAgain">Play Again</button>
-            }
+                @if (GameState.Value.GamePhase == "Results")
+                {
+                    <button class="flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md" @onclick="PlayAgain">
+                        Play Again
+                    </button>
+                }
+            </div>
         }
-
-        <hr>
-        <GameLog />
     }
     else
     {
-        <text>Waiting for game state...</text>
+        <div class="flex h-screen justify-center items-center">
+            <p class="text-center text-white text-lg font-semibold">Waiting for game state...</p>
+        </div>
     }
 }
 
