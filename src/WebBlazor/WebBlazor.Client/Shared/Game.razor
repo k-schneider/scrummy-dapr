@@ -83,7 +83,14 @@ else if (GameState.Value.Connected)
                     {
                         <div class="flex justify-center items-center">
                             <div class="bg-white rounded-lg text-2xl text-gray-800 py-2 px-4 font-semibold drop-shadow-md">
-                                Cast your vote...
+                                @if (GameState.Value.Votes.ContainsKey(GameState.Value.PlayerId))
+                                {
+                                    <text>Waiting for host...</text>
+                                }
+                                else
+                                {
+                                    <text>Cast your vote...</text>
+                                }
                             </div>
                         </div>
 
@@ -192,7 +199,8 @@ else if (GameState.Value.Connected)
                     @if (GameState.Value.GamePhase == "Results")
                     {
                         <button class="flex-1 sm:flex-none flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md" @onclick="PlayAgain">
-                            Play Again
+                            <span>Play Again</span>
+                            <i class="fa-solid fa-dice text-xl"></i>
                         </button>
                     }
                 </div>
