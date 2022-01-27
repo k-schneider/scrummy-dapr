@@ -41,10 +41,37 @@ else if (GameState.Value.Connected)
                 }
             </div>
 
-            <button class="flex justify-center items-center space-x-2 bg-orange-400 text-slate-800 text-xl font-bold py-2 px-6 border-b-4 border-orange-500 hover:bg-orange-300 hover:border-orange-400 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md">
-                <span>Kevin</span>
-                <i class="fa-solid fa-face-smile-beam text-2xl"></i>
-            </button>
+            <div class="relative">
+                <button @onclick="@(() => _test2 = true)" class="flex justify-center items-center space-x-2 bg-orange-400 text-slate-800 text-xl font-bold py-2 px-6 border-b-4 border-orange-500 hover:bg-orange-300 hover:border-orange-400 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md">
+                    <span>Kevin</span>
+                    <i class="fa-solid fa-face-smile-beam text-2xl"></i>
+                </button>
+
+                @if (_test2)
+                {
+                    <div @onclick="@(() => _test2 = false)" class="fixed inset-0 h-full w-full z-10 bg-black/25 backdrop-blur-sm"></div>
+
+                    <div class="absolute right-0 mt-2 w-96 bg-white rounded-md shadow-xl z-20 flex flex-col">
+                        <div class="flex flex-col space-y-2 p-4">
+                            <label class="w-full text-center text-lg font-semibold">Nickname</label>
+                            <input type="text" class="text-xl bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 block w-full p-2.5" />
+                            <button class="w-full flex justify-center items-center space-x-4 bg-orange-600 text-slate-200 text-xl font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md">
+                                Update Your Nickname
+                            </button>
+                        </div>
+                        <div class="bg-stone-200 p-4">
+                            <p class="w-full text-center text-lg font-semibold">Player Settings</p>
+                            <p class="w-full text-center mt-2">todo: Toggle for specator mode</p>
+                        </div>
+                        <div class="p-4">
+                            <button @onclick="LeaveGame" class="w-full flex justify-center items-center space-x-4 bg-orange-600 text-slate-200 text-xl font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md">
+                                <span>Leave Game</span>
+                                <i class="fa-solid fa-arrow-right-from-bracket text-2xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
 
         <div class="flex">
@@ -65,8 +92,6 @@ else if (GameState.Value.Connected)
                             <button class="transition-all ease-in-out drop-shadow-md select-none cursor-pointer bg-white rounded-xl flex m-2 h-32 w-20 lg:h-44 lg:w-28 text-4xl lg:text-5xl text-gray-800 flex items-center justify-center focus:outline-none border-8 hover:mt-1 hover:drop-shadow-xl @(card == MyVote ? "border-orange-500 mt-1" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
                         }
                     </div>
-
-                    <!--<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" @onclick="LeaveGame">Leave Game</button>-->
                 }
 
                 @if (GameState.Value.GamePhase == "Results")
@@ -100,9 +125,31 @@ else if (GameState.Value.Connected)
                                     <i class="fa-solid fa-circle-notch fa-spin text-white opacity-50 text-2xl"></i>
                                 }
                                 <span class="grow text-xl @(player.IsConnected ? "" : "opacity-50")">@player.Nickname</span>
-                                <button class="rounded-full hover:bg-black/10 p-1 text-slate-700 rounded-full hover:bg-black/10 p-1 text-slate-700 text-xl w-8 h-8 flex items-center justify-center">
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                </button>
+                                <div class="relative">
+                                    <button @onclick="@(() => _test3 = player.PlayerId)" class="rounded-full hover:bg-black/10 p-1 text-slate-700 rounded-full hover:bg-black/10 p-1 text-slate-700 text-xl w-8 h-8 flex items-center justify-center">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </button>
+
+                                    @if (_test3 == player.PlayerId)
+                                    {
+                                        <div @onclick="@(() => _test3 = null)" class="fixed inset-0 h-full w-full z-10"></div>
+
+                                        <div class="absolute right-0 mt-2 py-2 w-40 bg-white rounded-md shadow-xl z-20">
+                                            <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                                <i class="fa-solid fa-bolt w-7 text-center"></i>
+                                                <span>Nudge</span>
+                                            </a>
+                                            <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                                <i class="fa-solid fa-xmark w-7 text-center"></i>
+                                                <span>Remove</span>
+                                            </a>
+                                            <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                                <i class="fa-solid fa-crown w-7 text-center"></i>
+                                                <span>Promote</span>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
                             </div>
                         }
                     </div>
@@ -160,6 +207,8 @@ else if (GameState.Value.Connected)
 
 @code {
     private bool _test = false;
+    private bool _test2 = false;
+    private int? _test3 = null;
 
     [Parameter]
     public string GameId { get; set; } = null!;
