@@ -52,7 +52,12 @@ public class GameEffects
             if (_hubConnection is null)
             {
                 _hubConnection = new HubConnectionBuilder()
-                    .WithUrl(_navigationManager.ToAbsoluteUri($"/h/gamehub?sid={game.Sid}"))
+                    .WithUrl(_navigationManager.ToAbsoluteUri(
+                        $"/h/gamehub?sid={game.Sid}"),
+                        options => {
+                            options.Transports = HttpTransportType.WebSockets;
+                            options.SkipNegotiation = true;
+                        })
                     .Build();
 
                 _hubConnection.On<CardsFlippedMessage>(GameHubMethods.CardsFlipped, message =>
