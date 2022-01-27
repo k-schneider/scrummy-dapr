@@ -130,11 +130,13 @@ public class GameActor : Actor, IGameActor
 
     public Task NotifyPlayerDisconnected(int playerId, CancellationToken cancellationToken = default)
     {
-        EnsureGameInProgress();
+        var player = _players
+            .FirstOrDefault(p => p.PlayerId == playerId);
 
-        _players
-            .First(p => p.PlayerId == playerId)
-            .IsConnected = false;
+        if (player is not null)
+        {
+            player.IsConnected = false;
+        }
 
         return Task.CompletedTask;
     }
