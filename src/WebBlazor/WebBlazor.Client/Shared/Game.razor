@@ -2,7 +2,6 @@
 @implements IDisposable
 @inject IDispatcher Dispatcher
 @inject IState<GameState> GameState
-@inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 
 <PageTitle>Scrummy - Playing</PageTitle>
@@ -20,20 +19,20 @@ else if (GameState.Value.Connected)
         <div class="mb-24 sm:mb-12">
             <div class="flex justify-between py-4 px-4 md:px-8">
                 <div class="relative">
-                    <button @onclick="@(() => _test = true)" class="flex justify-center items-center space-x-2 bg-orange-600 text-slate-200 text-xl font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md">
+                    <button @onclick="OpenInvitePopover" class="flex justify-center items-center space-x-2 bg-orange-600 text-slate-200 text-xl font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg shadow-md">
                         <span>Invite</span>
                         <i class="fa-solid fa-envelope-open-text text-2xl"></i>
                     </button>
 
-                    @if (_test)
+                    @if (GameState.Value.InvitePopoverOpen)
                     {
-                        <div @onclick="@(() => _test = false)" class="fixed inset-0 h-full w-full z-10 bg-black/25 backdrop-blur-sm"></div>
+                        <div @onclick="CloseInvitePopover" class="fixed inset-0 h-full w-full z-10 bg-black/25 backdrop-blur-sm"></div>
 
                         <div class="absolute left-0 mt-2 py-2 px-4 w-96 bg-white rounded-md shadow-xl z-20 flex flex-col space-y-2">
                             <p class="text-center text-indigo-700 font-semibold">Invite players by sending them this link:</p>
                             <input type="text" readonly value="@NavigationManager.Uri" class="text-xl bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 block w-full p-2.5" />
                             <div>
-                                <button @onclick="CopyLinkToClipboard" class="w-full flex justify-center items-center space-x-4 bg-orange-600 text-slate-200 text-xl font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md">
+                                <button @onclick="CopyLinkToClipboard" class="w-full flex justify-center items-center space-x-4 bg-orange-600 text-slate-200 text-xl font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg shadow-md">
                                     <span>Copy link to clipboard</span>
                                     <i class="fa-solid fa-clipboard-list text-2xl"></i>
                                 </button>
@@ -43,20 +42,20 @@ else if (GameState.Value.Connected)
                 </div>
 
                 <div class="relative">
-                    <button @onclick="@(() => _test2 = true)" class="flex justify-center items-center space-x-2 bg-orange-400 text-slate-800 text-xl font-bold py-2 px-6 border-b-4 border-orange-500 hover:bg-orange-300 hover:border-orange-400 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md">
+                    <button @onclick="OpenPlayerPopover" class="flex justify-center items-center space-x-2 bg-orange-400 text-slate-800 text-xl font-bold py-2 px-6 border-b-4 border-orange-500 hover:bg-orange-300 hover:border-orange-400 active:mt-1 active:border-b-0 rounded-lg shadow-md">
                         <span>Kevin</span>
                         <i class="fa-solid fa-face-smile-beam text-2xl"></i>
                     </button>
 
-                    @if (_test2)
+                    @if (GameState.Value.PlayerPopoverOpen)
                     {
-                        <div @onclick="@(() => _test2 = false)" class="fixed inset-0 h-full w-full z-10 bg-black/25 backdrop-blur-sm"></div>
+                        <div @onclick="ClosePlayerPopover" class="fixed inset-0 h-full w-full z-10 bg-black/25 backdrop-blur-sm"></div>
 
                         <div class="absolute right-0 mt-2 w-96 bg-white rounded-md shadow-xl z-20 flex flex-col">
                             <div class="flex flex-col space-y-2 p-4">
                                 <label class="w-full text-center text-lg font-semibold">Nickname</label>
                                 <input type="text" class="text-xl bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 block w-full p-2.5" />
-                                <button class="w-full flex justify-center items-center space-x-4 bg-orange-600 text-slate-200 text-xl font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md">
+                                <button class="w-full flex justify-center items-center space-x-4 bg-orange-600 text-slate-200 text-xl font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg shadow-md">
                                     Update Your Nickname
                                 </button>
                             </div>
@@ -65,7 +64,7 @@ else if (GameState.Value.Connected)
                                 <p class="w-full text-center mt-2">todo: Toggle for specator mode</p>
                             </div>
                             <div class="p-4">
-                                <button @onclick="LeaveGame" class="w-full flex justify-center items-center space-x-4 bg-orange-600 text-slate-200 text-xl font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md">
+                                <button @onclick="LeaveGame" class="w-full flex justify-center items-center space-x-4 bg-orange-600 text-slate-200 text-xl font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg shadow-md">
                                     <span>Leave Game</span>
                                     <i class="fa-solid fa-arrow-right-from-bracket text-2xl"></i>
                                 </button>
@@ -82,7 +81,7 @@ else if (GameState.Value.Connected)
                     @if (GameState.Value.GamePhase == "Voting")
                     {
                         <div class="flex justify-center items-center">
-                            <div class="bg-white rounded-lg text-2xl text-gray-800 py-2 px-4 font-semibold drop-shadow-md">
+                            <div class="bg-white rounded-lg text-2xl text-gray-800 py-2 px-4 font-semibold shadow-md">
                                 @if (GameState.Value.Votes.ContainsKey(GameState.Value.PlayerId))
                                 {
                                     <text>Waiting for host...</text>
@@ -97,7 +96,7 @@ else if (GameState.Value.Connected)
                         <div class="flex flex-wrap justify-center mt-4">
                             @foreach (var card in GameState.Value.Deck)
                             {
-                                <button class="transition-all ease-in-out drop-shadow-md select-none cursor-pointer bg-white rounded-xl flex m-2 h-32 w-20 lg:h-44 lg:w-28 text-4xl lg:text-5xl text-gray-800 flex items-center justify-center border-8 hover:mt-1 hover:drop-shadow-xl @(card == MyVote ? "border-orange-500 mt-1" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
+                                <button class="transition-all ease-in-out shadow-md select-none cursor-pointer bg-white rounded-xl flex m-2 h-32 w-20 lg:h-44 lg:w-28 text-4xl lg:text-5xl text-gray-800 flex items-center justify-center border-8 hover:mt-1 hover:shadow-xl @(card == MyVote ? "border-orange-500 mt-1" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
                             }
                         </div>
                     }
@@ -114,7 +113,7 @@ else if (GameState.Value.Connected)
 
                 <div class="shrink-0 w-full sm:w-72 md:w-96 flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-4 p-4 md:p-8">
 
-                    <div class="flex-1 sm:flex-none flex flex-col bg-indigo-400 p-2 pt-1 h-80 rounded-lg drop-shadow-md">
+                    <div class="flex-1 sm:flex-none flex flex-col bg-indigo-400 p-2 pt-1 h-80 rounded-lg shadow-md">
                         <div class="text-center shrink-0 text-indigo-800 font-bold text-sm">Players</div>
                         <div class="mt-2 grow overflow-auto">
                             @foreach (var player in GameState.Value.Players)
@@ -133,37 +132,40 @@ else if (GameState.Value.Connected)
                                         <i class="fa-solid fa-circle-notch fa-spin text-white opacity-50 text-2xl"></i>
                                     }
                                     <span class="grow text-xl @(player.IsConnected ? "" : "opacity-50")">@player.Nickname</span>
-                                    <div class="relative">
-                                        <button @onclick="@(() => _test3 = player.PlayerId)" class="rounded-full hover:bg-black/10 p-1 text-slate-700 rounded-full hover:bg-black/10 p-1 text-slate-700 text-xl w-8 h-8 flex items-center justify-center">
-                                            <i class="fa-solid fa-ellipsis-vertical"></i>
-                                        </button>
+                                    @if (player.PlayerId != GameState.Value.PlayerId)
+                                    {
+                                        <div class="relative">
+                                            <button @onclick="@(() => OpenOtherPlayerMenu(player.PlayerId))" class="rounded-full hover:bg-black/10 p-1 text-slate-700 rounded-full hover:bg-black/10 p-1 text-slate-700 text-xl w-8 h-8 flex items-center justify-center">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                            </button>
 
-                                        @if (_test3 == player.PlayerId)
-                                        {
-                                            <div @onclick="@(() => _test3 = null)" class="fixed inset-0 h-full w-full z-10"></div>
+                                            @if (GameState.Value.OtherPlayerIdMenuOpen == player.PlayerId)
+                                            {
+                                                <div @onclick="CloseOtherPlayerMenu" class="fixed inset-0 h-full w-full z-10"></div>
 
-                                            <div class="absolute right-0 mt-2 py-2 w-40 bg-white rounded-md shadow-xl z-20">
-                                                <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
-                                                    <i class="fa-solid fa-bolt w-7 text-center"></i>
-                                                    <span>Nudge</span>
-                                                </a>
-                                                <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
-                                                    <i class="fa-solid fa-xmark w-7 text-center"></i>
-                                                    <span>Remove</span>
-                                                </a>
-                                                <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
-                                                    <i class="fa-solid fa-crown w-7 text-center"></i>
-                                                    <span>Promote</span>
-                                                </a>
-                                            </div>
-                                        }
-                                    </div>
+                                                <div class="absolute right-0 mt-2 py-2 w-40 bg-white rounded-md shadow-xl z-20">
+                                                    <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                                        <i class="fa-solid fa-bolt w-7 text-center"></i>
+                                                        <span>Nudge</span>
+                                                    </a>
+                                                    <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                                        <i class="fa-solid fa-xmark w-7 text-center"></i>
+                                                        <span>Remove</span>
+                                                    </a>
+                                                    <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                                        <i class="fa-solid fa-crown w-7 text-center"></i>
+                                                        <span>Promote</span>
+                                                    </a>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
                                 </div>
                             }
                         </div>
                     </div>
 
-                    <div class="flex-1 sm:flex-none flex flex-col bg-stone-400 p-2 pt-1 h-80 sm:h-96 rounded-lg text-sm drop-shadow-md">
+                    <div class="flex-1 sm:flex-none flex flex-col bg-stone-400 p-2 pt-1 h-80 sm:h-96 rounded-lg text-sm shadow-md">
                         <div class="text-center shrink-0 text-stone-800 font-bold">Game Log</div>
                         <div class="mt-2 grow overflow-auto">
                             @foreach (var logEntry in GameState.Value.Log)
@@ -186,11 +188,11 @@ else if (GameState.Value.Connected)
                 <div class="w-full sm:w-auto fixed bottom-0 flex space-x-4 py-4 px-4 md:px-8">
                     @if (GameState.Value.GamePhase == "Voting")
                     {
-                        <button class="flex-1 sm:flex-none flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md" @onclick="FlipCards">
+                        <button class="flex-1 sm:flex-none flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg shadow-md" @onclick="FlipCards">
                             <span>Flip Cards</span>
                             <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
                         </button>
-                        <button class="flex-1 sm:flex-none flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md" @onclick="ResetVotes">
+                        <button class="flex-1 sm:flex-none flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg shadow-md" @onclick="ResetVotes">
                             <span>Reset Votes</span>
                             <i class="fa-solid fa-rotate-left text-xl"></i>
                         </button>
@@ -198,7 +200,7 @@ else if (GameState.Value.Connected)
 
                     @if (GameState.Value.GamePhase == "Results")
                     {
-                        <button class="flex-1 sm:flex-none flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg drop-shadow-md" @onclick="PlayAgain">
+                        <button class="flex-1 sm:flex-none flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg shadow-md" @onclick="PlayAgain">
                             <span>Play Again</span>
                             <i class="fa-solid fa-dice text-xl"></i>
                         </button>
@@ -216,10 +218,6 @@ else if (GameState.Value.Connected)
 }
 
 @code {
-    private bool _test = false;
-    private bool _test2 = false;
-    private int? _test3 = null;
-
     [Parameter]
     public string GameId { get; set; } = null!;
 
@@ -243,10 +241,24 @@ else if (GameState.Value.Connected)
         await base.OnInitializedAsync();
     }
 
-    private async Task CopyLinkToClipboard()
+    private void CloseInvitePopover()
     {
-        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", NavigationManager.Uri);
-        _test = false;
+        Dispatcher.Dispatch(new CloseInvitePopoverAction());
+    }
+
+    private void CloseOtherPlayerMenu()
+    {
+        Dispatcher.Dispatch(new CloseOtherPlayerMenuAction());
+    }
+
+    private void ClosePlayerPopover()
+    {
+        Dispatcher.Dispatch(new ClosePlayerPopoverAction());
+    }
+
+    private void CopyLinkToClipboard()
+    {
+        Dispatcher.Dispatch(new CopyLinkToClipboardAction());
     }
 
     private void FlipCards()
@@ -257,6 +269,21 @@ else if (GameState.Value.Connected)
     private void LeaveGame()
     {
         Dispatcher.Dispatch(new LeaveGameAction());
+    }
+
+    private void OpenInvitePopover()
+    {
+        Dispatcher.Dispatch(new OpenInvitePopoverAction());
+    }
+
+    private void OpenOtherPlayerMenu(int playerId)
+    {
+        Dispatcher.Dispatch(new OpenOtherPlayerMenuAction(playerId));
+    }
+
+    private void OpenPlayerPopover()
+    {
+        Dispatcher.Dispatch(new OpenPlayerPopoverAction());
     }
 
     private void PlayAgain()

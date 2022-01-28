@@ -60,6 +60,27 @@ public static class GameReducers
         };
 
     [ReducerMethod]
+    public static GameState ReduceCloseInvitePopoverAction(GameState state, CloseInvitePopoverAction _) =>
+        state with
+        {
+            InvitePopoverOpen = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceCloseOtherPlayerMenuAction(GameState state, CloseOtherPlayerMenuAction _) =>
+        state with
+        {
+            OtherPlayerIdMenuOpen = null
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceClosePlayerPopoverAction(GameState state, ClosePlayerPopoverAction _) =>
+        state with
+        {
+            PlayerPopoverOpen = false
+        };
+
+    [ReducerMethod]
     public static GameState ReduceConnectToGameAction(GameState state, ConnectToGameAction _) =>
         state with
         {
@@ -174,6 +195,27 @@ public static class GameReducers
             Log = state.Log.Append(new LogEntry($"{name} started a new round of voting."))
         };
     }
+
+    [ReducerMethod]
+    public static GameState ReduceOpenInvitePopoverAction(GameState state, OpenInvitePopoverAction _) =>
+        state with
+        {
+            InvitePopoverOpen = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceOpenOtherPlayerMenuAction(GameState state, OpenOtherPlayerMenuAction action) =>
+        state with
+        {
+            OtherPlayerIdMenuOpen = action.PlayerId
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceOpenPlayerPopoverAction(GameState state, OpenPlayerPopoverAction _) =>
+        state with
+        {
+            PlayerPopoverOpen = true
+        };
 
     [ReducerMethod]
     public static GameState ReducePlayAgainAction(GameState state, PlayAgainAction _) =>

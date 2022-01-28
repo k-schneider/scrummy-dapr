@@ -6,9 +6,15 @@ public record CastVoteAction(string Vote);
 public record CastVoteSuccessAction();
 public record CastVoteFailedAction(string Error);
 
+public record CloseInvitePopoverAction();
+public record CloseOtherPlayerMenuAction();
+public record ClosePlayerPopoverAction();
+
 public record ConnectToGameAction(string GameId);
 public record ConnectToGameSuccessAction(string Sid, int PlayerId);
 public record ConnectToGameFailedAction(string Error);
+
+public record CopyLinkToClipboardAction();
 
 public record DisconnectFromGameAction();
 public record DisconnectFromGameSuccessAction();
@@ -25,6 +31,10 @@ public record LeaveGameSuccessAction(string GameId);
 public record LeaveGameFailedAction(string Error);
 
 public record NewVoteStartedAction();
+
+public record OpenInvitePopoverAction();
+public record OpenOtherPlayerMenuAction(int PlayerId);
+public record OpenPlayerPopoverAction();
 
 public record PlayAgainAction();
 public record PlayAgainSuccessAction();

@@ -5,6 +5,7 @@ public class GameEffects
     private readonly IAppApi _appApi;
     private readonly IState<GameState> _gameState;
     private readonly HttpClient _httpClient;
+    private readonly IJSRuntime _jsRuntime;
     private readonly IState<LobbyState> _lobbyState;
     private readonly NavigationManager _navigationManager;
     private HubConnection? _hubConnection;
@@ -13,12 +14,14 @@ public class GameEffects
         IAppApi appApi,
         IState<GameState> gameState,
         HttpClient httpClient,
+        IJSRuntime jsRuntime,
         IState<LobbyState> lobbyState,
         NavigationManager navigationManager)
     {
         _appApi = appApi;
         _gameState = gameState;
         _httpClient = httpClient;
+        _jsRuntime = jsRuntime;
         _lobbyState = lobbyState;
         _navigationManager = navigationManager;
     }
@@ -102,6 +105,13 @@ public class GameEffects
         {
             dispatcher.Dispatch(new ConnectToGameFailedAction(exc.Message));
         }
+    }
+
+    [EffectMethod]
+    public async Task HandleCopyLinkToClipboardAction(CopyLinkToClipboardAction _, IDispatcher dispatcher)
+    {
+        await _jsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", _navigationManager.Uri);
+        dispatcher.Dispatch(new CloseInvitePopoverAction());
     }
 
     [EffectMethod]
