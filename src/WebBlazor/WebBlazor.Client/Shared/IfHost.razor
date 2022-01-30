@@ -1,0 +1,16 @@
+@inherits FluxorComponent
+@inject IState<GameState> GameState
+
+@if (IsHost)
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private bool IsHost => GameState.Value.Players
+        .First(p => p.PlayerId == GameState.Value.PlayerId)
+        .IsHost;
+}

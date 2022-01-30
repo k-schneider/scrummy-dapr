@@ -23,14 +23,11 @@
 </div>
 
 @code {
-    private Player Me => GameState.Value.Players
-        .First(p => p.PlayerId == GameState.Value.PlayerId);
-
     private string? MyVote
     {
         get
         {
-            GameState.Value.Votes.TryGetValue(Me.PlayerId, out var vote);
+            GameState.Value.Votes.TryGetValue(GameState.Value.PlayerId, out var vote);
             return vote;
         }
     }

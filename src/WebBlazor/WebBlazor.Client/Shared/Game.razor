@@ -47,10 +47,9 @@ else if (GameState.Value.Connected)
             </div>
         </div>
 
-        @if (IsHost)
-        {
+        <IfHost>
             <HostControls />
-        }
+        </IfHost>
     }
     else
     {
@@ -62,10 +61,9 @@ else if (GameState.Value.Connected)
     [Parameter]
     public string GameId { get; set; } = null!;
 
-    private Player Me => GameState.Value.Players
-        .First(p => p.PlayerId == GameState.Value.PlayerId);
-
-    private bool IsHost => Me.IsHost;
+    private bool IsHost => GameState.Value.Players
+        .First(p => p.PlayerId == GameState.Value.PlayerId)
+        .IsHost;
 
     protected override async Task OnInitializedAsync()
     {
