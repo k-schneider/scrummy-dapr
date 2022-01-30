@@ -1,0 +1,54 @@
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
+@inject IState<GameState> GameState
+
+<div class="flex justify-center items-center">
+    <div class="bg-white rounded-lg text-2xl text-gray-800 py-2 px-4 font-semibold shadow-md">
+        @if (GameState.Value.Votes.ContainsKey(GameState.Value.PlayerId))
+        {
+            <text>Waiting for host...</text>
+        }
+        else
+        {
+            <text>Cast your vote...</text>
+        }
+    </div>
+</div>
+
+<div class="flex flex-wrap justify-center mt-4">
+    @foreach (var card in GameState.Value.Deck)
+    {
+        <button class="transition-all ease-in-out shadow-md select-none cursor-pointer bg-white rounded-xl flex m-2 h-32 w-20 lg:h-44 lg:w-28 text-4xl lg:text-5xl text-gray-800 flex items-center justify-center border-8 hover:mt-1 hover:shadow-xl @(card == MyVote ? "border-orange-500 mt-1" : "border-transparent")" @onclick="() => Vote(card)">@card</button>
+    }
+</div>
+
+@code {
+    private Player Me => GameState.Value.Players
+        .First(p => p.PlayerId == GameState.Value.PlayerId);
+
+    private string? MyVote
+    {
+        get
+        {
+            GameState.Value.Votes.TryGetValue(Me.PlayerId, out var vote);
+            return vote;
+        }
+    }
+
+    private void Vote(string card)
+    {
+        if (GameState.Value.Voting)
+        {
+            return;
+        }
+
+        if (card == MyVote)
+        {
+            Dispatcher.Dispatch(new RecallVoteAction());
+        }
+        else
+        {
+            Dispatcher.Dispatch(new CastVoteAction(card));
+        }
+    }
+}

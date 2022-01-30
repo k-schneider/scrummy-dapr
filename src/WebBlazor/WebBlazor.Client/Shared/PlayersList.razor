@@ -1,0 +1,67 @@
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
+@inject IState<GameState> GameState
+
+<div class="flex flex-col bg-indigo-400 p-2 pt-1 h-80 rounded-lg shadow-md">
+    <div class="text-center shrink-0 text-indigo-800 font-bold text-sm">Players</div>
+    <div class="mt-2 grow overflow-auto">
+        @foreach (var player in GameState.Value.Players)
+        {
+            <div class="px-2 py-2 even:bg-indigo-300/50 flex space-x-2 items-center">
+                @if (!player.IsConnected)
+                {
+                    <i class="fa-solid fa-circle-xmark text-slate-500 text-2xl opacity-50"></i>
+                }
+                else if (GameState.Value.Votes.ContainsKey(player.PlayerId))
+                {
+                    <i class="fa-solid fa-circle-check text-emerald-700 text-2xl"></i>
+                }
+                else
+                {
+                    <i class="fa-solid fa-circle-notch fa-spin text-white opacity-50 text-2xl"></i>
+                }
+                <span class="grow text-xl @(player.IsConnected ? "" : "opacity-50")">@player.Nickname</span>
+                @if (player.PlayerId != GameState.Value.PlayerId)
+                {
+                    <div class="relative">
+                        <button @onclick="@(() => OpenOtherPlayerMenu(player.PlayerId))" class="rounded-full hover:bg-black/10 p-1 text-slate-700 rounded-full hover:bg-black/10 p-1 text-slate-700 text-xl w-8 h-8 flex items-center justify-center">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+
+                        @if (GameState.Value.OtherPlayerIdMenuOpen == player.PlayerId)
+                        {
+                            <div @onclick="CloseOtherPlayerMenu" class="fixed inset-0 h-full w-full z-10"></div>
+
+                            <div class="absolute right-0 mt-2 py-2 w-40 bg-white rounded-md shadow-xl z-20">
+                                <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                    <i class="fa-solid fa-bolt w-7 text-center"></i>
+                                    <span>Nudge</span>
+                                </a>
+                                <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                    <i class="fa-solid fa-xmark w-7 text-center"></i>
+                                    <span>Remove</span>
+                                </a>
+                                <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                    <i class="fa-solid fa-crown w-7 text-center"></i>
+                                    <span>Promote</span>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private void CloseOtherPlayerMenu()
+    {
+        Dispatcher.Dispatch(new CloseOtherPlayerMenuAction());
+    }
+
+    private void OpenOtherPlayerMenu(int playerId)
+    {
+        Dispatcher.Dispatch(new OpenOtherPlayerMenuAction(playerId));
+    }
+}

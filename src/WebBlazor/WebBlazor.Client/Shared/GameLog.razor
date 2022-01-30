@@ -1,0 +1,16 @@
+@inherits FluxorComponent
+@inject IState<GameState> GameState
+
+<div class="flex flex-col bg-stone-400 p-2 pt-1 h-80 sm:h-96 rounded-lg text-sm shadow-md">
+    <div class="text-center shrink-0 text-stone-800 font-bold">Game Log</div>
+    <div class="mt-2 grow overflow-auto">
+        @foreach (var logEntry in GameState.Value.Log)
+        {
+            <p @key="@logEntry.Id" class="leading-tight px-2 py-1 even:bg-stone-300/50">
+                <span class="text-xs opacity-75">@DateTimeOffset.FromUnixTimeMilliseconds(logEntry.Timestamp).ToLocalTime().ToString("h:mm:ss tt")</span>
+                <br>
+                <span>@logEntry.Message</span>
+            </p>
+        }
+    </div>
+</div>

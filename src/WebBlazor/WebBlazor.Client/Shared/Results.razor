@@ -1,0 +1,7 @@
+@inherits FluxorComponent
+@inject IState<GameState> GameState
+
+@foreach (var vote in GameState.Value.Votes)
+{
+    <p>@vote.Key voted @vote.Value</p>
+}

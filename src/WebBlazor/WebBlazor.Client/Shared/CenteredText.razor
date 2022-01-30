@@ -1,0 +1,8 @@
+<div class="flex h-screen justify-center items-center">
+    <p class="text-center text-white text-lg font-semibold">@ChildContent</p>
+</div>
+
+@code {
+  [Parameter]
+  public RenderFragment? ChildContent { get; set; }
+}
