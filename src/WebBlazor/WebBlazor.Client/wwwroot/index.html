@@ -11,6 +11,9 @@
       tailwind.config = {
         theme: {
           extend: {
+            backgroundImage: {
+              'hero-cas': "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0V0zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm20 0a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM10 37a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm10-17h20v20H20V20zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14z' fill='%237d58ba' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E\")"
+            },
             fontFamily: {
               'play': ['Play', 'sans-serif']
             }
@@ -21,16 +24,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet">
-    <style type="text/css">
-      body {
-        background-color: #1e132f;
-        background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0V0zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm20 0a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM10 37a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm10-17h20v20H20V20zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14z' fill='%237d58ba' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");
-      }
-    </style>
     <script src="https://kit.fontawesome.com/e59c8ad818.js" crossorigin="anonymous"></script>
 </head>
 
-<body class="font-play">
+<body class="font-play bg-[#1e132f] bg-hero-cas">
     <div id="app">
       <div class="flex h-screen justify-center items-center">
         <p class="text-center text-white text-lg font-semibold">Loading...</p>
