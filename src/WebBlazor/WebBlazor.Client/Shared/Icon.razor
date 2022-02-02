@@ -1,0 +1,43 @@
+@if (!string.IsNullOrEmpty(ClassList))
+{
+    <i class="@ClassList"></i>
+}
+
+@code {
+    private string ClassList = string.Empty;
+
+    [Parameter]
+    public string? Type { get; set; }
+
+    [Parameter]
+    public string? Size { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        BuildClassList();
+    }
+
+    private void BuildClassList()
+    {
+        var classList = new List<string>();
+
+        if (!string.IsNullOrEmpty(Type))
+        {
+            classList.Add($"fa-{Type}");
+
+            var style = string.IsNullOrEmpty(Style) ? "solid" : Style;
+            classList.Add($"fa-{style}");
+
+            if (!string.IsNullOrEmpty(Size))
+            {
+                classList.Add($"text-{Size}");
+            }
+        }
+
+        ClassList = string.Join(' ', classList);
+    }
+}

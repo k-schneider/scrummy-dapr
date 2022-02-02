@@ -5,22 +5,13 @@
 <div class="w-full sm:w-auto fixed bottom-0 flex space-x-4 py-4 px-4 md:px-8">
     @if (GameState.Value.GamePhase == "Voting")
     {
-        <button class="flex-1 sm:flex-none flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg shadow-md" @onclick="FlipCards">
-            <span>Flip Cards</span>
-            <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
-        </button>
-        <button class="flex-1 sm:flex-none flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg shadow-md" @onclick="ResetVotes">
-            <span>Reset Votes</span>
-            <i class="fa-solid fa-rotate-left text-xl"></i>
-        </button>
+        <Button OnClick="FlipCards" Icon="wand-magic-sparkles" Variant="special" AdditionalClasses="flex-1 sm:flex-none">Flip Cards</Button>
+        <Button OnClick="ResetVotes" Icon="rotate-left" Variant="special" AdditionalClasses="flex-1 sm:flex-none">Reset Votes</Button>
     }
 
     @if (GameState.Value.GamePhase == "Results")
     {
-        <button class="flex-1 sm:flex-none flex justify-center items-center space-x-2 bg-amber-600 text-slate-200 text-lg font-bold py-2 px-6 border-b-4 border-amber-800 hover:bg-amber-500 hover:border-amber-700 active:mt-1 active:border-b-0 rounded-lg shadow-md" @onclick="PlayAgain">
-            <span>Play Again</span>
-            <i class="fa-solid fa-dice text-xl"></i>
-        </button>
+        <Button OnClick="PlayAgain" Icon="dice" Variant="special" AdditionalClasses="flex-1 sm:flex-none">Play Again</Button>
     }
 </div>
 

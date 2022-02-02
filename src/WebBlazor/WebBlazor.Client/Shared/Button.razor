@@ -1,0 +1,97 @@
+<button type="@Type" @onclick="HandleOnClick" class="flex justify-center items-center space-x-2 text-lg font-bold py-2 px-6 border-b-4 active:mt-1 active:border-b-0 rounded-lg shadow-md @ClassList">
+    @if (ChildContent != default)
+    {
+        @if (NoSpanWrap)
+        {
+            @ChildContent
+        }
+        else
+        {
+            <span>@ChildContent</span>
+        }
+    }
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <Icon Type="@Icon" Style="@IconStyle" Size="@IconSize" />
+    }
+</button>
+
+@code {
+    private const string DefaultVariant = "default";
+    private string ClassList = string.Empty;
+
+    private static Dictionary<string, string> VariantClasses = new()
+    {
+        { DefaultVariant, "bg-orange-600 text-slate-200 border-orange-800 hover:bg-orange-500" },
+        { "light", "bg-orange-400 text-slate-800 border-orange-500 hover:bg-orange-300 hover:border-orange-400" },
+        { "special", "bg-amber-600 text-slate-200 border-amber-800 hover:bg-amber-500 hover:border-amber-700" }
+    };
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Variant { get; set; }
+
+    [Parameter]
+    public string? AdditionalClasses { get; set; }
+
+    [Parameter]
+    public bool Block { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? IconSize { get; set; } = "2xl";
+
+    [Parameter]
+    public string? IconStyle { get; set; }
+
+    [Parameter]
+    public bool NoSpanWrap { get; set; }
+
+    [Parameter]
+    public string Type { get; set; } = "button";
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        BuildClassList();
+    }
+
+    private async Task HandleOnClick(MouseEventArgs args)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(args);
+        }
+    }
+
+    private void BuildClassList()
+    {
+        var classList = new List<string>();
+
+        var variant = Variant;
+        if (string.IsNullOrEmpty(variant) || !VariantClasses.ContainsKey(variant))
+        {
+            variant = DefaultVariant;
+        }
+        classList.Add(VariantClasses[variant]);
+
+        if (Block)
+        {
+            classList.Add("w-full");
+        }
+
+        if (!string.IsNullOrEmpty(AdditionalClasses))
+        {
+            classList.Add(AdditionalClasses);
+        }
+
+        ClassList = string.Join(' ', classList);
+    }
+}
