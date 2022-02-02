@@ -6,9 +6,8 @@
     <div class="mt-2 grow overflow-auto">
         @foreach (var logEntry in GameState.Value.Log)
         {
-            <p @key="@logEntry.Id" class="leading-tight px-2 py-1 even:bg-stone-300/50">
+            <p @key="@logEntry.Id" class="leading-tight px-2 py-1 even:bg-stone-300/50 flex flex-col">
                 <span class="text-xs opacity-75">@DateTimeOffset.FromUnixTimeMilliseconds(logEntry.Timestamp).ToLocalTime().ToString("h:mm:ss tt")</span>
-                <br>
                 <span>@logEntry.Message</span>
             </p>
         }

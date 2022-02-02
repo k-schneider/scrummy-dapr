@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject NavigationManager NavigationManager
 
 <PageTitle>Scrummy</PageTitle>
 
@@ -6,10 +7,7 @@
     <h1 class="text-6xl md:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 to-indigo-300 outline-none">Scrummy</h1>
 
     <div class="mt-12">
-        <a class="flex justify-center items-center space-x-2 bg-orange-600 text-slate-200 text-xl font-bold py-2 px-6 border-b-4 border-orange-800 hover:bg-orange-500 hover:border-orange-700 active:mt-1 active:border-b-0 rounded-lg shadow-md" href="/room/create">
-            <span>Create Game</span>
-            <i class="fa-solid fa-dice text-2xl"></i>
-        </a>
+        <Button OnClick="CreateGame" Icon="dice" Block="true">Create Game</Button>
     </div>
 
     <div class="mt-8 p-8 bg-black/50 text-white rounded-md">
@@ -38,3 +36,10 @@
         </ol>
     </div>
 </div>
+
+@code {
+    private void CreateGame()
+    {
+        NavigationManager.NavigateTo("/room/create");
+    }
+}

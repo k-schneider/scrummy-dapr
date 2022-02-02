@@ -12,7 +12,9 @@
     }
     @if (!string.IsNullOrEmpty(Icon))
     {
-        <Icon Type="@Icon" Style="@IconStyle" Size="@IconSize" />
+        <span class="@(string.IsNullOrEmpty(IconSize) ? string.Empty : "text-" + IconSize)">
+            <Icon Type="@Icon" Style="@IconStyle" />
+        </span>
     }
 </button>
 
@@ -22,7 +24,7 @@
 
     private static Dictionary<string, string> VariantClasses = new()
     {
-        { DefaultVariant, "bg-orange-600 text-slate-200 border-orange-800 hover:bg-orange-500" },
+        { "default", "bg-orange-600 text-slate-200 border-orange-800 hover:bg-orange-500" },
         { "light", "bg-orange-400 text-slate-800 border-orange-500 hover:bg-orange-300 hover:border-orange-400" },
         { "special", "bg-amber-600 text-slate-200 border-amber-800 hover:bg-amber-500 hover:border-amber-700" }
     };
@@ -34,7 +36,7 @@
     public string? Variant { get; set; }
 
     [Parameter]
-    public string? AdditionalClasses { get; set; }
+    public string? Class { get; set; }
 
     [Parameter]
     public bool Block { get; set; }
@@ -87,9 +89,9 @@
             classList.Add("w-full");
         }
 
-        if (!string.IsNullOrEmpty(AdditionalClasses))
+        if (!string.IsNullOrEmpty(Class))
         {
-            classList.Add(AdditionalClasses);
+            classList.Add(Class);
         }
 
         ClassList = string.Join(' ', classList);

@@ -1,0 +1,37 @@
+<div @onclick="HandleOnClick" class="fixed inset-0 h-full w-full z-10 @ClassList"></div>
+
+@code {
+    private string ClassList = string.Empty;
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public bool Blur { get; set; }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        BuildClassList();
+    }
+
+    private async Task HandleOnClick(MouseEventArgs args)
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(args);
+        }
+    }
+
+    private void BuildClassList()
+    {
+        var classList = new List<string>();
+
+        if (Blur)
+        {
+            classList.Add("bg-black/25 backdrop-blur-sm");
+        }
+
+        ClassList = string.Join(' ', classList);
+    }
+}

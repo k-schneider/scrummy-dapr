@@ -47,9 +47,10 @@ else if (GameState.Value.Connected)
             </div>
         </div>
 
-        <IfHost>
+        @if (GameState.Value.IsHost())
+        {
             <HostControls />
-        </IfHost>
+        }
     }
     else
     {

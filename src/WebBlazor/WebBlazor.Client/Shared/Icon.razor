@@ -10,10 +10,13 @@
     public string? Type { get; set; }
 
     [Parameter]
-    public string? Size { get; set; }
+    public string? Style { get; set; }
 
     [Parameter]
-    public string? Style { get; set; }
+    public bool Spin { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -32,9 +35,14 @@
             var style = string.IsNullOrEmpty(Style) ? "solid" : Style;
             classList.Add($"fa-{style}");
 
-            if (!string.IsNullOrEmpty(Size))
+            if (Spin)
             {
-                classList.Add($"text-{Size}");
+                classList.Add("fa-spin");
+            }
+
+            if (!string.IsNullOrEmpty(Class))
+            {
+                classList.Add(Class);
             }
         }
 

@@ -10,43 +10,47 @@
             <div class="px-2 py-2 even:bg-indigo-300/50 flex space-x-2 items-center">
                 @if (!player.IsConnected)
                 {
-                    <i class="fa-solid fa-circle-xmark text-slate-500 text-2xl opacity-50"></i>
+                    <Icon Type="circle-xmark" Class="text-slate-500 text-2xl opacity-50" />
                 }
                 else if (GameState.Value.Votes.ContainsKey(player.PlayerId))
                 {
-                    <i class="fa-solid fa-circle-check text-emerald-700 text-2xl"></i>
+                    <Icon Type="circle-check" Class="text-emerald-700 text-2xl" />
                 }
                 else
                 {
-                    <i class="fa-solid fa-circle-notch fa-spin text-white opacity-50 text-2xl"></i>
+                    <Icon Type="circle-notch" Spin="true" Class="text-white opacity-50 text-2xl" />
                 }
                 <span class="grow text-xl @(player.IsConnected ? "" : "opacity-50")">@player.Nickname</span>
-                @if (player.PlayerId != GameState.Value.PlayerId)
+                @if (player.PlayerId != GameState.Value.PlayerId && (player.IsConnected || GameState.Value.IsHost()))
                 {
                     <div class="relative">
                         <button @onclick="@(() => OpenOtherPlayerMenu(player.PlayerId))" class="rounded-full hover:bg-black/10 p-1 text-slate-700 rounded-full hover:bg-black/10 p-1 text-slate-700 text-xl w-8 h-8 flex items-center justify-center">
-                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                            <Icon Type="ellipsis-vertical" />
                         </button>
 
                         @if (GameState.Value.OtherPlayerIdMenuOpen == player.PlayerId)
                         {
-                            <div @onclick="CloseOtherPlayerMenu" class="fixed inset-0 h-full w-full z-10"></div>
+                            <Backdrop OnClick="CloseOtherPlayerMenu" />
 
                             <div class="absolute right-0 mt-2 py-2 w-40 bg-white rounded-md shadow-xl z-20">
-                                <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
-                                    <i class="fa-solid fa-bolt w-7 text-center"></i>
-                                    <span>Nudge</span>
-                                </a>
-                                <IfHost>
-                                    <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
-                                        <i class="fa-solid fa-xmark w-7 text-center"></i>
+                                @if (player.IsConnected)
+                                {
+                                    <button type="button" class="w-full px-4 py-2 text-left text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                        <Icon Type="bolt" Class="w-7 text-center" />
+                                        <span>Nudge</span>
+                                    </button>
+                                }
+                                @if (GameState.Value.IsHost())
+                                {
+                                    <button type="button" class="w-full px-4 py-2 text-left text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                        <Icon Type="xmark" Class="w-7 text-center" />
                                         <span>Remove</span>
-                                    </a>
-                                    <a href="javascript:void(0)" class="block px-4 py-2 text-gray-700 hover:bg-indigo-600 hover:text-white">
-                                        <i class="fa-solid fa-crown w-7 text-center"></i>
+                                    </button>
+                                    <button type="button" class="w-full px-4 py-2 text-left text-gray-700 hover:bg-indigo-600 hover:text-white">
+                                        <Icon Type="crown" Class="w-7 text-center" />
                                         <span>Promote</span>
-                                    </a>
-                                </IfHost>
+                                    </button>
+                                }
                             </div>
                         }
                     </div>

@@ -10,4 +10,5 @@ global using RestEase;
 global using RestEase.HttpClientFactory;
 global using Scrummy.AppContracts;
 global using Scrummy.WebBlazor.Client;
+global using Scrummy.WebBlazor.Client.Store.GameUseCase;
 global using Scrummy.WebBlazor.Client.Store.LobbyUseCase;

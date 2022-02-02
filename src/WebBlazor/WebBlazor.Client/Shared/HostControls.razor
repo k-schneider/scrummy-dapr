@@ -5,13 +5,13 @@
 <div class="w-full sm:w-auto fixed bottom-0 flex space-x-4 py-4 px-4 md:px-8">
     @if (GameState.Value.GamePhase == "Voting")
     {
-        <Button OnClick="FlipCards" Icon="wand-magic-sparkles" Variant="special" AdditionalClasses="flex-1 sm:flex-none">Flip Cards</Button>
-        <Button OnClick="ResetVotes" Icon="rotate-left" Variant="special" AdditionalClasses="flex-1 sm:flex-none">Reset Votes</Button>
+        <Button OnClick="FlipCards" Icon="wand-magic-sparkles" Variant="special" Class="flex-1 sm:flex-none">Flip Cards</Button>
+        <Button OnClick="ResetVotes" Icon="rotate-left" Variant="special" Class="flex-1 sm:flex-none">Reset Votes</Button>
     }
 
     @if (GameState.Value.GamePhase == "Results")
     {
-        <Button OnClick="PlayAgain" Icon="dice" Variant="special" AdditionalClasses="flex-1 sm:flex-none">Play Again</Button>
+        <Button OnClick="PlayAgain" Icon="dice" Variant="special" Class="flex-1 sm:flex-none">Play Again</Button>
     }
 </div>
 
