@@ -12,9 +12,7 @@
     }
     @if (!string.IsNullOrEmpty(Icon))
     {
-        <span class="@(string.IsNullOrEmpty(IconSize) ? string.Empty : "text-" + IconSize)">
-            <Icon Type="@Icon" Style="@IconStyle" />
-        </span>
+        <Icon Type="@Icon" Style="@IconStyle" Class="@(string.IsNullOrEmpty(IconSize) ? null : $"text-{IconSize}")" />
     }
 </button>
 

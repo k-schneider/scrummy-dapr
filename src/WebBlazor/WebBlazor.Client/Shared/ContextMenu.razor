@@ -1,0 +1,53 @@
+<CascadingValue Value="@this">
+    @ChildContent
+</CascadingValue>
+
+<div class="absolute right-0 mt-2 py-2 w-40 bg-white rounded-md shadow-xl z-20">
+    @foreach (var item in Items)
+    {
+        <button @onclick="args => HandleOnItemClick(item, args)" type="button" class="w-full px-4 py-2 text-left text-gray-700 hover:bg-indigo-600 hover:text-white">
+            @if (!string.IsNullOrEmpty(item.Icon))
+            {
+                <Icon Type="@item.Icon" Class="w-7 text-center" />
+            }
+            @if (item.ChildContent != default)
+            {
+                @if (item.NoSpanWrap)
+                {
+                    @item.ChildContent
+                }
+                else
+                {
+                    <span>@item.ChildContent</span>
+                }
+            }
+        </button>
+    }
+</div>
+
+@code {
+    private List<ContextMenuItem> Items { get; set; } = new();
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    public void AddItem(ContextMenuItem item)
+    {
+        Items.Add(item);
+        this.StateHasChanged();
+    }
+
+    private async Task HandleOnItemClick(ContextMenuItem item, MouseEventArgs args)
+    {
+        if (item.OnClick.HasDelegate)
+        {
+            await item.OnClick.InvokeAsync(args);
+        }
+    }
+
+    public void RemoveItem(ContextMenuItem item)
+    {
+        Items.Remove(item);
+        this.StateHasChanged();
+    }
+}
