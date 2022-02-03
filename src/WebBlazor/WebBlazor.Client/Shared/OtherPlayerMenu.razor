@@ -1,0 +1,46 @@
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
+@inject IState<GameState> GameState
+
+@if (player is not null)
+{
+    <ContextMenu>
+        @if (player.IsConnected)
+        {
+            <ContextMenuItem Icon="bolt" OnClick="() => NudgePlayer(player.PlayerId)">Nudge</ContextMenuItem>
+        }
+        @if (GameState.Value.IsHost())
+        {
+            <ContextMenuItem Icon="xmark" OnClick="() => RemovePlayer(player.PlayerId)">Remove</ContextMenuItem>
+            <ContextMenuItem Icon="crown" OnClick="() => PromotePlayer(player.PlayerId)">Promote</ContextMenuItem>
+        }
+    </ContextMenu>
+}
+
+@code {
+    private Player? player;
+
+    [Parameter]
+    public int PlayerId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        player = GameState.Value.Players.FirstOrDefault(p => p.PlayerId == PlayerId);
+        return base.OnParametersSetAsync();
+    }
+
+    private void NudgePlayer(int playerId)
+    {
+        Console.WriteLine("todo: nudge " + playerId);
+    }
+
+    private void PromotePlayer(int playerId)
+    {
+        Dispatcher.Dispatch(new PromotePlayerAction(playerId));
+    }
+
+    private void RemovePlayer(int playerId)
+    {
+        Console.WriteLine("todo: remove " + playerId);
+    }
+}

@@ -35,18 +35,7 @@
                         @if (GameState.Value.OtherPlayerIdMenuOpen == player.PlayerId)
                         {
                             <Backdrop OnClick="CloseOtherPlayerMenu" />
-
-                            <ContextMenu>
-                                @if (player.IsConnected)
-                                {
-                                    <ContextMenuItem Icon="bolt" OnClick="() => NudgePlayer(player.PlayerId)">Nudge</ContextMenuItem>
-                                }
-                                @if (GameState.Value.IsHost())
-                                {
-                                    <ContextMenuItem Icon="xmark" OnClick="() => RemovePlayer(player.PlayerId)">Remove</ContextMenuItem>
-                                    <ContextMenuItem Icon="crown" OnClick="() => PromotePlayer(player.PlayerId)">Promote</ContextMenuItem>
-                                }
-                            </ContextMenu>
+                            <OtherPlayerMenu PlayerId="@player.PlayerId" />
                         }
                     </div>
                 }
@@ -59,21 +48,6 @@
     private void CloseOtherPlayerMenu()
     {
         Dispatcher.Dispatch(new CloseOtherPlayerMenuAction());
-    }
-
-    private void NudgePlayer(int playerId)
-    {
-        Console.WriteLine("todo: nudge " + playerId);
-    }
-
-    private void PromotePlayer(int playerId)
-    {
-        Dispatcher.Dispatch(new PromotePlayerAction(playerId));
-    }
-
-    private void RemovePlayer(int playerId)
-    {
-        Console.WriteLine("todo: remove " + playerId);
     }
 
     private void OpenOtherPlayerMenu(int playerId)
