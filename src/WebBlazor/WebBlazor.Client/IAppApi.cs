@@ -25,4 +25,7 @@ public interface IAppApi
 
     [Delete("g/game/{gameId}/votes")]
     Task ResetVotes([Path] string gameId, [Body] ResetVotesRequest request, CancellationToken cancellationToken = default);
+
+    [Put("g/game/{gameId}/nickname")]
+    Task UpdateNickname([Path] string gameId, [Body] UpdateNicknameRequest request, CancellationToken cancellationToken = default);
 }

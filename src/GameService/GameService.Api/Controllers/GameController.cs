@@ -75,6 +75,13 @@ public class GameController : ControllerBase
         return Ok();
     }
 
+    [HttpPut("game/{gameId}/nickname")]
+    public async Task<IActionResult> UpdateNickname(string gameId, UpdateNicknameRequest request, CancellationToken cancellationToken)
+    {
+        await GetGameActor(gameId).UpdateNickname(request.Sid, request.Nickname, cancellationToken);
+        return Ok();
+    }
+
     private IGameActor GetGameActor(string gameId) =>
         _actorProxyFactory.CreateActorProxy<IGameActor>(
             new ActorId(gameId),

@@ -84,6 +84,9 @@ public class GameEffects
                 _hubConnection.On<PlayerLeftGameMessage>(GameHubMethods.PlayerLeftGame, message =>
                     dispatcher.Dispatch(new PlayerLeftGameAction(message.PlayerId)));
 
+                _hubConnection.On<PlayerNicknameChangedMessage>(GameHubMethods.PlayerNicknameChanged, message =>
+                    dispatcher.Dispatch(new PlayerNicknameChangedAction(message.PlayerId, message.Nickname)));
+
                 _hubConnection.On<PlayerVoteCastMessage>(GameHubMethods.PlayerVoteCast, message =>
                     dispatcher.Dispatch(new PlayerVoteCastAction(message.PlayerId, message.Vote)));
 
@@ -221,5 +224,28 @@ public class GameEffects
         {
             dispatcher.Dispatch(new ResetVotesFailedAction(exc.Message));
         }
+    }
+
+    [EffectMethod]
+    public async Task HandleUpdateNicknameAction(UpdateNicknameAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _appApi.UpdateNickname(
+                _gameState.Value.GameId,
+                new UpdateNicknameRequest(_gameState.Value.Sid, action.Nickname));
+            dispatcher.Dispatch(new UpdateNicknameSuccessAction());
+        }
+        catch (Exception exc)
+        {
+            dispatcher.Dispatch(new UpdateNicknameFailedAction(exc.Message));
+        }
+    }
+
+    [EffectMethod]
+    public Task HandleUpdateNicknameSuccessAction(UpdateNicknameSuccessAction action, IDispatcher dispatcher)
+    {
+        dispatcher.Dispatch(new ClosePlayerPopoverAction());
+        return Task.CompletedTask;
     }
 }

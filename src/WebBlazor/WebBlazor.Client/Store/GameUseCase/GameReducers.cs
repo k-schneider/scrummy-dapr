@@ -309,6 +309,24 @@ public static class GameReducers
     }
 
     [ReducerMethod]
+    public static GameState ReducePlayerNicknameChangedAction(GameState state, PlayerNicknameChangedAction action)
+    {
+        var players = state.Players.Select(p => p with
+        {
+            Nickname = p.PlayerId == action.PlayerId ? action.Nickname : p.Nickname
+        });
+
+        var name = state.PlayerId == action.PlayerId ? "You" : state.Players.First(p => p.PlayerId == action.PlayerId).Nickname;
+        var pronoun = state.PlayerId == action.PlayerId ? "your" : "their";
+
+        return state with
+        {
+            Players = players,
+            Log = state.Log.Append(new LogEntry($"{name} changed {pronoun} nickname to {action.Nickname}."))
+        };
+    }
+
+    [ReducerMethod]
     public static GameState ReducePlayerVoteCastAction(GameState state, PlayerVoteCastAction action)
     {
         var player = state.Players
@@ -426,6 +444,27 @@ public static class GameReducers
             Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected)),
             Votes = action.Snapshot.Votes,
             InSync = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceUpdateNicknameAction(GameState state, UpdateNicknameAction _) =>
+        state with
+        {
+            UpdatingNickname = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceUpdateNicknameSuccessAction(GameState state, UpdateNicknameSuccessAction _) =>
+        state with
+        {
+            UpdatingNickname = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceUpdateNicknameFailedAction(GameState state, UpdateNicknameFailedAction _) =>
+        state with
+        {
+            UpdatingNickname = false
         };
 
     [ReducerMethod]

@@ -130,6 +130,18 @@ public class GameEventController : ControllerBase
                 cancellationToken);
     }
 
+    [HttpPost("PlayerNicknameChanged")]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerNicknameChangedIntegrationEvent")]
+    public async Task HandleAsync(PlayerNicknameChangedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.PlayerNicknameChanged,
+                new PlayerNicknameChangedMessage(integrationEvent.PlayerId, integrationEvent.Nickname),
+                cancellationToken);
+    }
+
     [HttpPost("PlayerVoteCast")]
     [Topic(DAPR_PUBSUB_NAME, "PlayerVoteCastIntegrationEvent")]
     public async Task HandleAsync(PlayerVoteCastIntegrationEvent integrationEvent, CancellationToken cancellationToken)

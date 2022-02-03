@@ -13,4 +13,5 @@ public interface IGameActor : IActor
     Task RemovePlayer(string sid, CancellationToken cancellationToken = default);
     Task ResetVotes(string sid, CancellationToken cancellationToken = default);
     Task StartGame(CancellationToken cancellationToken = default);
+    Task UpdateNickname(string sid, string nickname, CancellationToken cancellationToken = default);
 }

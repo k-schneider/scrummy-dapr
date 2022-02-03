@@ -23,5 +23,6 @@ public record GameState
     public bool PlayingAgain { get; init; }
     public bool ResettingVotes { get; init; }
     public string Sid { get; init; } = string.Empty;
+    public bool UpdatingNickname { get; init; }
     public bool Voting { get; init; }
 }

@@ -35,6 +35,6 @@
 
     private void UpdateNickname()
     {
-        Console.WriteLine("Update nickname: " + nickname);
+        Dispatcher.Dispatch(new UpdateNicknameAction(nickname));
     }
 }

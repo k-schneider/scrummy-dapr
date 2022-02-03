@@ -47,6 +47,8 @@ public record PlayerJoinedGameAction(int PlayerId, string Nickname);
 
 public record PlayerLeftGameAction(int PlayerId);
 
+public record PlayerNicknameChangedAction(int PlayerId, string Nickname);
+
 public record PlayerVoteCastAction(int PlayerId, string? Vote);
 public record PlayerVoteRecalledAction(int PlayerId);
 
@@ -59,5 +61,9 @@ public record ResetVotesSuccessAction();
 public record ResetVotesFailedAction(string Error);
 
 public record SyncGameAction(GameSnapshot Snapshot);
+
+public record UpdateNicknameAction(string Nickname);
+public record UpdateNicknameSuccessAction();
+public record UpdateNicknameFailedAction(string Error);
 
 public record VotesResetAction();

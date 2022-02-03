@@ -251,6 +251,23 @@ public class GameActor : Actor, IGameActor
             cancellationToken);
     }
 
+    public async Task UpdateNickname(string sid, string nickname, CancellationToken cancellationToken = default)
+    {
+        EnsureGameInProgress();
+
+        var player = GetRequiredPlayer(sid);
+
+        player.Nickname = nickname;
+
+        await _eventBus.PublishAsync(
+            new PlayerNicknameChangedIntegrationEvent(
+                player.Sid,
+                player.PlayerId,
+                nickname,
+                GameId),
+            cancellationToken);
+    }
+
     private string NewSid() => Guid.NewGuid().ToString();
     private int NextPlayerId() => ++_playerCounter;
 
