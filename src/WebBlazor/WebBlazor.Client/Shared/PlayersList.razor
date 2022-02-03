@@ -68,7 +68,7 @@
 
     private void PromotePlayer(int playerId)
     {
-        Console.WriteLine("todo: promote " + playerId);
+        Dispatcher.Dispatch(new PromotePlayerAction(playerId));
     }
 
     private void RemovePlayer(int playerId)

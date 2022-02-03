@@ -50,7 +50,7 @@ public class GameController : ControllerBase
     [HttpPost("game/{gameId}/leave")]
     public async Task<IActionResult> LeaveGame(string gameId, LeaveGameRequest request, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).RemovePlayer(request.Sid, cancellationToken);
+        await GetGameActor(gameId).LeaveGame(request.Sid, cancellationToken);
         return Ok();
     }
 
@@ -58,6 +58,13 @@ public class GameController : ControllerBase
     public async Task<IActionResult> PlayAgain(string gameId, PlayAgainRequest request, CancellationToken cancellationToken)
     {
         await GetGameActor(gameId).PlayAgain(request.Sid, cancellationToken);
+        return Ok();
+    }
+
+    [HttpPost("game/{gameId}/promote")]
+    public async Task<IActionResult> PromotePlayer(string gameId, PromotePlayerRequest request, CancellationToken cancellationToken)
+    {
+        await GetGameActor(gameId).PromotePlayer(request.Sid, request.PlayerId, cancellationToken);
         return Ok();
     }
 

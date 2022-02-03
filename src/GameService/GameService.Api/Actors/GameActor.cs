@@ -117,62 +117,7 @@ public class GameActor : Actor, IGameActor
             votes));
     }
 
-    public Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
-    {
-        EnsureGameInProgress();
-
-        _players
-            .First(p => p.PlayerId == playerId)
-            .IsConnected = true;
-
-        return Task.CompletedTask;
-    }
-
-    public Task NotifyPlayerDisconnected(int playerId, CancellationToken cancellationToken = default)
-    {
-        var player = _players
-            .FirstOrDefault(p => p.PlayerId == playerId);
-
-        if (player is not null)
-        {
-            player.IsConnected = false;
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public async Task PlayAgain(string sid, CancellationToken cancellationToken = default)
-    {
-        EnsureResultsPhase();
-        EnsureHost(sid, "Only host can choose to play again");
-
-        _votes.Clear();
-        _gamePhase = GamePhase.Voting;
-
-        await _eventBus.PublishAsync(
-            new NewVoteStartedIntegrationEvent(GameId),
-            cancellationToken);
-    }
-
-    public async Task RecallVote(string sid, CancellationToken cancellationToken = default)
-    {
-        EnsureGameInProgress();
-
-        var player = GetRequiredPlayer(sid);
-
-        _votes.TryGetValue(player.PlayerId, out var previousVote);
-        _votes.Remove(player.PlayerId);
-
-        await _eventBus.PublishAsync(
-            new PlayerVoteRecalledIntegrationEvent(
-                player.Sid,
-                player.PlayerId,
-                previousVote,
-                GameId),
-            cancellationToken);
-    }
-
-    public async Task RemovePlayer(string sid, CancellationToken cancellationToken = default)
+    public async Task LeaveGame(string sid, CancellationToken cancellationToken = default)
     {
         EnsureGameInProgress();
         var player = GetRequiredPlayer(sid);
@@ -219,6 +164,89 @@ public class GameActor : Actor, IGameActor
         //   clear gameId SessionActor?
         //   remove from hub group?
         //   terminate connection somehow?
+    }
+
+    public Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
+    {
+        EnsureGameInProgress();
+
+        _players
+            .First(p => p.PlayerId == playerId)
+            .IsConnected = true;
+
+        return Task.CompletedTask;
+    }
+
+    public Task NotifyPlayerDisconnected(int playerId, CancellationToken cancellationToken = default)
+    {
+        var player = _players
+            .FirstOrDefault(p => p.PlayerId == playerId);
+
+        if (player is not null)
+        {
+            player.IsConnected = false;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public async Task PlayAgain(string sid, CancellationToken cancellationToken = default)
+    {
+        EnsureResultsPhase();
+        EnsureHost(sid, "Only host can choose to play again");
+
+        _votes.Clear();
+        _gamePhase = GamePhase.Voting;
+
+        await _eventBus.PublishAsync(
+            new NewVoteStartedIntegrationEvent(GameId),
+            cancellationToken);
+    }
+
+    public async Task PromotePlayer(string sid, int playerId, CancellationToken cancellationToken = default)
+    {
+        EnsureGameInProgress();
+        EnsureHost(sid, "Only host can promote other players");
+
+        var player = GetRequiredPlayer(sid);
+        var newHost = _players.FirstOrDefault(p => p.PlayerId == playerId);
+
+        if (newHost is null)
+        {
+            throw new InvalidOperationException("Player not found");
+        }
+
+        player.IsHost = false;
+        newHost.IsHost = true;
+
+        await _eventBus.PublishAsync(
+            new HostChangedIntegrationEvent(
+                player.Sid,
+                player.PlayerId,
+                player.Nickname,
+                newHost.Sid,
+                newHost.PlayerId,
+                newHost.Nickname,
+                GameId),
+            cancellationToken);
+    }
+
+    public async Task RecallVote(string sid, CancellationToken cancellationToken = default)
+    {
+        EnsureGameInProgress();
+
+        var player = GetRequiredPlayer(sid);
+
+        _votes.TryGetValue(player.PlayerId, out var previousVote);
+        _votes.Remove(player.PlayerId);
+
+        await _eventBus.PublishAsync(
+            new PlayerVoteRecalledIntegrationEvent(
+                player.Sid,
+                player.PlayerId,
+                previousVote,
+                GameId),
+            cancellationToken);
     }
 
     public async Task ResetVotes(string sid, CancellationToken cancellationToken = default)
@@ -281,7 +309,7 @@ public class GameActor : Actor, IGameActor
 
     private void EnsureHost(string sid, string error = "Not the host")
     {
-        var player = _players.First(p => p.Sid == sid);
+        var player = GetRequiredPlayer(sid);
 
         if (!player.IsHost)
         {
@@ -315,7 +343,7 @@ public class GameActor : Actor, IGameActor
 
         if (player is null)
         {
-            throw new InvalidOperationException("Player not found");
+            throw new InvalidOperationException("Invalid session id");
         }
 
         return player;

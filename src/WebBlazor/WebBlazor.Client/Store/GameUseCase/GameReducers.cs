@@ -88,6 +88,13 @@ public static class GameReducers
         };
 
     [ReducerMethod]
+    public static GameState ReduceConnectToGameFailedAction(GameState state, ConnectToGameFailedAction _) =>
+        state with
+        {
+            Connecting = false
+        };
+
+    [ReducerMethod]
     public static GameState ReduceConnectToGameSuccessAction(GameState state, ConnectToGameSuccessAction action) =>
         state with
         {
@@ -98,13 +105,6 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReduceConnectToGameFailedAction(GameState state, ConnectToGameFailedAction _) =>
-        state with
-        {
-            Connecting = false
-        };
-
-    [ReducerMethod]
     public static GameState ReduceDisconnectFromGameAction(GameState state, DisconnectFromGameAction _) =>
         state with
         {
@@ -112,15 +112,15 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReduceDisconnectFromGameSuccessAction(GameState _, DisconnectFromGameSuccessAction _1) =>
-        new GameState();
-
-    [ReducerMethod]
     public static GameState ReduceDisconnectFromGameFailedAction(GameState state, DisconnectFromGameFailedAction _) =>
         state with
         {
             Disconnecting = false
         };
+
+    [ReducerMethod]
+    public static GameState ReduceDisconnectFromGameSuccessAction(GameState _, DisconnectFromGameSuccessAction _1) =>
+        new GameState();
 
     [ReducerMethod]
     public static GameState ReduceFlipCardsAction(GameState state, FlipCardsAction _) =>
@@ -371,6 +371,27 @@ public static class GameReducers
     }
 
     [ReducerMethod]
+    public static GameState ReducePromotePlayerAction(GameState state, PromotePlayerAction action) =>
+        state with
+        {
+            PromotingPlayer = action.PlayerId
+        };
+
+    [ReducerMethod]
+    public static GameState ReducePromotePlayerFailedAction(GameState state, PromotePlayerFailedAction action) =>
+        state with
+        {
+            PromotingPlayer = null
+        };
+
+    [ReducerMethod]
+    public static GameState ReducePromotePlayerSuccessAction(GameState state, PromotePlayerSuccessAction action) =>
+        state with
+        {
+            PromotingPlayer = null
+        };
+
+    [ReducerMethod]
     public static GameState ReduceRecallVoteAction(GameState state, RecallVoteAction action)
     {
         var previousVote = state.Votes.ContainsKey(state.PlayerId) ? state.Votes[state.PlayerId] : null;
@@ -454,14 +475,14 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReduceUpdateNicknameSuccessAction(GameState state, UpdateNicknameSuccessAction _) =>
+    public static GameState ReduceUpdateNicknameFailedAction(GameState state, UpdateNicknameFailedAction _) =>
         state with
         {
             UpdatingNickname = false
         };
 
     [ReducerMethod]
-    public static GameState ReduceUpdateNicknameFailedAction(GameState state, UpdateNicknameFailedAction _) =>
+    public static GameState ReduceUpdateNicknameSuccessAction(GameState state, UpdateNicknameSuccessAction _) =>
         state with
         {
             UpdatingNickname = false

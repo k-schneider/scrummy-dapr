@@ -31,7 +31,10 @@ public class GameEffects
     {
         try
         {
-            await _appApi.CastVote(_gameState.Value.GameId, new CastVoteRequest(_gameState.Value.Sid, action.Vote));
+            await _appApi.CastVote(
+                _gameState.Value.GameId,
+                new CastVoteRequest(_gameState.Value.Sid, action.Vote));
+
             dispatcher.Dispatch(new CastVoteSuccessAction());
         }
         catch (Exception exc)
@@ -141,7 +144,10 @@ public class GameEffects
     {
         try
         {
-            await _appApi.FlipCards(_gameState.Value.GameId, new FlipCardsRequest(_gameState.Value.Sid));
+            await _appApi.FlipCards(
+                _gameState.Value.GameId,
+                new FlipCardsRequest(_gameState.Value.Sid));
+
             dispatcher.Dispatch(new FlipCardsSuccessAction());
         }
         catch (Exception exc)
@@ -178,7 +184,10 @@ public class GameEffects
     {
         try
         {
-            await _appApi.PlayAgain(_gameState.Value.GameId, new PlayAgainRequest(_gameState.Value.Sid));
+            await _appApi.PlayAgain(
+                _gameState.Value.GameId,
+                new PlayAgainRequest(_gameState.Value.Sid));
+
             dispatcher.Dispatch(new PlayAgainSuccessAction());
         }
         catch (Exception exc)
@@ -199,11 +208,38 @@ public class GameEffects
     }
 
     [EffectMethod]
+    public async Task HandlePromotePlayerAction(PromotePlayerAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _appApi.PromotePlayer(
+                _gameState.Value.GameId,
+                new PromotePlayerRequest(_gameState.Value.Sid, action.PlayerId));
+
+            dispatcher.Dispatch(new PromotePlayerSuccessAction());
+        }
+        catch (Exception exc)
+        {
+            dispatcher.Dispatch(new PromotePlayerFailedAction(exc.Message));
+        }
+    }
+
+    [EffectMethod]
+    public Task HandlePromotePlayerSuccessAction(PromotePlayerSuccessAction _, IDispatcher dispatcher)
+    {
+        dispatcher.Dispatch(new CloseOtherPlayerMenuAction());
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
     public async Task HandleRecallVoteAction(RecallVoteAction action, IDispatcher dispatcher)
     {
         try
         {
-            await _appApi.RecallVote(_gameState.Value.GameId, new RecallVoteRequest(_gameState.Value.Sid));
+            await _appApi.RecallVote(
+                _gameState.Value.GameId,
+                new RecallVoteRequest(_gameState.Value.Sid));
+
             dispatcher.Dispatch(new RecallVoteSuccessAction());
         }
         catch (Exception exc)
@@ -217,7 +253,10 @@ public class GameEffects
     {
         try
         {
-            await _appApi.ResetVotes(_gameState.Value.GameId, new ResetVotesRequest(_gameState.Value.Sid));
+            await _appApi.ResetVotes(
+                _gameState.Value.GameId,
+                new ResetVotesRequest(_gameState.Value.Sid));
+
             dispatcher.Dispatch(new ResetVotesSuccessAction());
         }
         catch (Exception exc)
@@ -234,6 +273,7 @@ public class GameEffects
             await _appApi.UpdateNickname(
                 _gameState.Value.GameId,
                 new UpdateNicknameRequest(_gameState.Value.Sid, action.Nickname));
+
             dispatcher.Dispatch(new UpdateNicknameSuccessAction());
         }
         catch (Exception exc)
@@ -243,7 +283,7 @@ public class GameEffects
     }
 
     [EffectMethod]
-    public Task HandleUpdateNicknameSuccessAction(UpdateNicknameSuccessAction action, IDispatcher dispatcher)
+    public Task HandleUpdateNicknameSuccessAction(UpdateNicknameSuccessAction _, IDispatcher dispatcher)
     {
         dispatcher.Dispatch(new ClosePlayerPopoverAction());
         return Task.CompletedTask;

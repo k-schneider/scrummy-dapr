@@ -20,6 +20,9 @@ public interface IAppApi
     [Post("g/game/{gameId}/next")]
     Task PlayAgain([Path] string gameId, [Body] PlayAgainRequest request, CancellationToken cancellationToken = default);
 
+    [Post("g/game/{gameId}/promote")]
+    Task PromotePlayer([Path] string gameId, [Body] PromotePlayerRequest request, CancellationToken cancellationToken = default);
+
     [Delete("g/game/{gameId}/vote")]
     Task RecallVote([Path] string gameId, [Body] RecallVoteRequest request, CancellationToken cancellationToken = default);
 
