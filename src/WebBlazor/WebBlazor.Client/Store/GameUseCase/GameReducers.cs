@@ -277,7 +277,7 @@ public static class GameReducers
     }
 
     [ReducerMethod]
-    public static GameState ReducePlayerJoinedGameAction(GameState state, PlayerJoinedGameAction action) =>
+    public static GameState ReducePlayerJoinedAction(GameState state, PlayerJoinedAction action) =>
         state with
         {
             Players = state.Players.Append(new Player(action.PlayerId, action.Nickname, false, false)),
@@ -285,7 +285,7 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReducePlayerLeftGameAction(GameState state, PlayerLeftGameAction action)
+    public static GameState ReducePlayerLeftAction(GameState state, PlayerLeftAction action)
     {
         if (state.PlayerId == action.PlayerId)
         {
@@ -323,6 +323,30 @@ public static class GameReducers
         {
             Players = players,
             Log = state.Log.Append(new LogEntry($"{name} changed {pronoun} nickname to {action.Nickname}."))
+        };
+    }
+
+    [ReducerMethod]
+    public static GameState ReducePlayerRemovedAction(GameState state, PlayerRemovedAction action)
+    {
+        if (state.PlayerId == action.PlayerId)
+        {
+            // Let effect handle redirect/disconnect
+            return state;
+        }
+
+        var player = state.Players
+            .Where(p => p.PlayerId == action.PlayerId)
+            .First();
+
+        var votes = new Dictionary<int, string?>(state.Votes);
+        votes.Remove(action.PlayerId);
+
+        return state with
+        {
+            Players = state.Players.Where(p => p.PlayerId != player.PlayerId),
+            Votes = votes,
+            Log = state.Log.Append(new LogEntry($"{player.Nickname} was removed from the game."))
         };
     }
 
@@ -378,21 +402,21 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReducePromotePlayerFailedAction(GameState state, PromotePlayerFailedAction action) =>
+    public static GameState ReducePromotePlayerFailedAction(GameState state, PromotePlayerFailedAction _) =>
         state with
         {
             PromotingPlayer = null
         };
 
     [ReducerMethod]
-    public static GameState ReducePromotePlayerSuccessAction(GameState state, PromotePlayerSuccessAction action) =>
+    public static GameState ReducePromotePlayerSuccessAction(GameState state, PromotePlayerSuccessAction _) =>
         state with
         {
             PromotingPlayer = null
         };
 
     [ReducerMethod]
-    public static GameState ReduceRecallVoteAction(GameState state, RecallVoteAction action)
+    public static GameState ReduceRecallVoteAction(GameState state, RecallVoteAction _)
     {
         var previousVote = state.Votes.ContainsKey(state.PlayerId) ? state.Votes[state.PlayerId] : null;
         var votes = new Dictionary<int, string?>(state.Votes);
@@ -432,6 +456,27 @@ public static class GameReducers
         state with
         {
             Voting = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceRemovePlayerAction(GameState state, RemovePlayerAction action) =>
+        state with
+        {
+            RemovingPlayer = action.PlayerId
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceRemovePlayerFailedAction(GameState state, RemovePlayerFailedAction _) =>
+        state with
+        {
+            RemovingPlayer = null
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceRemovePlayerSuccessAction(GameState state, RemovePlayerSuccessAction _) =>
+        state with
+        {
+            PromotingPlayer = null
         };
 
     [ReducerMethod]

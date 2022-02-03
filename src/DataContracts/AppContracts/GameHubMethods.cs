@@ -5,9 +5,10 @@ public static class GameHubMethods
     public const string NewVoteStarted = "NewVoteStarted";
     public const string PlayerConnected = "PlayerConnected";
     public const string PlayerDisconnected = "PlayerDisconnected";
-    public const string PlayerJoinedGame = "PlayerJoinedGame";
-    public const string PlayerLeftGame = "PlayerLeftGame";
+    public const string PlayerJoined = "PlayerJoined";
+    public const string PlayerLeft = "PlayerLeft";
     public const string PlayerNicknameChanged = "PlayerNicknameChanged";
+    public const string PlayerRemoved = "PlayerRemoved";
     public const string PlayerVoteCast = "PlayerVoteCast";
     public const string PlayerVoteRecalled = "PlayerVoteRecalled";
     public const string SyncGame = "SyncGame";

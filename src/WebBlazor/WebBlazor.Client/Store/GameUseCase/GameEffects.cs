@@ -81,14 +81,17 @@ public class GameEffects
                 _hubConnection.On<PlayerDisconnectedMessage>(GameHubMethods.PlayerDisconnected, message =>
                     dispatcher.Dispatch(new PlayerDisconnectedAction(message.PlayerId)));
 
-                _hubConnection.On<PlayerJoinedGameMessage>(GameHubMethods.PlayerJoinedGame, message =>
-                    dispatcher.Dispatch(new PlayerJoinedGameAction(message.PlayerId, message.Nickname)));
+                _hubConnection.On<PlayerJoinedMessage>(GameHubMethods.PlayerJoined, message =>
+                    dispatcher.Dispatch(new PlayerJoinedAction(message.PlayerId, message.Nickname)));
 
-                _hubConnection.On<PlayerLeftGameMessage>(GameHubMethods.PlayerLeftGame, message =>
-                    dispatcher.Dispatch(new PlayerLeftGameAction(message.PlayerId)));
+                _hubConnection.On<PlayerLeftMessage>(GameHubMethods.PlayerLeft, message =>
+                    dispatcher.Dispatch(new PlayerLeftAction(message.PlayerId)));
 
                 _hubConnection.On<PlayerNicknameChangedMessage>(GameHubMethods.PlayerNicknameChanged, message =>
                     dispatcher.Dispatch(new PlayerNicknameChangedAction(message.PlayerId, message.Nickname)));
+
+                _hubConnection.On<PlayerRemovedMessage>(GameHubMethods.PlayerRemoved, message =>
+                    dispatcher.Dispatch(new PlayerRemovedAction(message.PlayerId)));
 
                 _hubConnection.On<PlayerVoteCastMessage>(GameHubMethods.PlayerVoteCast, message =>
                     dispatcher.Dispatch(new PlayerVoteCastAction(message.PlayerId, message.Vote)));
@@ -163,7 +166,7 @@ public class GameEffects
         {
             var gameId = _gameState.Value.GameId;
             await _appApi.LeaveGame(gameId, new LeaveGameRequest(_gameState.Value.Sid));
-            dispatcher.Dispatch(new LeaveGameSuccessAction(gameId));
+            dispatcher.Dispatch(new LeaveGameSuccessAction());
         }
         catch (Exception exc)
         {
@@ -174,8 +177,9 @@ public class GameEffects
     [EffectMethod]
     public Task HandleLeaveGameSuccessAction(LeaveGameSuccessAction action, IDispatcher dispatcher)
     {
+        var gameId = _gameState.Value.GameId;
+        dispatcher.Dispatch(new ForgetGameAction(gameId));
         _navigationManager.NavigateTo($"/");
-        dispatcher.Dispatch(new ForgetGameAction(action.GameId));
         return Task.CompletedTask;
     }
 
@@ -197,11 +201,24 @@ public class GameEffects
     }
 
     [EffectMethod]
-    public Task HandlePlayerLeftGameAction(PlayerLeftGameAction action, IDispatcher dispatcher)
+    public Task HandlePlayerLeftAction(PlayerLeftAction action, IDispatcher dispatcher)
     {
         if (action.PlayerId == _gameState.Value.PlayerId)
         {
-            // Player left on another tab so redirect this tab too
+            var gameId = _gameState.Value.GameId;
+            dispatcher.Dispatch(new ForgetGameAction(gameId));
+            _navigationManager.NavigateTo($"/");
+        }
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public Task HandlePlayerRemovedAction(PlayerRemovedAction action, IDispatcher dispatcher)
+    {
+        if (action.PlayerId == _gameState.Value.PlayerId)
+        {
+            var gameId = _gameState.Value.GameId;
+            dispatcher.Dispatch(new ForgetGameAction(gameId));
             _navigationManager.NavigateTo($"/");
         }
         return Task.CompletedTask;
@@ -246,6 +263,30 @@ public class GameEffects
         {
             dispatcher.Dispatch(new RecallVoteFailedAction(exc.Message));
         }
+    }
+
+    [EffectMethod]
+    public async Task HandleRemovePlayerAction(RemovePlayerAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _appApi.RemovePlayer(
+                _gameState.Value.GameId,
+                new RemovePlayerRequest(_gameState.Value.Sid, action.PlayerId));
+
+            dispatcher.Dispatch(new RemovePlayerSuccessAction());
+        }
+        catch (Exception exc)
+        {
+            dispatcher.Dispatch(new RemovePlayerFailedAction(exc.Message));
+        }
+    }
+
+    [EffectMethod]
+    public Task HandleRemovePlayerSuccessAction(RemovePlayerSuccessAction _, IDispatcher dispatcher)
+    {
+        dispatcher.Dispatch(new CloseOtherPlayerMenuAction());
+        return Task.CompletedTask;
     }
 
     [EffectMethod]

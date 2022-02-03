@@ -41,6 +41,6 @@
 
     private void RemovePlayer(int playerId)
     {
-        Console.WriteLine("todo: remove " + playerId);
+        Dispatcher.Dispatch(new RemovePlayerAction(playerId));
     }
 }

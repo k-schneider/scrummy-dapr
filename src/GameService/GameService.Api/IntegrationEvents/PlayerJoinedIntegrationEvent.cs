@@ -1,6 +1,6 @@
 namespace Scrummy.GameService.Api.IntegrationEvents;
 
-public record PlayerJoinedGameIntegrationEvent(
+public record PlayerJoinedIntegrationEvent(
     string Sid,
     int PlayerId,
     string Nickname,

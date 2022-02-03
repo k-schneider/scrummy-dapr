@@ -106,27 +106,27 @@ public class GameEventController : ControllerBase
         }
     }
 
-    [HttpPost("PlayerJoinedGame")]
-    [Topic(DAPR_PUBSUB_NAME, "PlayerJoinedGameIntegrationEvent")]
-    public async Task HandleAsync(PlayerJoinedGameIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    [HttpPost("PlayerJoined")]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerJoinedIntegrationEvent")]
+    public async Task HandleAsync(PlayerJoinedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         await _hubContext.Clients
             .Group(integrationEvent.GameId)
             .SendAsync(
-                GameHubMethods.PlayerJoinedGame,
-                new PlayerJoinedGameMessage(integrationEvent.PlayerId, integrationEvent.Nickname),
+                GameHubMethods.PlayerJoined,
+                new PlayerJoinedMessage(integrationEvent.PlayerId, integrationEvent.Nickname),
                 cancellationToken);
     }
 
-    [HttpPost("PlayerLeftGame")]
-    [Topic(DAPR_PUBSUB_NAME, "PlayerLeftGameIntegrationEvent")]
-    public async Task HandleAsync(PlayerLeftGameIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    [HttpPost("PlayerLeft")]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerLeftIntegrationEvent")]
+    public async Task HandleAsync(PlayerLeftIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         await _hubContext.Clients
             .Group(integrationEvent.GameId)
             .SendAsync(
-                GameHubMethods.PlayerLeftGame,
-                new PlayerLeftGameMessage(integrationEvent.PlayerId),
+                GameHubMethods.PlayerLeft,
+                new PlayerLeftMessage(integrationEvent.PlayerId),
                 cancellationToken);
     }
 
@@ -139,6 +139,18 @@ public class GameEventController : ControllerBase
             .SendAsync(
                 GameHubMethods.PlayerNicknameChanged,
                 new PlayerNicknameChangedMessage(integrationEvent.PlayerId, integrationEvent.Nickname),
+                cancellationToken);
+    }
+
+    [HttpPost("PlayerRemoved")]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerRemovedIntegrationEvent")]
+    public async Task HandleAsync(PlayerRemovedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.PlayerRemoved,
+                new PlayerRemovedMessage(integrationEvent.PlayerId),
                 cancellationToken);
     }
 

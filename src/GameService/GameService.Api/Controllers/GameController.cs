@@ -75,6 +75,13 @@ public class GameController : ControllerBase
         return Ok();
     }
 
+    [HttpDelete("game/{gameId}/player")]
+    public async Task<IActionResult> RemovePlayer(string gameId, RemovePlayerRequest request, CancellationToken cancellationToken)
+    {
+        await GetGameActor(gameId).RemovePlayer(request.Sid, request.PlayerId, cancellationToken);
+        return Ok();
+    }
+
     [HttpDelete("game/{gameId}/votes")]
     public async Task<IActionResult> ResetVotes(string gameId, ResetVotesRequest request, CancellationToken cancellationToken)
     {

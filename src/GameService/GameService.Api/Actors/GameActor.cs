@@ -50,7 +50,7 @@ public class GameActor : Actor, IGameActor
         });
 
         await _eventBus.PublishAsync(
-            new PlayerJoinedGameIntegrationEvent(
+            new PlayerJoinedIntegrationEvent(
                 sid,
                 playerId,
                 nickname,
@@ -69,15 +69,15 @@ public class GameActor : Actor, IGameActor
             throw new InvalidOperationException("Invalid vote");
         }
 
-        var player = GetRequiredPlayer(sid);
+        var self = GetRequiredPlayer(sid);
 
-        _votes.TryGetValue(player.PlayerId, out var previousVote);
-        _votes[player.PlayerId] = vote;
+        _votes.TryGetValue(self.PlayerId, out var previousVote);
+        _votes[self.PlayerId] = vote;
 
         await _eventBus.PublishAsync(
             new PlayerVoteCastIntegrationEvent(
-                player.Sid,
-                player.PlayerId,
+                self.Sid,
+                self.PlayerId,
                 vote,
                 previousVote,
                 GameId),
@@ -120,29 +120,29 @@ public class GameActor : Actor, IGameActor
     public async Task LeaveGame(string sid, CancellationToken cancellationToken = default)
     {
         EnsureGameInProgress();
-        var player = GetRequiredPlayer(sid);
+        var self = GetRequiredPlayer(sid);
 
-        _players.Remove(player);
-        _votes.Remove(player.PlayerId);
+        _players.Remove(self);
+        _votes.Remove(self.PlayerId);
 
         await _eventBus.PublishAsync(
-            new PlayerLeftGameIntegrationEvent(
-                player.Sid,
-                player.PlayerId,
+            new PlayerLeftIntegrationEvent(
+                self.Sid,
+                self.PlayerId,
                 GameId),
             cancellationToken);
 
         // If the player was the host, pick a new host based on when they joined
-        if (player.IsHost && _players.Any())
+        if (self.IsHost && _players.Any())
         {
             var newHost = _players.OrderBy(p => p.JoinDate).First();
             newHost.IsHost = true;
 
             await _eventBus.PublishAsync(
                 new HostChangedIntegrationEvent(
-                    player.Sid,
-                    player.PlayerId,
-                    player.Nickname,
+                    self.Sid,
+                    self.PlayerId,
+                    self.Nickname,
                     newHost.Sid,
                     newHost.PlayerId,
                     newHost.Nickname,
@@ -168,11 +168,13 @@ public class GameActor : Actor, IGameActor
 
     public Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
     {
-        EnsureGameInProgress();
+        var player = _players
+            .FirstOrDefault(p => p.PlayerId == playerId);
 
-        _players
-            .First(p => p.PlayerId == playerId)
-            .IsConnected = true;
+        if (player is not null)
+        {
+            player.IsConnected = true;
+        }
 
         return Task.CompletedTask;
     }
@@ -208,22 +210,17 @@ public class GameActor : Actor, IGameActor
         EnsureGameInProgress();
         EnsureHost(sid, "Only host can promote other players");
 
-        var player = GetRequiredPlayer(sid);
-        var newHost = _players.FirstOrDefault(p => p.PlayerId == playerId);
+        var self = GetRequiredPlayer(sid);
+        var newHost = GetRequiredPlayer(playerId);
 
-        if (newHost is null)
-        {
-            throw new InvalidOperationException("Player not found");
-        }
-
-        player.IsHost = false;
+        self.IsHost = false;
         newHost.IsHost = true;
 
         await _eventBus.PublishAsync(
             new HostChangedIntegrationEvent(
-                player.Sid,
-                player.PlayerId,
-                player.Nickname,
+                self.Sid,
+                self.PlayerId,
+                self.Nickname,
                 newHost.Sid,
                 newHost.PlayerId,
                 newHost.Nickname,
@@ -245,6 +242,30 @@ public class GameActor : Actor, IGameActor
                 player.Sid,
                 player.PlayerId,
                 previousVote,
+                GameId),
+            cancellationToken);
+    }
+
+    public async Task RemovePlayer(string sid, int playerId, CancellationToken cancellationToken = default)
+    {
+        EnsureGameInProgress();
+        EnsureHost(sid, "Only host can remove players");
+
+        var self = GetRequiredPlayer(sid);
+
+        if (self.PlayerId == playerId)
+        {
+            throw new InvalidOperationException("Cannot remove yourself");
+        }
+
+        var player = GetRequiredPlayer(playerId);
+
+        _players.Remove(player);
+
+        await _eventBus.PublishAsync(
+            new PlayerRemovedIntegrationEvent(
+                player.Sid,
+                player.PlayerId,
                 GameId),
             cancellationToken);
     }
@@ -283,14 +304,14 @@ public class GameActor : Actor, IGameActor
     {
         EnsureGameInProgress();
 
-        var player = GetRequiredPlayer(sid);
+        var self = GetRequiredPlayer(sid);
 
-        player.Nickname = nickname;
+        self.Nickname = nickname;
 
         await _eventBus.PublishAsync(
             new PlayerNicknameChangedIntegrationEvent(
-                player.Sid,
-                player.PlayerId,
+                self.Sid,
+                self.PlayerId,
                 nickname,
                 GameId),
             cancellationToken);
@@ -344,6 +365,18 @@ public class GameActor : Actor, IGameActor
         if (player is null)
         {
             throw new InvalidOperationException("Invalid session id");
+        }
+
+        return player;
+    }
+
+    private PlayerState GetRequiredPlayer(int playerId)
+    {
+        var player = _players.FirstOrDefault(p => p.PlayerId == playerId);
+
+        if (player is null)
+        {
+            throw new InvalidOperationException("Player not found");
         }
 
         return player;

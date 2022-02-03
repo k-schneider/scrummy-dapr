@@ -1,13 +1,13 @@
 namespace Scrummy.AppContracts;
 
-public record PlayerLeftGameMessage
+public record PlayerRemovedMessage
 {
     public int PlayerId { get; init; }
 
     // Needed for SignalR serialization
-    private PlayerLeftGameMessage() { }
+    private PlayerRemovedMessage() { }
 
-    public PlayerLeftGameMessage(int playerId)
+    public PlayerRemovedMessage(int playerId)
     {
         PlayerId = playerId;
     }

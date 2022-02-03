@@ -27,7 +27,7 @@ public record FlipCardsFailedAction(string Error);
 public record HostChangedAction(int PlayerId);
 
 public record LeaveGameAction();
-public record LeaveGameSuccessAction(string GameId);
+public record LeaveGameSuccessAction();
 public record LeaveGameFailedAction(string Error);
 
 public record NewVoteStartedAction();
@@ -43,11 +43,13 @@ public record PlayAgainFailedAction(string Error);
 public record PlayerConnectedAction(int PlayerId);
 public record PlayerDisconnectedAction(int PlayerId);
 
-public record PlayerJoinedGameAction(int PlayerId, string Nickname);
+public record PlayerJoinedAction(int PlayerId, string Nickname);
 
-public record PlayerLeftGameAction(int PlayerId);
+public record PlayerLeftAction(int PlayerId);
 
 public record PlayerNicknameChangedAction(int PlayerId, string Nickname);
+
+public record PlayerRemovedAction(int PlayerId);
 
 public record PlayerVoteCastAction(int PlayerId, string? Vote);
 public record PlayerVoteRecalledAction(int PlayerId);
@@ -59,6 +61,10 @@ public record PromotePlayerFailedAction(string Error);
 public record RecallVoteAction();
 public record RecallVoteSuccessAction();
 public record RecallVoteFailedAction(string Error);
+
+public record RemovePlayerAction(int PlayerId);
+public record RemovePlayerSuccessAction();
+public record RemovePlayerFailedAction(string Error);
 
 public record ResetVotesAction();
 public record ResetVotesSuccessAction();
