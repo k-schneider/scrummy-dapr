@@ -1,7 +1,6 @@
 @inherits FluxorComponent
 @inject IDispatcher Dispatcher
 @inject IState<GameState> GameState
-@inject NavigationManager NavigationManager
 
 <div class="relative">
     <Button OnClick="OpenPopover" Icon="envelope-open-text">Invite</Button>
@@ -9,14 +8,7 @@
     @if (GameState.Value.InvitePopoverOpen)
     {
         <Backdrop OnClick="ClosePopover" Blur="true" />
-
-        <div class="absolute left-0 mt-2 py-2 px-4 w-96 bg-white rounded-md shadow-xl z-20 flex flex-col space-y-2">
-            <p class="text-center text-indigo-700 font-semibold">Invite players by sending them this link:</p>
-            <input type="text" readonly value="@NavigationManager.Uri" class="text-xl bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 block w-full p-2.5" />
-            <div>
-                <Button OnClick="CopyLinkToClipboard" Icon="clipboard-list" Block="true">Copy link to clipboard</Button>
-            </div>
-        </div>
+        <InvitePopover />
     }
 </div>
 
@@ -24,11 +16,6 @@
     private void ClosePopover()
     {
         Dispatcher.Dispatch(new CloseInvitePopoverAction());
-    }
-
-    private void CopyLinkToClipboard()
-    {
-        Dispatcher.Dispatch(new CopyLinkToClipboardAction());
     }
 
     private void OpenPopover()

@@ -1,0 +1,19 @@
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
+@inject IState<GameState> GameState
+@inject NavigationManager NavigationManager
+
+<div class="absolute left-0 mt-2 py-2 px-4 w-96 bg-white rounded-md shadow-xl z-20 flex flex-col space-y-2">
+    <p class="text-center text-indigo-700 font-semibold">Invite players by sending them this link:</p>
+    <Input ReadOnly="true" Block="true" Value="@NavigationManager.Uri" />
+    <div>
+        <Button OnClick="CopyLinkToClipboard" Icon="clipboard-list" Block="true">Copy link to clipboard</Button>
+    </div>
+</div>
+
+@code {
+    private void CopyLinkToClipboard()
+    {
+        Dispatcher.Dispatch(new CopyLinkToClipboardAction());
+    }
+}

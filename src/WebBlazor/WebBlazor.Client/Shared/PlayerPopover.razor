@@ -1,0 +1,40 @@
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
+@inject IState<GameState> GameState
+
+<div class="absolute right-0 mt-2 w-96 bg-white rounded-md shadow-xl z-20 flex flex-col">
+    <div class="flex flex-col space-y-2 p-4">
+        <label class="w-full text-center text-lg font-semibold">Nickname</label>
+        <Input Id="nickname" Name="nickname" @bind-Value="nickname" MaxLength="50" Block="true" Placeholder="Enter your nickname" />
+        <div>
+            <Button OnClick="UpdateNickname" Block="true">Update Your Nickname</Button>
+        </div>
+    </div>
+    <div class="bg-stone-200 p-4">
+        <p class="w-full text-center text-lg font-semibold">Player Settings</p>
+        <p class="w-full text-center mt-2">todo: Toggle for specator mode</p>
+    </div>
+    <div class="p-4">
+        <Button OnClick="LeaveGame" Icon="arrow-right-from-bracket" Block="true">Leave Game</Button>
+    </div>
+</div>
+
+@code {
+    private string nickname = string.Empty;
+
+    protected override Task OnInitializedAsync()
+    {
+        nickname = GameState.Value.Me()!.Nickname;
+        return base.OnInitializedAsync();
+    }
+
+    private void LeaveGame()
+    {
+        Dispatcher.Dispatch(new LeaveGameAction());
+    }
+
+    private void UpdateNickname()
+    {
+        Console.WriteLine("Update nickname: " + nickname);
+    }
+}
