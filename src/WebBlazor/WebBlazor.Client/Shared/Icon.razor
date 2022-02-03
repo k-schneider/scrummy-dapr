@@ -1,6 +1,6 @@
 @if (!string.IsNullOrEmpty(ClassList))
 {
-    <i class="@ClassList"></i>
+    <i class="@ClassList" title="@Title"></i>
 }
 
 @code {
@@ -17,6 +17,9 @@
 
     [Parameter]
     public string? Class { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
