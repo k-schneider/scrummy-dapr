@@ -62,10 +62,6 @@ else if (GameState.Value.Connected)
     [Parameter]
     public string GameId { get; set; } = null!;
 
-    private bool IsHost => GameState.Value.Players
-        .First(p => p.PlayerId == GameState.Value.PlayerId)
-        .IsHost;
-
     protected override async Task OnInitializedAsync()
     {
         Dispatcher.Dispatch(new ConnectToGameAction(GameId));

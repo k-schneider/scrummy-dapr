@@ -9,4 +9,10 @@ public static class GameExtensions
     {
         return state.Players.FirstOrDefault(p => p.PlayerId == state.PlayerId);
     }
+
+    public static string? MyVote(this GameState state)
+    {
+        state.Votes.TryGetValue(state.PlayerId, out var vote);
+        return vote;
+    }
 }
