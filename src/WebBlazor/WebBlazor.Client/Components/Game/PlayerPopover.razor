@@ -7,7 +7,7 @@
         <label class="w-full text-center text-lg font-semibold">Nickname</label>
         <Input Id="nickname" Name="nickname" @bind-Value="nickname" MaxLength="50" Block="true" Placeholder="Enter your nickname" />
         <div>
-            <Button OnClick="UpdateNickname" Block="true">Update Your Nickname</Button>
+            <Button OnClick="UpdateNickname" Icon="save" Block="true" Disabled="@GameState.Value.UpdatingNickname" Loading="@GameState.Value.UpdatingNickname">Update Your Nickname</Button>
         </div>
     </div>
     <div class="bg-stone-200 p-4">
@@ -15,7 +15,7 @@
         <p class="w-full text-center mt-2">todo: Toggle for specator mode</p>
     </div>
     <div class="p-4">
-        <Button OnClick="LeaveGame" Icon="arrow-right-from-bracket" Block="true">Leave Game</Button>
+        <Button OnClick="LeaveGame" Icon="arrow-right-from-bracket" Block="true" Disabled="@GameState.Value.Leaving" Loading="@GameState.Value.Leaving">Leave Game</Button>
     </div>
 </div>
 
@@ -35,6 +35,13 @@
 
     private void UpdateNickname()
     {
+        if (GameState.Value.Me()!.Nickname == nickname)
+        {
+            // Name didn't change so just close the popover
+            Dispatcher.Dispatch(new ClosePlayerPopoverAction());
+            return;
+        }
+
         Dispatcher.Dispatch(new UpdateNicknameAction(nickname));
     }
 }
