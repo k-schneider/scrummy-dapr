@@ -7,7 +7,7 @@
         <label class="w-full text-center text-lg font-semibold">Nickname</label>
         <Input Id="nickname" Name="nickname" @bind-Value="nickname" MaxLength="50" Block="true" Placeholder="Enter your nickname" />
         <div>
-            <Button OnClick="UpdateNickname" Icon="save" Block="true" Disabled="@GameState.Value.UpdatingNickname" Loading="@GameState.Value.UpdatingNickname">Update Your Nickname</Button>
+            <Button OnClick="UpdateNickname" Icon="pencil-alt" Block="true" Disabled="@GameState.Value.UpdatingNickname" Loading="@GameState.Value.UpdatingNickname">Update Your Nickname</Button>
         </div>
     </div>
     <div class="bg-stone-200 p-4">
