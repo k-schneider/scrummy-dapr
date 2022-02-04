@@ -1,4 +1,4 @@
-<button type="@Type" @onclick="HandleOnClick" disabled="@Disabled" class="flex justify-center items-center space-x-2 text-lg font-bold py-2 px-6 border-b-4 active:mt-1 active:border-b-0 rounded-lg shadow-md @ClassList">
+<button type="@Type" @onclick="HandleOnClick" disabled="@Disabled" class="flex justify-center items-center space-x-2 text-lg font-bold py-2 px-6 border-b-4 active:mt-1 active:border-b-0 rounded-lg shadow-md disabled:opacity-80 disabled:border-b-4 disabled:mt-0 @ClassList">
     @if (ChildContent != default)
     {
         @if (NoSpanWrap)
@@ -26,9 +26,9 @@
 
     private static Dictionary<string, string> VariantClasses = new()
     {
-        { "default", "bg-orange-600 text-slate-200 border-orange-800 hover:bg-orange-500" },
-        { "light", "bg-orange-400 text-slate-800 border-orange-500 hover:bg-orange-300 hover:border-orange-400" },
-        { "special", "bg-amber-600 text-slate-200 border-amber-800 hover:bg-amber-500 hover:border-amber-700" }
+        { "default", "bg-orange-600 text-slate-200 border-orange-800 hover:bg-orange-500 disabled:opacity-80 disabled:bg-orange-600" },
+        { "light", "bg-orange-400 text-slate-800 border-orange-500 hover:bg-orange-300 hover:border-orange-400 disabled:bg-orange-400" },
+        { "special", "bg-amber-600 text-slate-200 border-amber-800 hover:bg-amber-500 hover:border-amber-700 disabled:bg-amber-600" }
     };
 
     [Parameter]
