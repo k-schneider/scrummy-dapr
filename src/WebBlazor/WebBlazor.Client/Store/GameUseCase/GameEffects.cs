@@ -127,6 +127,13 @@ public class GameEffects
     }
 
     [EffectMethod]
+    public Task HandleConnectToGameFailedAction(ConnectToGameFailedAction _, IDispatcher dispatcher)
+    {
+        _toastService.ShowError("Unable to connect to game.");
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
     public async Task HandleCopyLinkToClipboardAction(CopyLinkToClipboardAction _, IDispatcher dispatcher)
     {
         await _jsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", _navigationManager.Uri);
@@ -164,10 +171,17 @@ public class GameEffects
 
             dispatcher.Dispatch(new FlipCardsSuccessAction());
         }
-        catch (Exception exc)
+        catch (ApiException exc)
         {
-            dispatcher.Dispatch(new FlipCardsFailedAction(exc.Message));
+            dispatcher.Dispatch(new FlipCardsFailedAction(exc.GetError()));
         }
+    }
+
+    [EffectMethod]
+    public Task HandleFlipCardsFailedAction(FlipCardsFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to flip cards: [{action.Error}]");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
@@ -179,10 +193,17 @@ public class GameEffects
             await _appApi.LeaveGame(gameId, new LeaveGameRequest(_gameState.Value.Sid));
             dispatcher.Dispatch(new LeaveGameSuccessAction());
         }
-        catch (Exception exc)
+        catch (ApiException exc)
         {
-            dispatcher.Dispatch(new LeaveGameFailedAction(exc.Message));
+            dispatcher.Dispatch(new LeaveGameFailedAction(exc.GetError()));
         }
+    }
+
+    [EffectMethod]
+    public Task HandleLeaveGameFailedAction(LeaveGameFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Failed to leave game: [{action.Error}]");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
@@ -205,10 +226,17 @@ public class GameEffects
 
             dispatcher.Dispatch(new PlayAgainSuccessAction());
         }
-        catch (Exception exc)
+        catch (ApiException exc)
         {
-            dispatcher.Dispatch(new PlayAgainFailedAction(exc.Message));
+            dispatcher.Dispatch(new PlayAgainFailedAction(exc.GetError()));
         }
+    }
+
+    [EffectMethod]
+    public Task HandlePlayAgainFailedAction(PlayAgainFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to play again: [{action.Error}]");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
@@ -246,10 +274,17 @@ public class GameEffects
 
             dispatcher.Dispatch(new PromotePlayerSuccessAction());
         }
-        catch (Exception exc)
+        catch (ApiException exc)
         {
-            dispatcher.Dispatch(new PromotePlayerFailedAction(exc.Message));
+            dispatcher.Dispatch(new PromotePlayerFailedAction(exc.GetError()));
         }
+    }
+
+    [EffectMethod]
+    public Task HandlePromotePlayerFailedAction(PromotePlayerFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to promote player: [{action.Error}]");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
@@ -270,10 +305,17 @@ public class GameEffects
 
             dispatcher.Dispatch(new RecallVoteSuccessAction());
         }
-        catch (Exception exc)
+        catch (ApiException exc)
         {
-            dispatcher.Dispatch(new RecallVoteFailedAction(exc.Message));
+            dispatcher.Dispatch(new RecallVoteFailedAction(exc.GetError()));
         }
+    }
+
+    [EffectMethod]
+    public Task HandleRecallVoteFailedAction(RecallVoteFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to recall vote: [{action.Error}]");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
@@ -287,10 +329,17 @@ public class GameEffects
 
             dispatcher.Dispatch(new RemovePlayerSuccessAction());
         }
-        catch (Exception exc)
+        catch (ApiException exc)
         {
-            dispatcher.Dispatch(new RemovePlayerFailedAction(exc.Message));
+            dispatcher.Dispatch(new RemovePlayerFailedAction(exc.GetError()));
         }
+    }
+
+    [EffectMethod]
+    public Task HandleRemovePlayerFailedAction(RemovePlayerFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to remove player: [{action.Error}]");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
@@ -311,10 +360,17 @@ public class GameEffects
 
             dispatcher.Dispatch(new ResetVotesSuccessAction());
         }
-        catch (Exception exc)
+        catch (ApiException exc)
         {
-            dispatcher.Dispatch(new ResetVotesFailedAction(exc.Message));
+            dispatcher.Dispatch(new ResetVotesFailedAction(exc.GetError()));
         }
+    }
+
+    [EffectMethod]
+    public Task HandleResetVotesFailedAction(ResetVotesFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to reset votes: [{action.Error}]");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
@@ -328,10 +384,17 @@ public class GameEffects
 
             dispatcher.Dispatch(new UpdateNicknameSuccessAction());
         }
-        catch (Exception exc)
+        catch (ApiException exc)
         {
-            dispatcher.Dispatch(new UpdateNicknameFailedAction(exc.Message));
+            dispatcher.Dispatch(new UpdateNicknameFailedAction(exc.GetError()));
         }
+    }
+
+    [EffectMethod]
+    public Task HandleUpdateNicknameFailedAction(UpdateNicknameFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to update nickname: [{action.Error}]");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]

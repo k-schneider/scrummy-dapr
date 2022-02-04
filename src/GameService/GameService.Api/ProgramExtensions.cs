@@ -18,6 +18,14 @@ public static class ProgramExtensions
         builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
     }
 
+    public static void AddCustomControllers(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddControllers(options =>
+        {
+            options.Filters.Add<HttpResponseExceptionFilter>();
+        });
+    }
+
     public static void MapHubs(this IEndpointRouteBuilder builder)
     {
         builder.MapHub<GameHub>("/hub/gamehub", o => {

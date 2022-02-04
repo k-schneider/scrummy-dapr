@@ -3,10 +3,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.AddCustomActors();
 builder.AddCustomApplicationServices();
-
+builder.AddCustomControllers();
 
 builder.Services.AddDaprClient();
-builder.Services.AddControllers();
 builder.Services.AddSignalR().AddJsonProtocol();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

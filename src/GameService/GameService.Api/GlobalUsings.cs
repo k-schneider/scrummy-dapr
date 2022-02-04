@@ -5,6 +5,7 @@ global using Dapr.Actors.Runtime;
 global using Dapr.Client;
 global using Microsoft.AspNetCore.Http.Connections;
 global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.SignalR;
 global using Scrummy.AppContracts;
 global using Scrummy.BuildingBlocks.EventBus;
