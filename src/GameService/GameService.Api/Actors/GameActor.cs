@@ -334,7 +334,7 @@ public class GameActor : Actor, IGameActor
 
         if (!player.IsHost)
         {
-            throw new InvalidOperationException(error);
+            throw new UnauthorizedAccessException(error);
         }
     }
 

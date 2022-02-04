@@ -39,7 +39,7 @@ public class GameController : ControllerBase
     {
         if (!await GetLobbyActor().GameExists(gameId))
         {
-            return NotFound();
+            return NotFound("Game does not exist");
         }
 
         var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);

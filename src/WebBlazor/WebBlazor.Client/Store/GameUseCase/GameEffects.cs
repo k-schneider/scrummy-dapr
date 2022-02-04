@@ -8,6 +8,7 @@ public class GameEffects
     private readonly IJSRuntime _jsRuntime;
     private readonly IState<LobbyState> _lobbyState;
     private readonly NavigationManager _navigationManager;
+    private readonly IToastService _toastService;
     private HubConnection? _hubConnection;
 
     public GameEffects(
@@ -16,7 +17,8 @@ public class GameEffects
         HttpClient httpClient,
         IJSRuntime jsRuntime,
         IState<LobbyState> lobbyState,
-        NavigationManager navigationManager)
+        NavigationManager navigationManager,
+        IToastService toastService)
     {
         _appApi = appApi;
         _gameState = gameState;
@@ -24,6 +26,7 @@ public class GameEffects
         _jsRuntime = jsRuntime;
         _lobbyState = lobbyState;
         _navigationManager = navigationManager;
+        _toastService = toastService;
     }
 
     [EffectMethod]
@@ -37,10 +40,17 @@ public class GameEffects
 
             dispatcher.Dispatch(new CastVoteSuccessAction());
         }
-        catch (Exception exc)
+        catch (ApiException exc)
         {
-            dispatcher.Dispatch(new CastVoteFailedAction(exc.Message));
+            dispatcher.Dispatch(new CastVoteFailedAction(exc.GetError()));
         }
+    }
+
+    [EffectMethod]
+    public Task HandleCastVoteFailedAction(CastVoteFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to cast vote: [{action.Error}]");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
@@ -121,6 +131,7 @@ public class GameEffects
     {
         await _jsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", _navigationManager.Uri);
         dispatcher.Dispatch(new CloseInvitePopoverAction());
+        _toastService.ShowSuccess("Link copied to clipboard.");
     }
 
     [EffectMethod]

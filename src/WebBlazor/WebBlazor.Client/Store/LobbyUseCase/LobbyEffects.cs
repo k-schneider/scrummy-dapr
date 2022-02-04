@@ -9,17 +9,20 @@ public class LobbyEffects
     private readonly IState<LobbyState> _lobbyState;
     private readonly ILocalStorageService _localStorage;
     private readonly NavigationManager _navigationManager;
+    private readonly IToastService _toastService;
 
     public LobbyEffects(
         IAppApi appApi,
         IState<LobbyState> lobbyState,
         ILocalStorageService localStorage,
-        NavigationManager navigationManager)
+        NavigationManager navigationManager,
+        IToastService toastService)
     {
         _appApi = appApi;
         _lobbyState = lobbyState;
         _localStorage = localStorage;
         _navigationManager = navigationManager;
+        _toastService = toastService;
     }
 
     [EffectMethod]
@@ -42,10 +45,17 @@ public class LobbyEffects
             var gameMembership = new GameMembership(response.GameId, response.PlayerId, response.Sid);
             dispatcher.Dispatch(new CreateGameSuccessAction(gameMembership));
         }
-        catch (Exception exc)
+        catch (ApiException exc)
         {
-            dispatcher.Dispatch(new CreateGameFailedAction(exc.Message));
+            dispatcher.Dispatch(new CreateGameFailedAction(exc.GetError()));
         }
+    }
+
+    [EffectMethod]
+    public Task HandleCreateGameFailedAction(CreateGameFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to create game: [{action.Error}]");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]
@@ -66,9 +76,9 @@ public class LobbyEffects
             var game = new GameMembership(response.GameId, response.PlayerId, response.Sid);
             dispatcher.Dispatch(new JoinGameSuccessAction(game));
         }
-        catch (Exception exc)
+        catch (ApiException exc)
         {
-            dispatcher.Dispatch(new JoinGameFailedAction(exc.Message));
+            dispatcher.Dispatch(new JoinGameFailedAction(exc.GetError()));
         }
     }
 
@@ -77,6 +87,13 @@ public class LobbyEffects
     {
         await RememberGames();
         _navigationManager.NavigateTo($"/room/{action.Game.GameId}");
+    }
+
+    [EffectMethod]
+    public Task HandleJoinGameFailedAction(JoinGameFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to join game: [{action.Error}]");
+        return Task.CompletedTask;
     }
 
     [EffectMethod]

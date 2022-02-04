@@ -1,4 +1,6 @@
 ﻿global using Blazored.LocalStorage;
+global using Blazored.Toast;
+global using Blazored.Toast.Services;
 global using Fluxor;
 global using Microsoft.AspNetCore.Components;
 global using Microsoft.AspNetCore.Components.Web;
@@ -12,3 +14,4 @@ global using Scrummy.AppContracts;
 global using Scrummy.WebBlazor.Client;
 global using Scrummy.WebBlazor.Client.Store.GameUseCase;
 global using Scrummy.WebBlazor.Client.Store.LobbyUseCase;
+global using System.Net;
