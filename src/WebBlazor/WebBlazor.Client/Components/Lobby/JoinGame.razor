@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="px-4 py-3 sm:px-6">
-            <Button OnClick="Continue" Icon="dice" Block="true">Join Game</Button>
+            <Button OnClick="Continue" Icon="dice" Block="true" Disabled="@LobbyState.Value.JoiningGame" Loading="@LobbyState.Value.JoiningGame">Join Game</Button>
         </div>
     </div>
 </div>

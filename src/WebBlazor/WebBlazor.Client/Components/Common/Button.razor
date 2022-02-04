@@ -1,4 +1,4 @@
-<button type="@Type" @onclick="HandleOnClick" class="flex justify-center items-center space-x-2 text-lg font-bold py-2 px-6 border-b-4 active:mt-1 active:border-b-0 rounded-lg shadow-md @ClassList">
+<button type="@Type" @onclick="HandleOnClick" disabled="@Disabled" class="flex justify-center items-center space-x-2 text-lg font-bold py-2 px-6 border-b-4 active:mt-1 active:border-b-0 rounded-lg shadow-md @ClassList">
     @if (ChildContent != default)
     {
         @if (NoSpanWrap)
@@ -10,7 +10,11 @@
             <span>@ChildContent</span>
         }
     }
-    @if (!string.IsNullOrEmpty(Icon))
+    @if (Loading)
+    {
+        <Icon Type="circle-notch" Spin="true" Class="@(string.IsNullOrEmpty(IconSize) ? null : $"text-{IconSize}")" />
+    }
+    else if (!string.IsNullOrEmpty(Icon))
     {
         <Icon Type="@Icon" Style="@IconStyle" Class="@(string.IsNullOrEmpty(IconSize) ? null : $"text-{IconSize}")" />
     }
@@ -38,6 +42,12 @@
 
     [Parameter]
     public bool Block { get; set; }
+
+    [Parameter]
+    public bool Loading { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
 
     [Parameter]
     public string? Icon { get; set; }
