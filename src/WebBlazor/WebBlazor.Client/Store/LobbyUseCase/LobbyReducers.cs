@@ -2,6 +2,8 @@ namespace Scrummy.WebBlazor.Client.Store.LobbyUseCase;
 
 public static class LobbyReducers
 {
+    private const int MaxGames = 50;
+
     [ReducerMethod]
     public static LobbyState ReduceInitializeLobbyAction(LobbyState state, InitializeLobbyAction action) =>
         state with
@@ -31,6 +33,8 @@ public static class LobbyReducers
     {
         var games = new Dictionary<string, GameMembership>()
             .Concat(state.Games)
+            .OrderByDescending(x => x.Value.JoinedAt)
+            .Take(MaxGames - 1)
             .ToDictionary(x => x.Key, x => x.Value);
 
         games[action.Game.GameId] = action.Game;
@@ -77,6 +81,8 @@ public static class LobbyReducers
     {
         var games = new Dictionary<string, GameMembership>()
             .Concat(state.Games)
+            .OrderByDescending(x => x.Value.JoinedAt)
+            .Take(MaxGames - 1)
             .ToDictionary(x => x.Key, x => x.Value);
 
         games[action.Game.GameId] = action.Game;

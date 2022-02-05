@@ -29,9 +29,19 @@ public class LobbyEffects
     public async Task HandleStoreInitializedAction(StoreInitializedAction _, IDispatcher dispatcher)
     {
         var nickname = await _localStorage.GetItemAsync<string>(NicknameKey) ?? string.Empty;
-        var games = await _localStorage.GetItemAsync<Dictionary<string, GameMembership>>(GamesKey) ?? new Dictionary<string, GameMembership>();
 
-        dispatcher.Dispatch(new InitializeLobbyAction(nickname, games));
+        // Try and deserialize remembered games, if this fails we'll just ignore it
+        Dictionary<string, GameMembership>? games = null;
+        try
+        {
+            games = await _localStorage.GetItemAsync<Dictionary<string, GameMembership>>(GamesKey);
+        }
+        catch
+        {
+            Console.WriteLine("Warning: unable to load games from local storage.");
+        }
+
+        dispatcher.Dispatch(new InitializeLobbyAction(nickname, games ?? new Dictionary<string, GameMembership>()));
     }
 
     [EffectMethod]
