@@ -8,4 +8,3 @@
 - Implement "IsVoting"
 - Implement "Nudge"
 - Results page
-- Scroll game log to bottom
