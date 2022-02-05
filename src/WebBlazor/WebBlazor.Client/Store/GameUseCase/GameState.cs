@@ -18,13 +18,14 @@ public record GameState
     public int PlayerId { get; init; }
     public bool PlayerPopoverOpen { get; init; }
     public IEnumerable<Player> Players { get; init; } = Enumerable.Empty<Player>();
-    public Dictionary<int, string?> Votes { get; init; } = new();
-    public string? PreviousVote { get; init; }
     public bool PlayingAgain { get; init; }
+    public string? PreviousVote { get; init; }
     public int? PromotingPlayer { get; init; }
+    public bool RecallingVote { get; init; }
     public int? RemovingPlayer { get; init; }
     public bool ResettingVotes { get; init; }
     public string Sid { get; init; } = string.Empty;
     public bool UpdatingNickname { get; init; }
+    public Dictionary<int, string?> Votes { get; init; } = new();
     public bool Voting { get; init; }
 }

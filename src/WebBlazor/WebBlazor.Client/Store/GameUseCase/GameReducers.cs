@@ -430,7 +430,7 @@ public static class GameReducers
         {
             PreviousVote = previousVote,
             Votes = votes,
-            Voting = true
+            RecallingVote = true
         };
     }
 
@@ -451,7 +451,7 @@ public static class GameReducers
         return state with
         {
             Votes = votes,
-            Voting = false
+            RecallingVote = false
         };
     }
 
@@ -459,7 +459,7 @@ public static class GameReducers
     public static GameState ReduceRecallVoteSuccessAction(GameState state, RecallVoteSuccessAction _) =>
         state with
         {
-            Voting = false
+            RecallingVote = false
         };
 
     [ReducerMethod]

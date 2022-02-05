@@ -2,11 +2,17 @@
 @inject IDispatcher Dispatcher
 @inject IState<GameState> GameState
 
-<button type="button" @onclick="Vote" class="transition-all ease-in-out shadow-md select-none cursor-pointer bg-neutral-200 rounded-xl flex m-2 h-32 w-20 lg:h-44 lg:w-28 text-4xl lg:text-5xl text-gray-800 flex items-center justify-center border-8 hover:mt-1 hover:shadow-xl @(Value == GameState.Value.MyVote() ? "border-orange-500 mt-1" : "border-transparent")">@Value</button>
+<button type="button" @onclick="Vote" disabled="@(GameState.Value.Voting || GameState.Value.RecallingVote)" class="transition-all ease-in-out shadow-md select-none cursor-pointer bg-neutral-200 rounded-xl flex m-2 h-32 w-20 lg:h-44 lg:w-28 text-4xl lg:text-5xl text-gray-800 flex items-center justify-center border-8 hover:mt-1 hover:shadow-xl relative @(Value == GameState.Value.MyVote() ? "border-orange-500 mt-1" : "border-transparent")">
+    <span class="@(ChangingVote ? "animate-pulse" : null)">@Value</span>
+</button>
 
 @code {
     [Parameter]
     public string Value { get; set; } = string.Empty;
+
+    private bool ChangingVote =>
+        (GameState.Value.Voting && GameState.Value.MyVote() == Value) ||
+        (GameState.Value.RecallingVote && GameState.Value.PreviousVote == Value);
 
     private void Vote()
     {

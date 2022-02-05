@@ -2,14 +2,24 @@
 @inject IState<GameState> GameState
 
 <div class="flex justify-center items-center">
-    <div class="bg-neutral-200 rounded-lg text-2xl text-gray-800 py-2 px-4 font-semibold shadow-md">
-        @if (GameState.Value.Votes.ContainsKey(GameState.Value.PlayerId))
+    <div class="bg-neutral-200 rounded-lg text-2xl text-gray-800 py-2 px-10 font-semibold shadow-md flex space-x-2 items-center transition-all ease-in-out">
+        @if (GameState.Value.Voting)
         {
-            <text>Wait for the flip...</text>
+            <span>Casting vote</span>
+            <Icon Type="circle-notch" Spin="true" />
+        }
+        else if (GameState.Value.RecallingVote)
+        {
+            <span>Recalling vote</span>
+            <Icon Type="circle-notch" Spin="true" />
+        }
+        else if (GameState.Value.Votes.ContainsKey(GameState.Value.PlayerId))
+        {
+            <span>Wait for the flip...</span>
         }
         else
         {
-            <text>Cast your vote...</text>
+            <span>Cast your vote...</span>
         }
     </div>
 </div>
