@@ -51,7 +51,7 @@ public record PlayerNicknameChangedAction(int PlayerId, string Nickname);
 
 public record PlayerRemovedAction(int PlayerId);
 
-public record PlayerVoteCastAction(int PlayerId, string? Vote);
+public record PlayerVoteCastAction(int PlayerId, string? Vote, string? PreviousVote);
 public record PlayerVoteRecalledAction(int PlayerId);
 
 public record PromotePlayerAction(int PlayerId);

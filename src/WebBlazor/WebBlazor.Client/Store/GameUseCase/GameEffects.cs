@@ -104,7 +104,7 @@ public class GameEffects
                     dispatcher.Dispatch(new PlayerRemovedAction(message.PlayerId)));
 
                 _hubConnection.On<PlayerVoteCastMessage>(GameHubMethods.PlayerVoteCast, message =>
-                    dispatcher.Dispatch(new PlayerVoteCastAction(message.PlayerId, message.Vote)));
+                    dispatcher.Dispatch(new PlayerVoteCastAction(message.PlayerId, message.Vote, message.PreviousVote)));
 
                 _hubConnection.On<PlayerVoteRecalledMessage>(GameHubMethods.PlayerVoteRecalled, message =>
                     dispatcher.Dispatch(new PlayerVoteRecalledAction(message.PlayerId)));

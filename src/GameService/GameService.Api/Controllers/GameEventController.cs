@@ -166,7 +166,7 @@ public class GameEventController : ControllerBase
             .GroupExcept(integrationEvent.GameId, connectionIds)
             .SendAsync(
                 GameHubMethods.PlayerVoteCast,
-                new PlayerVoteCastMessage(integrationEvent.PlayerId, null),
+                new PlayerVoteCastMessage(integrationEvent.PlayerId, null, null),
                 cancellationToken);
 
         // Send the player a notification to sync their vote across connections
@@ -174,7 +174,7 @@ public class GameEventController : ControllerBase
             .Clients(connectionIds)
             .SendAsync(
                 GameHubMethods.PlayerVoteCast,
-                new PlayerVoteCastMessage(integrationEvent.PlayerId, integrationEvent.Vote),
+                new PlayerVoteCastMessage(integrationEvent.PlayerId, integrationEvent.Vote, integrationEvent.PreviousVote),
                 cancellationToken);
     }
 
