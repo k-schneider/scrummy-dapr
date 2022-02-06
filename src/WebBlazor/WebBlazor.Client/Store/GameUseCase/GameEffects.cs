@@ -296,7 +296,7 @@ public class GameEffects
                 await _nudgeTimer.DisposeAsync();
             }
 
-            _nudgeTimer = new Timer(_ => dispatcher.Dispatch(new ResetNudgedAction()), null, 1000, Timeout.Infinite);
+            _nudgeTimer = new Timer(_ => dispatcher.Dispatch(new ResetNudgedAction()), null, 1500, Timeout.Infinite);
         }
     }
 

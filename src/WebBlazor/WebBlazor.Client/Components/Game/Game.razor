@@ -53,6 +53,11 @@ else if (GameState.Value.Connected)
                 <HostControls />
             }
         </div>
+
+        @if (GameState.Value.Nudged)
+        {
+            <audio autoplay><source src="door_bell.mp3" /></audio>
+        }
     }
     else
     {
