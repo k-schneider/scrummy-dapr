@@ -1,14 +1,14 @@
-namespace Scrummy.AppContracts;
+namespace Scrummy.AppContracts.SignalR;
 
-public record PlayerJoinedMessage
+public record PlayerNicknameChangedMessage
 {
     public int PlayerId { get; init; }
     public string Nickname { get; init; } = null!;
 
     // Needed for SignalR serialization
-    private PlayerJoinedMessage() { }
+    private PlayerNicknameChangedMessage() { }
 
-    public PlayerJoinedMessage(int playerId, string nickname)
+    public PlayerNicknameChangedMessage(int playerId, string nickname)
     {
         PlayerId = playerId;
         Nickname = nickname;

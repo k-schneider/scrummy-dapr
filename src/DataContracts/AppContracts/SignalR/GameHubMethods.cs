@@ -1,3 +1,5 @@
+namespace Scrummy.AppContracts.SignalR;
+
 public static class GameHubMethods
 {
     public const string CardsFlipped = "CardsFlipped";

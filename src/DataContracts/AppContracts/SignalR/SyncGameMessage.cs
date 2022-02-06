@@ -1,4 +1,4 @@
-namespace Scrummy.AppContracts;
+namespace Scrummy.AppContracts.SignalR;
 
 public record SyncGameMessage
 {
