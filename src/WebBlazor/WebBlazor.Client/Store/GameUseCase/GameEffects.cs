@@ -10,6 +10,7 @@ public class GameEffects
     private readonly NavigationManager _navigationManager;
     private readonly IToastService _toastService;
     private HubConnection? _hubConnection;
+    private Timer? _nudgeTimer;
 
     public GameEffects(
         IAppApi appApi,
@@ -286,13 +287,17 @@ public class GameEffects
     }
 
     [EffectMethod]
-    public Task HandlePlayerNudgedAction(PlayerNudgedAction action, IDispatcher _)
+    public async Task HandlePlayerNudgedAction(PlayerNudgedAction action, IDispatcher dispatcher)
     {
         if (action.ToPlayerId == _gameState.Value.PlayerId)
         {
-            Console.WriteLine("todo: shake screen and play a sound");
+            if (_nudgeTimer != null)
+            {
+                await _nudgeTimer.DisposeAsync();
+            }
+
+            _nudgeTimer = new Timer(_ => dispatcher.Dispatch(new ResetNudgedAction()), null, 1000, Timeout.Infinite);
         }
-        return Task.CompletedTask;
     }
 
     [EffectMethod]

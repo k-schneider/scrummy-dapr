@@ -72,6 +72,8 @@ public record RemovePlayerAction(int PlayerId);
 public record RemovePlayerSuccessAction();
 public record RemovePlayerFailedAction(string Error);
 
+public record ResetNudgedAction();
+
 public record ResetVotesAction();
 public record ResetVotesSuccessAction();
 public record ResetVotesFailedAction(string Error);

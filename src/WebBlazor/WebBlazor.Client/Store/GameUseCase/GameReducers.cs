@@ -363,6 +363,7 @@ public static class GameReducers
 
         return state with
         {
+            Nudged = action.ToPlayerId == state.PlayerId ? true : state.Nudged,
             Log = state.Log.Append(new LogEntry($"{fromName} nudged {toName}."))
         };
     }
@@ -518,6 +519,13 @@ public static class GameReducers
         state with
         {
             PromotingPlayer = null
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceResetNudgedAction(GameState state, ResetNudgedAction _) =>
+        state with
+        {
+            Nudged = false
         };
 
     [ReducerMethod]
