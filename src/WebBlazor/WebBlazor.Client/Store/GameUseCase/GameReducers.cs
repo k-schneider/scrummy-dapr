@@ -360,11 +360,7 @@ public static class GameReducers
         var name = state.PlayerId == action.PlayerId ? "You" : player.Nickname;
         var pronoun = state.PlayerId == action.PlayerId ? "your" : "their";
 
-        var voteChanged = state.PlayerId == action.PlayerId
-            ? action.PreviousVote is not null
-            : state.Votes.ContainsKey(action.PlayerId);
-
-        var logMessage = voteChanged
+        var logMessage = action.hadPreviousVote
             ? $"{name} changed {pronoun} vote."
             : $"{name} voted.";
 

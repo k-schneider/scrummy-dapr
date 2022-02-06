@@ -160,13 +160,14 @@ public class GameEventController : ControllerBase
     {
         var session = GetSessionActor(integrationEvent.Sid);
         var connectionIds = await session.GetConnectionIds(cancellationToken);
+        var hadPreviousVote = integrationEvent.PreviousVote is not null;
 
         // Send players a notification that the player has voted excluding the vote value
         await _hubContext.Clients
             .GroupExcept(integrationEvent.GameId, connectionIds)
             .SendAsync(
                 GameHubMethods.PlayerVoteCast,
-                new PlayerVoteCastMessage(integrationEvent.PlayerId, null, null),
+                new PlayerVoteCastMessage(integrationEvent.PlayerId, hadPreviousVote, null),
                 cancellationToken);
 
         // Send the player a notification to sync their vote across connections
@@ -174,7 +175,8 @@ public class GameEventController : ControllerBase
             .Clients(connectionIds)
             .SendAsync(
                 GameHubMethods.PlayerVoteCast,
-                new PlayerVoteCastMessage(integrationEvent.PlayerId, integrationEvent.Vote, integrationEvent.PreviousVote),
+                new PlayerVoteCastMessage(
+                    integrationEvent.PlayerId, hadPreviousVote, integrationEvent.Vote),
                 cancellationToken);
     }
 
