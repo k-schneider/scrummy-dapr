@@ -54,6 +54,13 @@ public class GameController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("game/{gameId}/nudge")]
+    public async Task<IActionResult> NudgePlayer(string gameId, NudgePlayerRequest request, CancellationToken cancellationToken)
+    {
+        await GetGameActor(gameId).NudgePlayer(request.Sid, request.PlayerId, cancellationToken);
+        return Ok();
+    }
+
     [HttpPost("game/{gameId}/next")]
     public async Task<IActionResult> PlayAgain(string gameId, PlayAgainRequest request, CancellationToken cancellationToken)
     {

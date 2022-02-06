@@ -31,7 +31,7 @@
 
     private void NudgePlayer(int playerId)
     {
-        Console.WriteLine("todo: nudge " + playerId);
+        Dispatcher.Dispatch(new NudgePlayerAction(playerId));
     }
 
     private void PromotePlayer(int playerId)

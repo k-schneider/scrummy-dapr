@@ -166,6 +166,23 @@ public class GameActor : Actor, IGameActor
         //   terminate connection somehow?
     }
 
+    public async Task NudgePlayer(string sid, int playerId, CancellationToken cancellationToken = default)
+    {
+        EnsureGameInProgress();
+
+        var self = GetRequiredPlayer(sid);
+        var player = GetRequiredPlayer(playerId);
+
+        await _eventBus.PublishAsync(
+            new PlayerNudgedIntegrationEvent(
+                self.Sid,
+                self.PlayerId,
+                player.Sid,
+                player.PlayerId,
+                GameId),
+            cancellationToken);
+    }
+
     public Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
     {
         var player = _players

@@ -142,6 +142,18 @@ public class GameEventController : ControllerBase
                 cancellationToken);
     }
 
+    [HttpPost("PlayerNudged")]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerNudgedIntegrationEvent")]
+    public async Task HandleAsync(PlayerNudgedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.PlayerNudged,
+                new PlayerNudgedMessage(integrationEvent.FromPlayerId, integrationEvent.ToPlayerId),
+                cancellationToken);
+    }
+
     [HttpPost("PlayerRemoved")]
     [Topic(DAPR_PUBSUB_NAME, "PlayerRemovedIntegrationEvent")]
     public async Task HandleAsync(PlayerRemovedIntegrationEvent integrationEvent, CancellationToken cancellationToken)

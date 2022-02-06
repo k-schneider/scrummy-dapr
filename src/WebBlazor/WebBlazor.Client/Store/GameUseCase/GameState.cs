@@ -14,6 +14,7 @@ public record GameState
     public bool InvitePopoverOpen { get; init; }
     public bool Leaving { get; init; }
     public IEnumerable<LogEntry> Log { get; init; } = Enumerable.Empty<LogEntry>();
+    public int? NudgingPlayer { get; init ; }
     public int? OtherPlayerIdMenuOpen { get; init; }
     public int PlayerId { get; init; }
     public bool PlayerPopoverOpen { get; init; }

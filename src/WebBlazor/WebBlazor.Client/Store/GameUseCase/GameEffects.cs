@@ -100,6 +100,9 @@ public class GameEffects
                 _hubConnection.On<PlayerNicknameChangedMessage>(GameHubMethods.PlayerNicknameChanged, message =>
                     dispatcher.Dispatch(new PlayerNicknameChangedAction(message.PlayerId, message.Nickname)));
 
+                _hubConnection.On<PlayerNudgedMessage>(GameHubMethods.PlayerNudged, message =>
+                    dispatcher.Dispatch(new PlayerNudgedAction(message.FromPlayerId, message.ToPlayerId)));
+
                 _hubConnection.On<PlayerRemovedMessage>(GameHubMethods.PlayerRemoved, message =>
                     dispatcher.Dispatch(new PlayerRemovedAction(message.PlayerId)));
 
@@ -216,6 +219,37 @@ public class GameEffects
     }
 
     [EffectMethod]
+    public async Task HandleNudgePlayerAction(NudgePlayerAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _appApi.NudgePlayer(
+                _gameState.Value.GameId,
+                new NudgePlayerRequest(_gameState.Value.Sid, action.PlayerId));
+
+            dispatcher.Dispatch(new NudgePlayerSuccessAction());
+        }
+        catch (ApiException exc)
+        {
+            dispatcher.Dispatch(new NudgePlayerFailedAction(exc.GetError()));
+        }
+    }
+
+    [EffectMethod]
+    public Task HandleNudgePlayerFailedAction(NudgePlayerFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Failed to nudge player: [{action.Error}]");
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public Task HandleNudgePlayerSuccessAction(NudgePlayerSuccessAction _, IDispatcher dispatcher)
+    {
+        dispatcher.Dispatch(new CloseOtherPlayerMenuAction());
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
     public async Task HandlePlayAgainAction(PlayAgainAction action, IDispatcher dispatcher)
     {
         try
@@ -247,6 +281,16 @@ public class GameEffects
             var gameId = _gameState.Value.GameId;
             dispatcher.Dispatch(new ForgetGameAction(gameId));
             _navigationManager.NavigateTo($"/");
+        }
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public Task HandlePlayerNudgedAction(PlayerNudgedAction action, IDispatcher _)
+    {
+        if (action.ToPlayerId == _gameState.Value.PlayerId)
+        {
+            Console.WriteLine("todo: shake screen and play a sound");
         }
         return Task.CompletedTask;
     }

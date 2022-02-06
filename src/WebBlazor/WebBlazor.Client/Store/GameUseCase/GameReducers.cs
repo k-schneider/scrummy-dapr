@@ -197,6 +197,27 @@ public static class GameReducers
     }
 
     [ReducerMethod]
+    public static GameState ReduceNudgePlayerAction(GameState state, NudgePlayerAction action) =>
+        state with
+        {
+            NudgingPlayer = action.PlayerId
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceNudgePlayerFailedAction(GameState state, NudgePlayerFailedAction _) =>
+        state with
+        {
+            NudgingPlayer = null
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceNudgePlayerSuccessAction(GameState state, NudgePlayerSuccessAction _) =>
+        state with
+        {
+            NudgingPlayer = null
+        };
+
+    [ReducerMethod]
     public static GameState ReduceOpenInvitePopoverAction(GameState state, OpenInvitePopoverAction _) =>
         state with
         {
@@ -323,6 +344,26 @@ public static class GameReducers
         {
             Players = players,
             Log = state.Log.Append(new LogEntry($"{name} changed {pronoun} nickname to {action.Nickname}."))
+        };
+    }
+
+    [ReducerMethod]
+    public static GameState ReducePlayerNudgedAction(GameState state, PlayerNudgedAction action)
+    {
+        var fromPlayer = state.Players
+            .Where(p => p.PlayerId == action.FromPlayerId)
+            .First();
+
+        var toPlayer = state.Players
+            .Where(p => p.PlayerId == action.ToPlayerId)
+            .First();
+
+        var fromName = state.PlayerId == fromPlayer.PlayerId ? "You" : fromPlayer.Nickname;
+        var toName = state.PlayerId == toPlayer.PlayerId ? "you" : toPlayer.Nickname;
+
+        return state with
+        {
+            Log = state.Log.Append(new LogEntry($"{fromName} nudged {toName}."))
         };
     }
 

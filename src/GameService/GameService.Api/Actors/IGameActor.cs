@@ -9,6 +9,7 @@ public interface IGameActor : IActor
     Task LeaveGame(string sid, CancellationToken cancellationToken = default);
     Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default);
     Task NotifyPlayerDisconnected(int playerId, CancellationToken cancellationToken = default);
+    Task NudgePlayer(string sid, int playerId, CancellationToken cancellationToken = default);
     Task PlayAgain(string sid, CancellationToken cancellationToken = default);
     Task PromotePlayer(string sid, int playerId, CancellationToken cancellationToken = default);
     Task RecallVote(string sid, CancellationToken cancellationToken = default);

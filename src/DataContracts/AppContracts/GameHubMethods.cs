@@ -8,6 +8,7 @@ public static class GameHubMethods
     public const string PlayerJoined = "PlayerJoined";
     public const string PlayerLeft = "PlayerLeft";
     public const string PlayerNicknameChanged = "PlayerNicknameChanged";
+    public const string PlayerNudged = "PlayerNudged";
     public const string PlayerRemoved = "PlayerRemoved";
     public const string PlayerVoteCast = "PlayerVoteCast";
     public const string PlayerVoteRecalled = "PlayerVoteRecalled";

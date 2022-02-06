@@ -32,6 +32,10 @@ public record LeaveGameFailedAction(string Error);
 
 public record NewVoteStartedAction();
 
+public record NudgePlayerAction(int PlayerId);
+public record NudgePlayerSuccessAction();
+public record NudgePlayerFailedAction(string Error);
+
 public record OpenInvitePopoverAction();
 public record OpenOtherPlayerMenuAction(int PlayerId);
 public record OpenPlayerPopoverAction();
@@ -48,6 +52,8 @@ public record PlayerJoinedAction(int PlayerId, string Nickname);
 public record PlayerLeftAction(int PlayerId);
 
 public record PlayerNicknameChangedAction(int PlayerId, string Nickname);
+
+public record PlayerNudgedAction(int FromPlayerId, int ToPlayerId);
 
 public record PlayerRemovedAction(int PlayerId);
 
