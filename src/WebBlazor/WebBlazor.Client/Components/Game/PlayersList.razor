@@ -7,7 +7,7 @@
     <div class="mt-2 grow overflow-auto">
         @foreach (var player in GameState.Value.Players.OrderByDescending(p => p.IsHost).ThenBy(p => p.Nickname))
         {
-            <div class="px-2 py-2 even:bg-indigo-300/50 flex space-x-2 items-center">
+            <div class="px-2 py-2 even:bg-indigo-300/50 flex gap-x-2 items-center">
                 @if (!player.IsConnected)
                 {
                     <Icon Type="circle-xmark" Class="text-slate-500 text-2xl opacity-50" />
@@ -27,7 +27,7 @@
                 }
                 @if (player.PlayerId != GameState.Value.PlayerId && (player.IsConnected || GameState.Value.IsHost()))
                 {
-                    <div class="relative !ml-auto">
+                    <div class="relative ml-auto">
                         <button @onclick="() => OpenOtherPlayerMenu(player.PlayerId)" class="rounded-full hover:bg-black/10 p-1 text-slate-700 rounded-full hover:bg-black/10 p-1 text-slate-700 text-xl w-8 h-8 flex items-center justify-center">
                             <Icon Type="ellipsis-vertical" />
                         </button>

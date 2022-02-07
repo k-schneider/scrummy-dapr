@@ -2,7 +2,7 @@
 @inject IDispatcher Dispatcher
 @inject IState<GameState> GameState
 
-<div class="w-full sm:w-auto fixed bottom-0 flex space-x-4 py-4 px-4 md:px-8">
+<div class="w-full sm:w-auto fixed bottom-0 flex gap-x-4 py-4 px-4 md:px-8">
     @if (GameState.Value.GamePhase == "Voting")
     {
         <Button OnClick="FlipCards" Icon="wand-magic-sparkles" Variant="special" Disabled="@GameState.Value.Flipping" Loading="@GameState.Value.Flipping" Class="flex-1 sm:flex-none">Flip Cards</Button>

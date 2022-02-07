@@ -13,31 +13,26 @@
     <div class="mt-8 p-8 bg-black/50 text-white rounded-md">
         <h2 class="text-2xl font-bold text-indigo-300">How to play:</h2>
         <ol class="mt-4 list-none">
-            <li class="flex space-x-2">
-                <span class="font-bold text-indigo-300">1.</span>
-                <span>Click on the CREATE GAME button.</span>
-            </li>
-            <li class="flex space-x-2">
-                <span class="font-bold text-indigo-300">2.</span>
-                <span>Enter your Nickname and start the game.</span>
-            </li>
-            <li class="flex space-x-2">
-                <span class="font-bold text-indigo-300">3.</span>
-                <span>Connect with your team using your favorite audio or video chat.</span>
-            </li>
-            <li class="flex space-x-2">
-                <span class="font-bold text-indigo-300">4.</span>
-                <span>Share the game URL with your team.</span>
-            </li>
-            <li class="flex space-x-2">
-                <span class="font-bold text-indigo-300">5.</span>
-                <span>Once everyone has voted, flip the cards to reveal the results.</span>
-            </li>
+            @for (var i = 0; i < Instructions.Length; i++)
+            {
+                <li class="flex gap-x-2">
+                    <span class="font-bold text-indigo-300">@(i + 1).</span>
+                    <span>@Instructions[i]</span>
+                </li>
+            }
         </ol>
     </div>
 </div>
 
 @code {
+    private string[] Instructions = new string[] {
+        "Click on the CREATE GAME button.",
+        "Enter your Nickname and start the game.",
+        "Connect with your team using your favorite audio or video chat.",
+        "Share the game URL with your team.",
+        "Once everyone has voted, flip the cards to reveal the results.",
+    };
+
     private void CreateGame()
     {
         NavigationManager.NavigateTo("/room/create");

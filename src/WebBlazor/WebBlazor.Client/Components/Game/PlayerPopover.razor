@@ -3,7 +3,7 @@
 @inject IState<GameState> GameState
 
 <div class="absolute right-0 mt-2 w-96 bg-white rounded-md shadow-xl z-20 flex flex-col">
-    <div class="flex flex-col space-y-2 p-4">
+    <div class="flex flex-col gap-y-2 p-4">
         <label class="w-full text-center text-lg font-semibold">Nickname</label>
         <Input Id="nickname" Name="nickname" @bind-Value="nickname" MaxLength="50" Block="true" Placeholder="Enter your nickname" />
         <div>

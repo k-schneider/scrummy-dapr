@@ -2,7 +2,7 @@
 @inject IState<GameState> GameState
 
 <div class="flex justify-center items-center">
-    <div class="bg-neutral-200 rounded-lg text-2xl text-gray-800 py-2 px-10 font-semibold shadow-md flex space-x-2 items-center transition-all ease-in-out">
+    <div class="bg-neutral-200 rounded-lg text-2xl text-gray-800 py-2 px-10 font-semibold shadow-md flex gap-x-2 items-center transition-all ease-in-out">
         @if (GameState.Value.Voting)
         {
             <span>Casting vote</span>
