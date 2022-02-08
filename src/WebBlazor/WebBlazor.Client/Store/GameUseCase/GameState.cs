@@ -5,6 +5,7 @@ public record GameState
 {
     public bool Connecting { get; init; }
     public bool Connected { get; init;}
+    public long? ConnectedTime { get; init; }
     public IEnumerable<string> Deck { get; init; } = Enumerable.Empty<string>();
     public bool Disconnecting { get; init; }
     public bool Flipping { get; init; }

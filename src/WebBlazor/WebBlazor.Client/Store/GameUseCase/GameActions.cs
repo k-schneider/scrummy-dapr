@@ -14,6 +14,8 @@ public record ConnectToGameAction(string GameId);
 public record ConnectToGameSuccessAction(string Sid, int PlayerId);
 public record ConnectToGameFailedAction(string Error);
 
+public record ConnectionToGameRejectedAction(string GameId);
+
 public record CopyLinkToClipboardAction();
 
 public record DisconnectFromGameAction();

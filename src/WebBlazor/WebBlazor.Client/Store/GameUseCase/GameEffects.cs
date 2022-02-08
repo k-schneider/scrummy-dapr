@@ -119,6 +119,18 @@ public class GameEffects
                 _hubConnection.On(GameHubMethods.VotesReset, () =>
                     dispatcher.Dispatch(new VotesResetAction()));
 
+                _hubConnection.Closed += exc =>
+                {
+                    // If we just connected and then the connection was immediately
+                    // closed then the server rejected the connection
+                    if (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - _gameState.Value.ConnectedTime < 1000)
+                    {
+                        dispatcher.Dispatch(new ConnectionToGameRejectedAction(action.GameId));
+                    }
+
+                    return Task.CompletedTask;
+                };
+
                 await _hubConnection.StartAsync();
             }
 
@@ -134,6 +146,16 @@ public class GameEffects
     public Task HandleConnectToGameFailedAction(ConnectToGameFailedAction _, IDispatcher dispatcher)
     {
         _toastService.ShowError("Unable to connect to game.");
+        _navigationManager.NavigateTo("/");
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public Task HandleConnectionToGameRejectedAction(ConnectionToGameRejectedAction action, IDispatcher dispatcher)
+    {
+        dispatcher.Dispatch(new ForgetGameAction(action.GameId));
+        _toastService.ShowError("Connection rejected by server.");
+        _navigationManager.NavigateTo("/");
         return Task.CompletedTask;
     }
 

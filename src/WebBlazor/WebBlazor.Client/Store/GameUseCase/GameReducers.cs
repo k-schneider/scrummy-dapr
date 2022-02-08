@@ -81,9 +81,11 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReduceConnectToGameAction(GameState state, ConnectToGameAction _) =>
+    public static GameState ReduceConnectToGameAction(GameState state, ConnectToGameAction action) =>
         state with
         {
+            Connected = false,
+            ConnectedTime = null,
             Connecting = true
         };
 
@@ -99,6 +101,7 @@ public static class GameReducers
         state with
         {
             Connected = true,
+            ConnectedTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
             Connecting = false,
             Sid = action.Sid,
             PlayerId = action.PlayerId
