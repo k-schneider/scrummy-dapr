@@ -7,6 +7,7 @@ global using Microsoft.AspNetCore.Http.Connections;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.SignalR;
+global using Scrummy.AppContracts;
 global using Scrummy.AppContracts.Rest;
 global using Scrummy.AppContracts.SignalR;
 global using Scrummy.BuildingBlocks.EventBus;

@@ -10,6 +10,7 @@ global using Microsoft.AspNetCore.SignalR.Client;
 global using Microsoft.JSInterop;
 global using RestEase;
 global using RestEase.HttpClientFactory;
+global using Scrummy.AppContracts;
 global using Scrummy.AppContracts.Rest;
 global using Scrummy.AppContracts.SignalR;
 global using Scrummy.WebBlazor.Client;

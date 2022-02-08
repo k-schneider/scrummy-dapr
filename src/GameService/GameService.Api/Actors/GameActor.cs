@@ -4,8 +4,8 @@ public class GameActor : Actor, IGameActor
 {
     private readonly IEventBus _eventBus;
 
-    private GameStatus _gameStatus = GameStatus.None;
-    private GamePhase _gamePhase = GamePhase.Voting;
+    private string _gameStatus = GameStatus.None;
+    private string _gamePhase = GamePhase.Voting;
     private int _playerCounter;
     private List<PlayerState> _players = new();
     private Dictionary<int, string> _votes = new();
@@ -111,7 +111,7 @@ public class GameActor : Actor, IGameActor
 
         return Task.FromResult(new GameSnapshot(
             GameId,
-            _gamePhase.Name,
+            _gamePhase,
             players,
             _deck,
             votes));

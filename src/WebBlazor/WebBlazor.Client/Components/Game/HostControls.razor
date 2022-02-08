@@ -3,13 +3,13 @@
 @inject IState<GameState> GameState
 
 <div class="w-full sm:w-auto fixed bottom-0 flex gap-x-4 py-4 px-4 md:px-8">
-    @if (GameState.Value.GamePhase == "Voting")
+    @if (GameState.Value.GamePhase == GamePhase.Voting)
     {
         <Button OnClick="FlipCards" Icon="wand-magic-sparkles" Variant="special" Disabled="@GameState.Value.Flipping" Loading="@GameState.Value.Flipping" Class="flex-1 sm:flex-none">Flip Cards</Button>
         <Button OnClick="ResetVotes" Icon="rotate-left" Variant="special" Disabled="@GameState.Value.ResettingVotes" Loading="@GameState.Value.ResettingVotes" Class="flex-1 sm:flex-none">Reset Votes</Button>
     }
 
-    @if (GameState.Value.GamePhase == "Results")
+    @if (GameState.Value.GamePhase == GamePhase.Results)
     {
         <Button OnClick="PlayAgain" Icon="dice" Variant="special" Disabled="@GameState.Value.PlayingAgain" Loading="@GameState.Value.PlayingAgain" Class="flex-1 sm:flex-none">Play Again</Button>
     }
