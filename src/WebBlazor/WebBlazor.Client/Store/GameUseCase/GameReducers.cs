@@ -10,7 +10,7 @@ public static class GameReducers
 
         return state with
         {
-            GamePhase = GamePhase.Results,
+            GamePhase = GamePhases.Results,
             Votes = action.Votes.ToDictionary(kvp => kvp.Key, kvp => kvp.Value ?? null),
             Log = state.Log.Append(new LogEntry($"{name} flipped the cards."))
         };
@@ -199,7 +199,7 @@ public static class GameReducers
 
         return state with
         {
-            GamePhase = GamePhase.Voting,
+            GamePhase = GamePhases.Voting,
             Votes = new(),
             Log = state.Log.Append(new LogEntry($"{name} started a new round of voting."))
         };
@@ -522,6 +522,7 @@ public static class GameReducers
         {
             GameId = action.Game.GameId,
             GamePhase = action.Game.GamePhase,
+            GameVersion = action.Game.GameVersion,
             Deck = action.Game.Deck,
             Players = action.Game.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected)),
             Votes = action.Game.Votes

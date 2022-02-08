@@ -2,13 +2,23 @@ namespace Scrummy.GameService.Api.Actors;
 
 public class LobbyActor : Actor, ILobbyActor
 {
+    private const string LobbyStateName = "LobbyState";
+
     private readonly DaprClient _dapr;
-    private readonly HashSet<string> _games = new();
+    private LobbyState _lobbyState = null!;
 
     public LobbyActor(ActorHost host, DaprClient dapr)
         : base(host)
     {
         _dapr = dapr;
+    }
+
+    protected override async Task OnActivateAsync()
+    {
+        var lobbyState = await StateManager.TryGetStateAsync<LobbyState>(LobbyStateName);
+        _lobbyState = lobbyState.HasValue ? lobbyState.Value : new LobbyState();
+
+        await base.OnActivateAsync();
     }
 
     public async Task<string> CreateGame(CancellationToken cancellationToken = default)
@@ -17,20 +27,21 @@ public class LobbyActor : Actor, ILobbyActor
 
         await GetGameActor(gameId).StartGame(cancellationToken);
 
-        _games.Add(gameId);
+        _lobbyState.Games.Add(gameId);
+        await SaveLobbyState();
 
         return gameId;
     }
 
     public Task<bool> GameExists(string gameId, CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(_games.Contains(gameId));
+        return Task.FromResult(_lobbyState.Games.Contains(gameId));
     }
 
-    public Task NotifyGameEnded(string gameId, CancellationToken cancellationToken = default)
+    public async Task NotifyGameEnded(string gameId, CancellationToken cancellationToken = default)
     {
-        _games.Remove(gameId);
-        return Task.CompletedTask;
+        _lobbyState.Games.Remove(gameId);
+        await SaveLobbyState();
     }
 
     private string GenerateGameId()
@@ -41,7 +52,7 @@ public class LobbyActor : Actor, ILobbyActor
         {
             var gameId = GameId.Generate();
 
-            if (_games.Contains(gameId))
+            if (_lobbyState.Games.Contains(gameId))
             {
                 continue;
             }
@@ -56,4 +67,7 @@ public class LobbyActor : Actor, ILobbyActor
         ProxyFactory.CreateActorProxy<IGameActor>(
             new ActorId(gameId),
             typeof(GameActor).Name);
+
+    private Task SaveLobbyState() =>
+        StateManager.SetStateAsync(LobbyStateName, _lobbyState);
 }

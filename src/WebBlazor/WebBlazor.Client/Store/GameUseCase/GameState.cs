@@ -11,6 +11,7 @@ public record GameState
     public bool Flipping { get; init; }
     public string? GameId { get; init; }
     public string? GamePhase { get; init; }
+    public int GameVersion { get; init; }
     public bool InvitePopoverOpen { get; init; }
     public bool Leaving { get; init; }
     public IEnumerable<LogEntry> Log { get; init; } = Enumerable.Empty<LogEntry>();

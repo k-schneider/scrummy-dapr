@@ -1,6 +1,6 @@
 namespace Scrummy.GameService.Api.Actors;
 
-public static class GameStatus
+public static class GameStatuses
 {
     public const string None = "none";
     public const string InProgress = "inProgress";

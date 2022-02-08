@@ -2,27 +2,11 @@ namespace Scrummy.GameService.Api.Actors;
 
 public class GameActor : Actor, IGameActor
 {
+    private const string GameStateName = "GameState";
+
     private readonly IEventBus _eventBus;
 
-    private string _gameStatus = GameStatus.None;
-    private string _gamePhase = GamePhase.Voting;
-    private int _playerCounter;
-    private List<PlayerState> _players = new();
-    private Dictionary<int, string> _votes = new();
-    private HashSet<string> _deck = new()
-    {
-        "0",
-        "1",
-        "2",
-        "3",
-        "5",
-        "8",
-        "13",
-        "20",
-        "40",
-        "100",
-        "?"
-    };
+    private GameState _gameState = null!;
 
     private string GameId => Id.GetId();
 
@@ -32,22 +16,32 @@ public class GameActor : Actor, IGameActor
         _eventBus = eventBus;
     }
 
+    protected override async Task OnActivateAsync()
+    {
+        var gameState = await StateManager.TryGetStateAsync<GameState>(GameStateName);
+        _gameState = gameState.HasValue ? gameState.Value : new GameState();
+
+        await base.OnActivateAsync();
+    }
+
     public async Task<(string sid, int playerId)> AddPlayer(string nickname, CancellationToken cancellationToken = default)
     {
         EnsureGameInProgress();
 
         var sid = NewSid();
-        var playerId = NextPlayerId();
+        var playerId = ++_gameState.PlayerCounter;
 
         await GetSessionActor(sid).AssociateWithGame(GameId, playerId, cancellationToken);
 
-        _players.Add(new PlayerState
+        _gameState.Players.Add(new PlayerState
         {
             Sid = sid,
             PlayerId = playerId,
             Nickname = nickname,
-            IsHost = !_players.Any()
+            IsHost = !_gameState.Players.Any()
         });
+
+        await SaveGameState();
 
         await _eventBus.PublishAsync(
             new PlayerJoinedIntegrationEvent(
@@ -64,15 +58,17 @@ public class GameActor : Actor, IGameActor
     {
         EnsureGameInProgress();
 
-        if (!_deck.Contains(vote))
+        if (!_gameState.Deck.Contains(vote))
         {
             throw new InvalidOperationException("Invalid vote");
         }
 
         var self = GetRequiredPlayer(sid);
 
-        _votes.TryGetValue(self.PlayerId, out var previousVote);
-        _votes[self.PlayerId] = vote;
+        _gameState.Votes.TryGetValue(self.PlayerId, out var previousVote);
+        _gameState.Votes[self.PlayerId] = vote;
+
+        await SaveGameState();
 
         await _eventBus.PublishAsync(
             new PlayerVoteCastIntegrationEvent(
@@ -89,31 +85,34 @@ public class GameActor : Actor, IGameActor
         EnsureVotingPhase();
         EnsureHost(sid, "Only host can flip cards");
 
-        _gamePhase = GamePhase.Results;
+        _gameState.GamePhase = GamePhases.Results;
+
+        await SaveGameState();
 
         await _eventBus.PublishAsync(
-            new CardsFlippedIntegrationEvent(GameId, _votes),
+            new CardsFlippedIntegrationEvent(GameId, _gameState.Votes),
             cancellationToken);
     }
 
     public Task<Game> GetGameState(int playerId, CancellationToken cancellationToken = default)
     {
-        var players = _players.Select(p => new Player(
+        var players = _gameState.Players.Select(p => new Player(
             p.PlayerId,
             p.Nickname,
             p.IsHost,
             p.IsConnected)).ToList();
 
-        var votes = _votes.ToDictionary(kvp =>
+        var votes = _gameState.Votes.ToDictionary(kvp =>
             kvp.Key,
             // only return vote values for other players when showing results
-            kvp => kvp.Key == playerId || _gamePhase == GamePhase.Results ? kvp.Value : null);
+            kvp => kvp.Key == playerId || _gameState.GamePhase == GamePhases.Results ? kvp.Value : null);
 
         return Task.FromResult(new Game(
             GameId,
-            _gamePhase,
+            _gameState.GameVersion,
+            _gameState.GamePhase,
             players,
-            _deck,
+            _gameState.Deck,
             votes));
     }
 
@@ -122,8 +121,10 @@ public class GameActor : Actor, IGameActor
         EnsureGameInProgress();
         var self = GetRequiredPlayer(sid);
 
-        _players.Remove(self);
-        _votes.Remove(self.PlayerId);
+        _gameState.Players.Remove(self);
+        _gameState.Votes.Remove(self.PlayerId);
+
+        await SaveGameState();
 
         await _eventBus.PublishAsync(
             new PlayerLeftIntegrationEvent(
@@ -133,10 +134,12 @@ public class GameActor : Actor, IGameActor
             cancellationToken);
 
         // If the player was the host, pick a new host based on when they joined
-        if (self.IsHost && _players.Any())
+        if (self.IsHost && _gameState.Players.Any())
         {
-            var newHost = _players.OrderBy(p => p.JoinDate).First();
+            var newHost = _gameState.Players.OrderBy(p => p.JoinDate).First();
             newHost.IsHost = true;
+
+            await SaveGameState();
 
             await _eventBus.PublishAsync(
                 new HostChangedIntegrationEvent(
@@ -150,9 +153,11 @@ public class GameActor : Actor, IGameActor
                 cancellationToken);
         }
 
-        if (!_players.Any())
+        if (!_gameState.Players.Any())
         {
-            _gameStatus = GameStatus.GameOver;
+            _gameState.GameStatus = GameStatuses.GameOver;
+
+            await SaveGameState();
 
             await _eventBus.PublishAsync(
                 new GameEndedIntegrationEvent(
@@ -163,7 +168,6 @@ public class GameActor : Actor, IGameActor
         // todo: considerations...
         //   clear gameId SessionActor?
         //   remove from hub group?
-        //   terminate connection somehow?
     }
 
     public async Task NudgePlayer(string sid, int playerId, CancellationToken cancellationToken = default)
@@ -183,30 +187,28 @@ public class GameActor : Actor, IGameActor
             cancellationToken);
     }
 
-    public Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
+    public async Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
     {
-        var player = _players
+        var player = _gameState.Players
             .FirstOrDefault(p => p.PlayerId == playerId);
 
         if (player is not null)
         {
             player.IsConnected = true;
+            await SaveGameState();
         }
-
-        return Task.CompletedTask;
     }
 
-    public Task NotifyPlayerDisconnected(int playerId, CancellationToken cancellationToken = default)
+    public async Task NotifyPlayerDisconnected(int playerId, CancellationToken cancellationToken = default)
     {
-        var player = _players
+        var player = _gameState.Players
             .FirstOrDefault(p => p.PlayerId == playerId);
 
         if (player is not null)
         {
             player.IsConnected = false;
+            await SaveGameState();
         }
-
-        return Task.CompletedTask;
     }
 
     public async Task PlayAgain(string sid, CancellationToken cancellationToken = default)
@@ -214,8 +216,10 @@ public class GameActor : Actor, IGameActor
         EnsureResultsPhase();
         EnsureHost(sid, "Only host can choose to play again");
 
-        _votes.Clear();
-        _gamePhase = GamePhase.Voting;
+        _gameState.Votes.Clear();
+        _gameState.GamePhase = GamePhases.Voting;
+
+        await SaveGameState();
 
         await _eventBus.PublishAsync(
             new NewVoteStartedIntegrationEvent(GameId),
@@ -232,6 +236,8 @@ public class GameActor : Actor, IGameActor
 
         self.IsHost = false;
         newHost.IsHost = true;
+
+        await SaveGameState();
 
         await _eventBus.PublishAsync(
             new HostChangedIntegrationEvent(
@@ -251,8 +257,10 @@ public class GameActor : Actor, IGameActor
 
         var player = GetRequiredPlayer(sid);
 
-        _votes.TryGetValue(player.PlayerId, out var previousVote);
-        _votes.Remove(player.PlayerId);
+        _gameState.Votes.TryGetValue(player.PlayerId, out var previousVote);
+        _gameState.Votes.Remove(player.PlayerId);
+
+        await SaveGameState();
 
         await _eventBus.PublishAsync(
             new PlayerVoteRecalledIntegrationEvent(
@@ -277,7 +285,9 @@ public class GameActor : Actor, IGameActor
 
         var player = GetRequiredPlayer(playerId);
 
-        _players.Remove(player);
+        _gameState.Players.Remove(player);
+
+        await SaveGameState();
 
         await _eventBus.PublishAsync(
             new PlayerRemovedIntegrationEvent(
@@ -292,7 +302,9 @@ public class GameActor : Actor, IGameActor
         EnsureVotingPhase();
         EnsureHost(sid, "Only host can reset votes");
 
-        _votes.Clear();
+        _gameState.Votes.Clear();
+
+        await SaveGameState();
 
         await _eventBus.PublishAsync(
             new VotesResetIntegrationEvent(GameId),
@@ -301,16 +313,18 @@ public class GameActor : Actor, IGameActor
 
     public async Task StartGame(CancellationToken cancellationToken = default)
     {
-        if (_gameStatus == GameStatus.InProgress)
+        if (_gameState.GameStatus == GameStatuses.InProgress)
         {
             throw new InvalidOperationException("Game has already started");
         }
 
-        _gameStatus = GameStatus.InProgress;
-        _gamePhase = GamePhase.Voting;
-        _playerCounter = 0;
-        _players = new();
-        _votes = new();
+        _gameState.GameStatus = GameStatuses.InProgress;
+        _gameState.GamePhase = GamePhases.Voting;
+        _gameState.PlayerCounter = 0;
+        _gameState.Players.Clear();
+        _gameState.Votes.Clear();
+
+        await SaveGameState();
 
         await _eventBus.PublishAsync(
             new GameStartedIntegrationEvent(GameId),
@@ -335,11 +349,10 @@ public class GameActor : Actor, IGameActor
     }
 
     private string NewSid() => Guid.NewGuid().ToString();
-    private int NextPlayerId() => ++_playerCounter;
 
     private void EnsureGameInProgress(string error = "Game is not in progress")
     {
-        if (_gameStatus != GameStatus.InProgress)
+        if (_gameState.GameStatus != GameStatuses.InProgress)
         {
             throw new InvalidOperationException(error);
         }
@@ -359,7 +372,7 @@ public class GameActor : Actor, IGameActor
     {
         EnsureGameInProgress();
 
-        if (_gamePhase != GamePhase.Results)
+        if (_gameState.GameStatus != GamePhases.Results)
         {
             throw new InvalidOperationException(error);
         }
@@ -369,7 +382,7 @@ public class GameActor : Actor, IGameActor
     {
         EnsureGameInProgress();
 
-        if (_gamePhase != GamePhase.Voting)
+        if (_gameState.GamePhase != GamePhases.Voting)
         {
             throw new InvalidOperationException(error);
         }
@@ -377,7 +390,7 @@ public class GameActor : Actor, IGameActor
 
     private PlayerState GetRequiredPlayer(string sid)
     {
-        var player = _players.FirstOrDefault(p => p.Sid == sid);
+        var player = _gameState.Players.FirstOrDefault(p => p.Sid == sid);
 
         if (player is null)
         {
@@ -389,7 +402,7 @@ public class GameActor : Actor, IGameActor
 
     private PlayerState GetRequiredPlayer(int playerId)
     {
-        var player = _players.FirstOrDefault(p => p.PlayerId == playerId);
+        var player = _gameState.Players.FirstOrDefault(p => p.PlayerId == playerId);
 
         if (player is null)
         {
@@ -403,4 +416,7 @@ public class GameActor : Actor, IGameActor
         ProxyFactory.CreateActorProxy<ISessionActor>(
             new ActorId(sid),
             typeof(SessionActor).Name);
+
+    private Task SaveGameState() =>
+        StateManager.SetStateAsync(GameStateName, _gameState);
 }

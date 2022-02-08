@@ -32,12 +32,12 @@ else if (GameState.Value.Connected)
 
                     <div class="sm:grow p-2 sm:p-4 md:p-8">
 
-                        @if (GameState.Value.GamePhase == GamePhase.Voting)
+                        @if (GameState.Value.GamePhase == GamePhases.Voting)
                         {
                             <Voting />
                         }
 
-                        @if (GameState.Value.GamePhase == GamePhase.Results)
+                        @if (GameState.Value.GamePhase == GamePhases.Results)
                         {
                             <Results />
                         }
