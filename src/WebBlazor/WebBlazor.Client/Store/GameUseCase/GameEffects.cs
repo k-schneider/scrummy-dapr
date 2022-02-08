@@ -121,11 +121,16 @@ public class GameEffects
 
                 _hubConnection.Closed += exc =>
                 {
-                    // If the connection is closed before receiving the sync message
-                    // then the connection was rejected and we should forget this game
-                    if (_gameState.Value.GamePhase is null)
+                    if (_gameState.Value.Connected)
                     {
-                        dispatcher.Dispatch(new ConnectionToGameRejectedAction(action.GameId));
+                        // If the connection is closed before receiving the sync message
+                        // then the connection was rejected and we should forget this game
+                        if (_gameState.Value.GamePhase is null)
+                        {
+                            dispatcher.Dispatch(new ConnectionToGameRejectedAction(action.GameId));
+                        }
+
+                        // todo: Handle disconnect from hub
                     }
 
                     return Task.CompletedTask;
@@ -230,14 +235,6 @@ public class GameEffects
     public Task HandleLeaveGameFailedAction(LeaveGameFailedAction action, IDispatcher _)
     {
         _toastService.ShowError($"Failed to leave game: [{action.Error}]");
-        return Task.CompletedTask;
-    }
-
-    [EffectMethod]
-    public Task HandleLeaveGameSuccessAction(LeaveGameSuccessAction action, IDispatcher dispatcher)
-    {
-        dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
-        _navigationManager.NavigateTo($"/");
         return Task.CompletedTask;
     }
 
