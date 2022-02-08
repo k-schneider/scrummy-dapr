@@ -78,12 +78,12 @@ public class GameEventController : ControllerBase
                     cancellationToken);
         }
 
-        // Send the new connection a snapshot of the current game state
+        // Send the new connection the games current state
         await _hubContext.Clients
             .Client(integrationEvent.ConnectionId)
             .SendAsync(
                 GameHubMethods.ReceiveGameState,
-                new ReceiveGameStateMessage(await game.GetGameSnapshot(integrationEvent.PlayerId, cancellationToken)),
+                new ReceiveGameStateMessage(await game.GetGameState(integrationEvent.PlayerId, cancellationToken)),
                 cancellationToken);
     }
 

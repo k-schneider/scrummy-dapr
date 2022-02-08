@@ -96,9 +96,9 @@ public class GameActor : Actor, IGameActor
             cancellationToken);
     }
 
-    public Task<GameSnapshot> GetGameSnapshot(int playerId, CancellationToken cancellationToken = default)
+    public Task<Game> GetGameState(int playerId, CancellationToken cancellationToken = default)
     {
-        var players = _players.Select(p => new PlayerSnapshot(
+        var players = _players.Select(p => new Player(
             p.PlayerId,
             p.Nickname,
             p.IsHost,
@@ -109,7 +109,7 @@ public class GameActor : Actor, IGameActor
             // only return vote values for other players when showing results
             kvp => kvp.Key == playerId || _gamePhase == GamePhase.Results ? kvp.Value : null);
 
-        return Task.FromResult(new GameSnapshot(
+        return Task.FromResult(new Game(
             GameId,
             _gamePhase,
             players,

@@ -114,7 +114,7 @@ public class GameEffects
                     dispatcher.Dispatch(new PlayerVoteRecalledAction(message.PlayerId)));
 
                 _hubConnection.On<ReceiveGameStateMessage>(GameHubMethods.ReceiveGameState, message =>
-                    dispatcher.Dispatch(new ReceiveGameStateAction(message.Snapshot)));
+                    dispatcher.Dispatch(new ReceiveGameStateAction(message.Game)));
 
                 _hubConnection.On(GameHubMethods.VotesReset, () =>
                     dispatcher.Dispatch(new VotesResetAction()));

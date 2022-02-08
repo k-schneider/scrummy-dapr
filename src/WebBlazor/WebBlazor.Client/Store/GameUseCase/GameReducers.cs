@@ -520,11 +520,11 @@ public static class GameReducers
     public static GameState ReduceReceiveGameStateAction(GameState state, ReceiveGameStateAction action) =>
         state with
         {
-            GameId = action.Snapshot.GameId,
-            GamePhase = action.Snapshot.GamePhase,
-            Deck = action.Snapshot.Deck,
-            Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected)),
-            Votes = action.Snapshot.Votes
+            GameId = action.Game.GameId,
+            GamePhase = action.Game.GamePhase,
+            Deck = action.Game.Deck,
+            Players = action.Game.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected)),
+            Votes = action.Game.Votes
         };
 
     [ReducerMethod]

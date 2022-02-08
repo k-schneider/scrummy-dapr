@@ -70,7 +70,7 @@ public record RecallVoteAction();
 public record RecallVoteSuccessAction();
 public record RecallVoteFailedAction(string Error);
 
-public record ReceiveGameStateAction(GameSnapshot Snapshot);
+public record ReceiveGameStateAction(Game Game);
 
 public record ReconnectToGameAction();
 
