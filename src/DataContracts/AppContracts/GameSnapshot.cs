@@ -1,4 +1,4 @@
-namespace Scrummy.AppContracts.SignalR;
+namespace Scrummy.AppContracts;
 
 public record GameSnapshot
 {
