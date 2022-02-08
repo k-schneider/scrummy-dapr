@@ -14,6 +14,6 @@ public static class GameHubMethods
     public const string PlayerRemoved = "PlayerRemoved";
     public const string PlayerVoteCast = "PlayerVoteCast";
     public const string PlayerVoteRecalled = "PlayerVoteRecalled";
-    public const string SyncGame = "SyncGame";
+    public const string ReceiveGameState = "ReceiveGameState";
     public const string VotesReset = "VotesReset";
 }

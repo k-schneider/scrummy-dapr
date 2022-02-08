@@ -1,13 +1,13 @@
 namespace Scrummy.AppContracts.SignalR;
 
-public record SyncGameMessage
+public record ReceiveGameStateMessage
 {
     public GameSnapshot Snapshot { get; init; } = null!;
 
     // Needed for SignalR serialization
-    private SyncGameMessage() { }
+    private ReceiveGameStateMessage() { }
 
-    public SyncGameMessage(GameSnapshot snapshot)
+    public ReceiveGameStateMessage(GameSnapshot snapshot)
     {
         Snapshot = snapshot;
     }

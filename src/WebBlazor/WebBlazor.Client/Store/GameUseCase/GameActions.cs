@@ -70,6 +70,8 @@ public record RecallVoteAction();
 public record RecallVoteSuccessAction();
 public record RecallVoteFailedAction(string Error);
 
+public record ReceiveGameStateAction(GameSnapshot Snapshot);
+
 public record ReconnectToGameAction();
 
 public record RemovePlayerAction(int PlayerId);
@@ -81,8 +83,6 @@ public record ResetNudgedAction();
 public record ResetVotesAction();
 public record ResetVotesSuccessAction();
 public record ResetVotesFailedAction(string Error);
-
-public record SyncGameAction(GameSnapshot Snapshot);
 
 public record UpdateNicknameAction(string Nickname);
 public record UpdateNicknameSuccessAction();

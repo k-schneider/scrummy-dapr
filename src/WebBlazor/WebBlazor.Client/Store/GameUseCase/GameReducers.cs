@@ -517,6 +517,17 @@ public static class GameReducers
         };
 
     [ReducerMethod]
+    public static GameState ReduceReceiveGameStateAction(GameState state, ReceiveGameStateAction action) =>
+        state with
+        {
+            GameId = action.Snapshot.GameId,
+            GamePhase = action.Snapshot.GamePhase,
+            Deck = action.Snapshot.Deck,
+            Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected)),
+            Votes = action.Snapshot.Votes
+        };
+
+    [ReducerMethod]
     public static GameState ReduceRemovePlayerAction(GameState state, RemovePlayerAction action) =>
         state with
         {
@@ -563,17 +574,6 @@ public static class GameReducers
         state with
         {
             ResettingVotes = false
-        };
-
-    [ReducerMethod]
-    public static GameState ReduceSyncGameAction(GameState state, SyncGameAction action) =>
-        state with
-        {
-            GameId = action.Snapshot.GameId,
-            GamePhase = action.Snapshot.GamePhase,
-            Deck = action.Snapshot.Deck,
-            Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected)),
-            Votes = action.Snapshot.Votes
         };
 
     [ReducerMethod]

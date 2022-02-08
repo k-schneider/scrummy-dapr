@@ -82,8 +82,8 @@ public class GameEventController : ControllerBase
         await _hubContext.Clients
             .Client(integrationEvent.ConnectionId)
             .SendAsync(
-                GameHubMethods.SyncGame,
-                new SyncGameMessage(await game.GetGameSnapshot(integrationEvent.PlayerId, cancellationToken)),
+                GameHubMethods.ReceiveGameState,
+                new ReceiveGameStateMessage(await game.GetGameSnapshot(integrationEvent.PlayerId, cancellationToken)),
                 cancellationToken);
     }
 
