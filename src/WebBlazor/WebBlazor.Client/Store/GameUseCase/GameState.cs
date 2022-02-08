@@ -5,13 +5,11 @@ public record GameState
 {
     public bool Connecting { get; init; }
     public bool Connected { get; init;}
-    public long? ConnectedTime { get; init; }
     public IEnumerable<string> Deck { get; init; } = Enumerable.Empty<string>();
     public bool Disconnecting { get; init; }
     public bool Flipping { get; init; }
-    public string GameId { get; init; } = string.Empty;
-    public string GamePhase { get; init; } = string.Empty;  // Voting, Results
-    public bool InSync { get; init; }
+    public string? GameId { get; init; }
+    public string? GamePhase { get; init; }
     public bool InvitePopoverOpen { get; init; }
     public bool Leaving { get; init; }
     public IEnumerable<LogEntry> Log { get; init; } = Enumerable.Empty<LogEntry>();
@@ -27,7 +25,7 @@ public record GameState
     public bool RecallingVote { get; init; }
     public int? RemovingPlayer { get; init; }
     public bool ResettingVotes { get; init; }
-    public string Sid { get; init; } = string.Empty;
+    public string? Sid { get; init; }
     public bool UpdatingNickname { get; init; }
     public Dictionary<int, string?> Votes { get; init; } = new();
     public bool Voting { get; init; }

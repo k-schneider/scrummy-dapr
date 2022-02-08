@@ -11,7 +11,11 @@
 }
 else if (GameState.Value.Connected)
 {
-    if (GameState.Value.InSync)
+    if (GameState.Value.GamePhase is null)
+    {
+        <CenteredText>Waiting for game state...</CenteredText>
+    }
+    else
     {
         <div class="@(GameState.Value.Nudged ? "shake-hard shake-constant" : null)">
             <div class="mb-24 sm:mb-12">
@@ -58,10 +62,6 @@ else if (GameState.Value.Connected)
         {
             <audio autoplay><source src="door_bell.mp3" /></audio>
         }
-    }
-    else
-    {
-        <CenteredText>Waiting for game state...</CenteredText>
     }
 }
 

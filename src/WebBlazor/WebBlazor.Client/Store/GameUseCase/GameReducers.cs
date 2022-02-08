@@ -85,7 +85,6 @@ public static class GameReducers
         state with
         {
             Connected = false,
-            ConnectedTime = null,
             Connecting = true
         };
 
@@ -101,7 +100,6 @@ public static class GameReducers
         state with
         {
             Connected = true,
-            ConnectedTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
             Connecting = false,
             Sid = action.Sid,
             PlayerId = action.PlayerId
@@ -560,8 +558,7 @@ public static class GameReducers
             GamePhase = action.Snapshot.GamePhase,
             Deck = action.Snapshot.Deck,
             Players = action.Snapshot.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected)),
-            Votes = action.Snapshot.Votes,
-            InSync = true
+            Votes = action.Snapshot.Votes
         };
 
     [ReducerMethod]

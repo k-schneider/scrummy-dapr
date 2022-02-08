@@ -36,8 +36,8 @@ public class GameEffects
         try
         {
             await _appApi.CastVote(
-                _gameState.Value.GameId,
-                new CastVoteRequest(_gameState.Value.Sid, action.Vote));
+                _gameState.Value.GameId!,
+                new CastVoteRequest(_gameState.Value.Sid!, action.Vote));
 
             dispatcher.Dispatch(new CastVoteSuccessAction());
         }
@@ -121,9 +121,9 @@ public class GameEffects
 
                 _hubConnection.Closed += exc =>
                 {
-                    // If we just connected and then the connection was immediately
-                    // closed then the server rejected the connection
-                    if (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - _gameState.Value.ConnectedTime < 1000)
+                    // If the connection is closed before receiving the sync message
+                    // then the connection was rejected and we should forget this game
+                    if (_gameState.Value.GamePhase is null)
                     {
                         dispatcher.Dispatch(new ConnectionToGameRejectedAction(action.GameId));
                     }
@@ -154,7 +154,7 @@ public class GameEffects
     public Task HandleConnectionToGameRejectedAction(ConnectionToGameRejectedAction action, IDispatcher dispatcher)
     {
         dispatcher.Dispatch(new ForgetGameAction(action.GameId));
-        _toastService.ShowError("Connection rejected by server.");
+        _toastService.ShowError("Connection rejected by the server.");
         _navigationManager.NavigateTo("/");
         return Task.CompletedTask;
     }
@@ -192,8 +192,8 @@ public class GameEffects
         try
         {
             await _appApi.FlipCards(
-                _gameState.Value.GameId,
-                new FlipCardsRequest(_gameState.Value.Sid));
+                _gameState.Value.GameId!,
+                new FlipCardsRequest(_gameState.Value.Sid!));
 
             dispatcher.Dispatch(new FlipCardsSuccessAction());
         }
@@ -215,8 +215,9 @@ public class GameEffects
     {
         try
         {
-            var gameId = _gameState.Value.GameId;
-            await _appApi.LeaveGame(gameId, new LeaveGameRequest(_gameState.Value.Sid));
+            await _appApi.LeaveGame(
+                _gameState.Value.GameId!,
+                new LeaveGameRequest(_gameState.Value.Sid!));
             dispatcher.Dispatch(new LeaveGameSuccessAction());
         }
         catch (ApiException exc)
@@ -235,8 +236,7 @@ public class GameEffects
     [EffectMethod]
     public Task HandleLeaveGameSuccessAction(LeaveGameSuccessAction action, IDispatcher dispatcher)
     {
-        var gameId = _gameState.Value.GameId;
-        dispatcher.Dispatch(new ForgetGameAction(gameId));
+        dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
         _navigationManager.NavigateTo($"/");
         return Task.CompletedTask;
     }
@@ -247,8 +247,8 @@ public class GameEffects
         try
         {
             await _appApi.NudgePlayer(
-                _gameState.Value.GameId,
-                new NudgePlayerRequest(_gameState.Value.Sid, action.PlayerId));
+                _gameState.Value.GameId!,
+                new NudgePlayerRequest(_gameState.Value.Sid!, action.PlayerId));
 
             dispatcher.Dispatch(new NudgePlayerSuccessAction());
         }
@@ -278,8 +278,8 @@ public class GameEffects
         try
         {
             await _appApi.PlayAgain(
-                _gameState.Value.GameId,
-                new PlayAgainRequest(_gameState.Value.Sid));
+                _gameState.Value.GameId!,
+                new PlayAgainRequest(_gameState.Value.Sid!));
 
             dispatcher.Dispatch(new PlayAgainSuccessAction());
         }
@@ -301,8 +301,7 @@ public class GameEffects
     {
         if (action.PlayerId == _gameState.Value.PlayerId)
         {
-            var gameId = _gameState.Value.GameId;
-            dispatcher.Dispatch(new ForgetGameAction(gameId));
+            dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
             _navigationManager.NavigateTo($"/");
         }
         return Task.CompletedTask;
@@ -327,8 +326,7 @@ public class GameEffects
     {
         if (action.PlayerId == _gameState.Value.PlayerId)
         {
-            var gameId = _gameState.Value.GameId;
-            dispatcher.Dispatch(new ForgetGameAction(gameId));
+            dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
             _navigationManager.NavigateTo($"/");
         }
         return Task.CompletedTask;
@@ -340,8 +338,8 @@ public class GameEffects
         try
         {
             await _appApi.PromotePlayer(
-                _gameState.Value.GameId,
-                new PromotePlayerRequest(_gameState.Value.Sid, action.PlayerId));
+                _gameState.Value.GameId!,
+                new PromotePlayerRequest(_gameState.Value.Sid!, action.PlayerId));
 
             dispatcher.Dispatch(new PromotePlayerSuccessAction());
         }
@@ -371,8 +369,8 @@ public class GameEffects
         try
         {
             await _appApi.RecallVote(
-                _gameState.Value.GameId,
-                new RecallVoteRequest(_gameState.Value.Sid));
+                _gameState.Value.GameId!,
+                new RecallVoteRequest(_gameState.Value.Sid!));
 
             dispatcher.Dispatch(new RecallVoteSuccessAction());
         }
@@ -395,8 +393,8 @@ public class GameEffects
         try
         {
             await _appApi.RemovePlayer(
-                _gameState.Value.GameId,
-                new RemovePlayerRequest(_gameState.Value.Sid, action.PlayerId));
+                _gameState.Value.GameId!,
+                new RemovePlayerRequest(_gameState.Value.Sid!, action.PlayerId));
 
             dispatcher.Dispatch(new RemovePlayerSuccessAction());
         }
@@ -426,8 +424,8 @@ public class GameEffects
         try
         {
             await _appApi.ResetVotes(
-                _gameState.Value.GameId,
-                new ResetVotesRequest(_gameState.Value.Sid));
+                _gameState.Value.GameId!,
+                new ResetVotesRequest(_gameState.Value.Sid!));
 
             dispatcher.Dispatch(new ResetVotesSuccessAction());
         }
@@ -450,8 +448,8 @@ public class GameEffects
         try
         {
             await _appApi.UpdateNickname(
-                _gameState.Value.GameId,
-                new UpdateNicknameRequest(_gameState.Value.Sid, action.Nickname));
+                _gameState.Value.GameId!,
+                new UpdateNicknameRequest(_gameState.Value.Sid!, action.Nickname));
 
             dispatcher.Dispatch(new UpdateNicknameSuccessAction());
         }
