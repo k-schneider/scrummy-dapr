@@ -85,7 +85,8 @@ public static class GameReducers
         state with
         {
             Connected = false,
-            Connecting = true
+            Connecting = true,
+            GameId = action.GameId
         };
 
     [ReducerMethod]
@@ -142,6 +143,13 @@ public static class GameReducers
         state with
         {
             Flipping = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceGameConnectionClosedAction(GameState state, GameConnectionClosedAction _) =>
+        state with
+        {
+            ConnectionClosed = true
         };
 
     [ReducerMethod]
@@ -237,6 +245,13 @@ public static class GameReducers
         state with
         {
             PlayerPopoverOpen = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceReconnectToGameAction(GameState state, ReconnectToGameAction _) =>
+        state with
+        {
+            Reconnecting = true
         };
 
     [ReducerMethod]

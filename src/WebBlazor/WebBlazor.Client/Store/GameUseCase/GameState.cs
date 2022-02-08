@@ -4,7 +4,8 @@ namespace Scrummy.WebBlazor.Client.Store.GameUseCase;
 public record GameState
 {
     public bool Connecting { get; init; }
-    public bool Connected { get; init;}
+    public bool Connected { get; init; }
+    public bool ConnectionClosed { get; init; }
     public IEnumerable<string> Deck { get; init; } = Enumerable.Empty<string>();
     public bool Disconnecting { get; init; }
     public bool Flipping { get; init; }
@@ -23,6 +24,7 @@ public record GameState
     public string? PreviousVote { get; init; }
     public int? PromotingPlayer { get; init; }
     public bool RecallingVote { get; init; }
+    public bool Reconnecting { get; init; }
     public int? RemovingPlayer { get; init; }
     public bool ResettingVotes { get; init; }
     public string? Sid { get; init; }

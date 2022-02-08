@@ -15,6 +15,10 @@ else if (GameState.Value.Connected)
     {
         <CenteredText>Waiting for game state...</CenteredText>
     }
+    else if (GameState.Value.ConnectionClosed)
+    {
+        <ConnectionClosed />
+    }
     else
     {
         <div class="@(GameState.Value.Nudged ? "shake-hard shake-constant" : null)">

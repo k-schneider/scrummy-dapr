@@ -1,0 +1,18 @@
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
+@inject IState<GameState> GameState
+
+<div class="flex h-screen justify-center items-center">
+    <div class="bg-white rounded-md shadow-xl py-4 px-8 flex flex-col items-center gap-4">
+        <h1 class="text-2xl font-semibold">Connection Lost</h1>
+        <p class="text-center">Your connection to the game was lost.<br>If you'd like to continue playing please reconnect.</p>
+        <Button OnClick="Reconnect" Icon="sync" Block="true" Disabled="@GameState.Value.Reconnecting" Loading="@GameState.Value.Reconnecting">Reconnect</Button>
+    </div>
+</div>
+
+@code {
+    private void Reconnect()
+    {
+        Dispatcher.Dispatch(new ReconnectToGameAction());
+    }
+}

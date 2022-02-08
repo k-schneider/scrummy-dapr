@@ -123,14 +123,7 @@ public class GameEffects
                 {
                     if (_gameState.Value.Connected)
                     {
-                        // If the connection is closed before receiving the sync message
-                        // then the connection was rejected and we should forget this game
-                        if (_gameState.Value.GamePhase is null)
-                        {
-                            dispatcher.Dispatch(new ConnectionToGameRejectedAction(action.GameId));
-                        }
-
-                        // todo: Handle disconnect from hub
+                        dispatcher.Dispatch(new GameConnectionClosedAction());
                     }
 
                     return Task.CompletedTask;
@@ -151,15 +144,6 @@ public class GameEffects
     public Task HandleConnectToGameFailedAction(ConnectToGameFailedAction _, IDispatcher dispatcher)
     {
         _toastService.ShowError("Unable to connect to game.");
-        _navigationManager.NavigateTo("/");
-        return Task.CompletedTask;
-    }
-
-    [EffectMethod]
-    public Task HandleConnectionToGameRejectedAction(ConnectionToGameRejectedAction action, IDispatcher dispatcher)
-    {
-        dispatcher.Dispatch(new ForgetGameAction(action.GameId));
-        _toastService.ShowError("Connection rejected by the server.");
         _navigationManager.NavigateTo("/");
         return Task.CompletedTask;
     }
@@ -212,6 +196,21 @@ public class GameEffects
     public Task HandleFlipCardsFailedAction(FlipCardsFailedAction action, IDispatcher _)
     {
         _toastService.ShowError($"Unable to flip cards: [{action.Error}]");
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public Task HandleGameConnectionClosedAction(GameConnectionClosedAction _, IDispatcher dispatcher)
+    {
+        if (_gameState.Value.GamePhase is null)
+        {
+            // If the connection is closed before receiving game state
+            // then the connection was rejected and we should forget this game
+            dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
+            _toastService.ShowError("Connection rejected by the server.");
+            _navigationManager.NavigateTo("/");
+        }
+
         return Task.CompletedTask;
     }
 
@@ -381,6 +380,13 @@ public class GameEffects
     public Task HandleRecallVoteFailedAction(RecallVoteFailedAction action, IDispatcher _)
     {
         _toastService.ShowError($"Unable to recall vote: [{action.Error}]");
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public Task HandleReconnectToGameAction(ReconnectToGameAction _, IDispatcher _1)
+    {
+        _navigationManager.NavigateTo(_navigationManager.Uri, true);
         return Task.CompletedTask;
     }
 

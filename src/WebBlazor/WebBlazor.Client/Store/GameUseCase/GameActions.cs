@@ -14,8 +14,6 @@ public record ConnectToGameAction(string GameId);
 public record ConnectToGameSuccessAction(string Sid, int PlayerId);
 public record ConnectToGameFailedAction(string Error);
 
-public record ConnectionToGameRejectedAction(string GameId);
-
 public record CopyLinkToClipboardAction();
 
 public record DisconnectFromGameAction();
@@ -25,6 +23,8 @@ public record DisconnectFromGameFailedAction(string Error);
 public record FlipCardsAction();
 public record FlipCardsSuccessAction();
 public record FlipCardsFailedAction(string Error);
+
+public record GameConnectionClosedAction();
 
 public record HostChangedAction(int PlayerId);
 
@@ -69,6 +69,8 @@ public record PromotePlayerFailedAction(string Error);
 public record RecallVoteAction();
 public record RecallVoteSuccessAction();
 public record RecallVoteFailedAction(string Error);
+
+public record ReconnectToGameAction();
 
 public record RemovePlayerAction(int PlayerId);
 public record RemovePlayerSuccessAction();
