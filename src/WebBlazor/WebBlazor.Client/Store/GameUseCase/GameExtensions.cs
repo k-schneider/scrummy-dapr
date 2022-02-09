@@ -1,5 +1,10 @@
 public static class GameExtensions
 {
+    public static bool AllVotesIn(this GameState state)
+    {
+        return state.Votes.Count == state.Players.Count();
+    }
+
     public static bool IsHost(this GameState state)
     {
         return state.Me()?.IsHost == true;
