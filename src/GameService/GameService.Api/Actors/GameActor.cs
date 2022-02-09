@@ -133,6 +133,8 @@ public class GameActor : Actor, IGameActor, IRemindable
 
         await SaveGameState(cancellationToken);
 
+        await GetSessionActor(self.Sid).Reset(cancellationToken);
+
         await _eventBus.PublishAsync(
             new PlayerLeftIntegrationEvent(
                 self.Sid,
@@ -172,10 +174,6 @@ public class GameActor : Actor, IGameActor, IRemindable
         }
 
         await SetInactivityReminder(cancellationToken);
-
-        // todo: considerations...
-        //   clear gameId SessionActor?
-        //   remove from hub group?
     }
 
     public async Task NudgePlayer(string sid, int playerId, CancellationToken cancellationToken = default)
@@ -306,8 +304,11 @@ public class GameActor : Actor, IGameActor, IRemindable
         var player = GetRequiredPlayer(playerId);
 
         _gameState.Players.Remove(player);
+        _gameState.Votes.Remove(player.PlayerId);
 
         await SaveGameState(cancellationToken);
+
+        await GetSessionActor(player.Sid).Reset(cancellationToken);
 
         await _eventBus.PublishAsync(
             new PlayerRemovedIntegrationEvent(
@@ -420,7 +421,7 @@ public class GameActor : Actor, IGameActor, IRemindable
     {
         EnsureGameInProgress();
 
-        if (_gameState.GameStatus != GamePhases.Results)
+        if (_gameState.GamePhase != GamePhases.Results)
         {
             throw new InvalidOperationException(error);
         }

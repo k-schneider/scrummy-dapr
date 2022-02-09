@@ -2,7 +2,6 @@
 
 ## TODO
 
-- Actor state / reminders
 - Setting for "IsVoting" / "Spectator" (name TBD)
 - Setting for mute
 - Results page

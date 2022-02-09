@@ -251,9 +251,12 @@ public class GameEffects
     [EffectMethod]
     public Task HandleGameEndedAction(GameEndedAction _, IDispatcher dispatcher)
     {
-        dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
-        _navigationManager.NavigateTo($"/");
-        _toastService.ShowWarning("Game has ended.");
+        if (!_gameState.Value.Leaving && !_gameState.Value.Disconnecting)
+        {
+            dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
+            _navigationManager.NavigateTo($"/");
+            _toastService.ShowWarning("Game has ended.");
+        }
         return Task.CompletedTask;
     }
 
@@ -315,7 +318,9 @@ public class GameEffects
     [EffectMethod]
     public Task HandlePlayerLeftAction(PlayerLeftAction action, IDispatcher dispatcher)
     {
-        if (action.PlayerId == _gameState.Value.PlayerId && !_gameState.Value.Leaving)
+        if (action.PlayerId == _gameState.Value.PlayerId
+            && !_gameState.Value.Leaving
+            && !_gameState.Value.Disconnecting)
         {
             dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
             _navigationManager.NavigateTo($"/");
