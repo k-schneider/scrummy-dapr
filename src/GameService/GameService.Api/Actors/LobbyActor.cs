@@ -28,7 +28,8 @@ public class LobbyActor : Actor, ILobbyActor
         await GetGameActor(gameId).StartGame(cancellationToken);
 
         _lobbyState.Games.Add(gameId);
-        await SaveLobbyState();
+
+        await SaveLobbyState(cancellationToken);
 
         return gameId;
     }
@@ -41,7 +42,8 @@ public class LobbyActor : Actor, ILobbyActor
     public async Task NotifyGameEnded(string gameId, CancellationToken cancellationToken = default)
     {
         _lobbyState.Games.Remove(gameId);
-        await SaveLobbyState();
+
+        await SaveLobbyState(cancellationToken);
     }
 
     private string GenerateGameId()
@@ -68,6 +70,6 @@ public class LobbyActor : Actor, ILobbyActor
             new ActorId(gameId),
             typeof(GameActor).Name);
 
-    private Task SaveLobbyState() =>
-        StateManager.SetStateAsync(LobbyStateName, _lobbyState);
+    private Task SaveLobbyState(CancellationToken cancellationToken = default) =>
+        StateManager.SetStateAsync(LobbyStateName, _lobbyState, cancellationToken);
 }

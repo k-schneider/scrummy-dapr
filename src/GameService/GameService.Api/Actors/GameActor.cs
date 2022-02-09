@@ -1,8 +1,9 @@
 namespace Scrummy.GameService.Api.Actors;
 
-public class GameActor : Actor, IGameActor
+public class GameActor : Actor, IGameActor, IRemindable
 {
     private const string GameStateName = "GameState";
+    private const string InactivityReminderName = "InactivityReminder";
 
     private readonly IEventBus _eventBus;
 
@@ -41,7 +42,7 @@ public class GameActor : Actor, IGameActor
             IsHost = !_gameState.Players.Any()
         });
 
-        await SaveGameState();
+        await SaveGameState(cancellationToken);
 
         await _eventBus.PublishAsync(
             new PlayerJoinedIntegrationEvent(
@@ -50,6 +51,8 @@ public class GameActor : Actor, IGameActor
                 nickname,
                 GameId),
             cancellationToken);
+
+        await SetInactivityReminder(cancellationToken);
 
         return (sid, playerId);
     }
@@ -68,7 +71,7 @@ public class GameActor : Actor, IGameActor
         _gameState.Votes.TryGetValue(self.PlayerId, out var previousVote);
         _gameState.Votes[self.PlayerId] = vote;
 
-        await SaveGameState();
+        await SaveGameState(cancellationToken);
 
         await _eventBus.PublishAsync(
             new PlayerVoteCastIntegrationEvent(
@@ -78,6 +81,8 @@ public class GameActor : Actor, IGameActor
                 previousVote,
                 GameId),
             cancellationToken);
+
+        await SetInactivityReminder(cancellationToken);
     }
 
     public async Task FlipCards(string sid, CancellationToken cancellationToken = default)
@@ -87,11 +92,13 @@ public class GameActor : Actor, IGameActor
 
         _gameState.GamePhase = GamePhases.Results;
 
-        await SaveGameState();
+        await SaveGameState(cancellationToken);
 
         await _eventBus.PublishAsync(
             new CardsFlippedIntegrationEvent(GameId, _gameState.Votes),
             cancellationToken);
+
+        await SetInactivityReminder(cancellationToken);
     }
 
     public Task<Game> GetGameState(int playerId, CancellationToken cancellationToken = default)
@@ -124,7 +131,7 @@ public class GameActor : Actor, IGameActor
         _gameState.Players.Remove(self);
         _gameState.Votes.Remove(self.PlayerId);
 
-        await SaveGameState();
+        await SaveGameState(cancellationToken);
 
         await _eventBus.PublishAsync(
             new PlayerLeftIntegrationEvent(
@@ -139,7 +146,7 @@ public class GameActor : Actor, IGameActor
             var newHost = _gameState.Players.OrderBy(p => p.JoinDate).First();
             newHost.IsHost = true;
 
-            await SaveGameState();
+            await SaveGameState(cancellationToken);
 
             await _eventBus.PublishAsync(
                 new HostChangedIntegrationEvent(
@@ -157,13 +164,14 @@ public class GameActor : Actor, IGameActor
         {
             _gameState.GameStatus = GameStatuses.GameOver;
 
-            await SaveGameState();
+            await SaveGameState(cancellationToken);
 
             await _eventBus.PublishAsync(
-                new GameEndedIntegrationEvent(
-                    GameId),
+                new GameEndedIntegrationEvent(GameId),
                 cancellationToken);
         }
+
+        await SetInactivityReminder(cancellationToken);
 
         // todo: considerations...
         //   clear gameId SessionActor?
@@ -185,6 +193,8 @@ public class GameActor : Actor, IGameActor
                 player.PlayerId,
                 GameId),
             cancellationToken);
+
+        await SetInactivityReminder(cancellationToken);
     }
 
     public async Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default)
@@ -195,8 +205,10 @@ public class GameActor : Actor, IGameActor
         if (player is not null)
         {
             player.IsConnected = true;
-            await SaveGameState();
+            await SaveGameState(cancellationToken);
         }
+
+        await SetInactivityReminder(cancellationToken);
     }
 
     public async Task NotifyPlayerDisconnected(int playerId, CancellationToken cancellationToken = default)
@@ -207,8 +219,10 @@ public class GameActor : Actor, IGameActor
         if (player is not null)
         {
             player.IsConnected = false;
-            await SaveGameState();
+            await SaveGameState(cancellationToken);
         }
+
+        await SetInactivityReminder(cancellationToken);
     }
 
     public async Task PlayAgain(string sid, CancellationToken cancellationToken = default)
@@ -219,11 +233,13 @@ public class GameActor : Actor, IGameActor
         _gameState.Votes.Clear();
         _gameState.GamePhase = GamePhases.Voting;
 
-        await SaveGameState();
+        await SaveGameState(cancellationToken);
 
         await _eventBus.PublishAsync(
             new NewVoteStartedIntegrationEvent(GameId),
             cancellationToken);
+
+        await SetInactivityReminder(cancellationToken);
     }
 
     public async Task PromotePlayer(string sid, int playerId, CancellationToken cancellationToken = default)
@@ -237,7 +253,7 @@ public class GameActor : Actor, IGameActor
         self.IsHost = false;
         newHost.IsHost = true;
 
-        await SaveGameState();
+        await SaveGameState(cancellationToken);
 
         await _eventBus.PublishAsync(
             new HostChangedIntegrationEvent(
@@ -249,6 +265,8 @@ public class GameActor : Actor, IGameActor
                 newHost.Nickname,
                 GameId),
             cancellationToken);
+
+        await SetInactivityReminder(cancellationToken);
     }
 
     public async Task RecallVote(string sid, CancellationToken cancellationToken = default)
@@ -260,7 +278,7 @@ public class GameActor : Actor, IGameActor
         _gameState.Votes.TryGetValue(player.PlayerId, out var previousVote);
         _gameState.Votes.Remove(player.PlayerId);
 
-        await SaveGameState();
+        await SaveGameState(cancellationToken);
 
         await _eventBus.PublishAsync(
             new PlayerVoteRecalledIntegrationEvent(
@@ -269,6 +287,8 @@ public class GameActor : Actor, IGameActor
                 previousVote,
                 GameId),
             cancellationToken);
+
+        await SetInactivityReminder(cancellationToken);
     }
 
     public async Task RemovePlayer(string sid, int playerId, CancellationToken cancellationToken = default)
@@ -287,7 +307,7 @@ public class GameActor : Actor, IGameActor
 
         _gameState.Players.Remove(player);
 
-        await SaveGameState();
+        await SaveGameState(cancellationToken);
 
         await _eventBus.PublishAsync(
             new PlayerRemovedIntegrationEvent(
@@ -295,6 +315,20 @@ public class GameActor : Actor, IGameActor
                 player.PlayerId,
                 GameId),
             cancellationToken);
+
+        await SetInactivityReminder();
+    }
+
+    public async Task ResetGame(CancellationToken cancellationToken = default)
+    {
+        if (_gameState.GameStatus != GameStatuses.GameOver)
+        {
+            throw new InvalidOperationException("Game must be over to reset");
+        }
+
+        await Task.WhenAll(_gameState.Players.Select(p => GetSessionActor(p.Sid).Reset()));
+        await StateManager.TryRemoveStateAsync(GameStateName, cancellationToken);
+        _gameState = new();
     }
 
     public async Task ResetVotes(string sid, CancellationToken cancellationToken = default)
@@ -304,31 +338,31 @@ public class GameActor : Actor, IGameActor
 
         _gameState.Votes.Clear();
 
-        await SaveGameState();
+        await SaveGameState(cancellationToken);
 
         await _eventBus.PublishAsync(
             new VotesResetIntegrationEvent(GameId),
             cancellationToken);
+
+        await SetInactivityReminder();
     }
 
     public async Task StartGame(CancellationToken cancellationToken = default)
     {
-        if (_gameState.GameStatus == GameStatuses.InProgress)
+        if (_gameState.GameStatus != GameStatuses.None)
         {
             throw new InvalidOperationException("Game has already started");
         }
 
         _gameState.GameStatus = GameStatuses.InProgress;
-        _gameState.GamePhase = GamePhases.Voting;
-        _gameState.PlayerCounter = 0;
-        _gameState.Players.Clear();
-        _gameState.Votes.Clear();
 
-        await SaveGameState();
+        await SaveGameState(cancellationToken);
 
         await _eventBus.PublishAsync(
             new GameStartedIntegrationEvent(GameId),
             cancellationToken);
+
+        await SetInactivityReminder();
     }
 
     public async Task UpdateNickname(string sid, string nickname, CancellationToken cancellationToken = default)
@@ -346,6 +380,20 @@ public class GameActor : Actor, IGameActor
                 nickname,
                 GameId),
             cancellationToken);
+
+        await SetInactivityReminder(cancellationToken);
+    }
+
+    async Task IRemindable.ReceiveReminderAsync(string reminderName, byte[] state, TimeSpan dueTime, TimeSpan period)
+    {
+        if (reminderName == InactivityReminderName)
+        {
+            _gameState.GameStatus = GameStatuses.GameOver;
+
+            await SaveGameState();
+
+            await _eventBus.PublishAsync(new GameEndedIntegrationEvent(GameId));
+        }
     }
 
     private string NewSid() => Guid.NewGuid().ToString();
@@ -417,6 +465,18 @@ public class GameActor : Actor, IGameActor
             new ActorId(sid),
             typeof(SessionActor).Name);
 
-    private Task SaveGameState() =>
-        StateManager.SetStateAsync(GameStateName, _gameState);
+    private Task SaveGameState(CancellationToken cancellationToken = default) =>
+        StateManager.SetStateAsync(GameStateName, _gameState, cancellationToken);
+
+    private async Task SetInactivityReminder(CancellationToken cancellationToken = default)
+    {
+        // Remove previous reminder if one exists
+        await UnregisterReminderAsync(InactivityReminderName);
+
+        await RegisterReminderAsync(
+            InactivityReminderName,
+            Array.Empty<byte>(),
+            TimeSpan.FromDays(1),
+            TimeSpan.FromMilliseconds(-1));
+    }
 }

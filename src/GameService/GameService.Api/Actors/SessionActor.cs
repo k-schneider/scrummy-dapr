@@ -32,7 +32,7 @@ public class SessionActor : Actor, ISessionActor
 
         if (_sessionState.ConnectionIds.Add(connectionId))
         {
-            await SaveSessionState();
+            await SaveSessionState(cancellationToken);
 
             await _eventBus.PublishAsync(
                 new PlayerConnectedIntegrationEvent(
@@ -55,7 +55,7 @@ public class SessionActor : Actor, ISessionActor
         _sessionState.GameId = gameId;
         _sessionState.PlayerId = playerId;
 
-        await SaveSessionState();
+        await SaveSessionState(cancellationToken);
     }
 
     public Task<IEnumerable<string>> GetConnectionIds(CancellationToken cancellationToken = default)
@@ -72,7 +72,7 @@ public class SessionActor : Actor, ISessionActor
     {
         if (_sessionState.ConnectionIds.Remove(connectionId))
         {
-            await SaveSessionState();
+            await SaveSessionState(cancellationToken);
 
             await _eventBus.PublishAsync(
                 new PlayerDisconnectedIntegrationEvent(
@@ -85,6 +85,12 @@ public class SessionActor : Actor, ISessionActor
         }
     }
 
-    private Task SaveSessionState() =>
-        StateManager.SetStateAsync(SessionStateName, _sessionState);
+    public async Task Reset(CancellationToken cancellationToken = default)
+    {
+        await StateManager.TryRemoveStateAsync(SessionStateName, cancellationToken);
+        _sessionState = new();
+    }
+
+    private Task SaveSessionState(CancellationToken cancellationToken = default) =>
+        StateManager.SetStateAsync(SessionStateName, _sessionState, cancellationToken);
 }

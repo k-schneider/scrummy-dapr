@@ -7,4 +7,5 @@ public interface ISessionActor : IActor
     Task<string?> GetGameId(CancellationToken cancellationToken = default);
     Task<IEnumerable<string>> GetConnectionIds(CancellationToken cancellationToken = default);
     Task RemoveConnection(string connectionId, CancellationToken cancellationToken = default);
+    Task Reset(CancellationToken cancellationToken = default);
 }

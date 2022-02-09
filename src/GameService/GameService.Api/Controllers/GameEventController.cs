@@ -33,7 +33,18 @@ public class GameEventController : ControllerBase
     [Topic(DAPR_PUBSUB_NAME, "GameEndedIntegrationEvent")]
     public async Task HandleAsync(GameEndedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        await GetLobbyActor().NotifyGameEnded(integrationEvent.GameId, cancellationToken);
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.GameEnded,
+                cancellationToken);
+
+        await GetLobbyActor().NotifyGameEnded(
+            integrationEvent.GameId,
+            cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId)
+            .ResetGame(cancellationToken);
     }
 
     [HttpPost("HostChanged")]

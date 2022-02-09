@@ -26,6 +26,8 @@ public record FlipCardsFailedAction(string Error);
 
 public record GameConnectionClosedAction();
 
+public record GameEndedAction();
+
 public record HostChangedAction(int PlayerId);
 
 public record LeaveGameAction();

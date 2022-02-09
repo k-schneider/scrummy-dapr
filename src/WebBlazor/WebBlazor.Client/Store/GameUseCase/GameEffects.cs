@@ -80,6 +80,9 @@ public class GameEffects
                 _hubConnection.On<CardsFlippedMessage>(GameHubMethods.CardsFlipped, message =>
                     dispatcher.Dispatch(new CardsFlippedAction(message.Votes)));
 
+                _hubConnection.On(GameHubMethods.GameEnded, () =>
+                    dispatcher.Dispatch(new GameEndedAction()));
+
                 _hubConnection.On<HostChangedMessage>(GameHubMethods.HostChanged, message =>
                     dispatcher.Dispatch(new HostChangedAction(message.PlayerId)));
 
@@ -234,6 +237,15 @@ public class GameEffects
     public Task HandleLeaveGameFailedAction(LeaveGameFailedAction action, IDispatcher _)
     {
         _toastService.ShowError($"Failed to leave game: [{action.Error}]");
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public Task HandleGameEndedAction(GameEndedAction _, IDispatcher dispatcher)
+    {
+        dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
+        _navigationManager.NavigateTo($"/");
+        _toastService.ShowWarning("Game has ended.");
         return Task.CompletedTask;
     }
 
