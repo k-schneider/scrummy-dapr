@@ -66,6 +66,11 @@ public class GameEffects
                 throw new Exception("Must join game prior to connecting to it.");
             }
 
+            if (!await _appApi.GameExists(game.GameId))
+            {
+                throw new Exception("Game does not exist.");
+            }
+
             if (_hubConnection is null)
             {
                 _hubConnection = new HubConnectionBuilder()
@@ -144,9 +149,10 @@ public class GameEffects
     }
 
     [EffectMethod]
-    public Task HandleConnectToGameFailedAction(ConnectToGameFailedAction _, IDispatcher dispatcher)
+    public Task HandleConnectToGameFailedAction(ConnectToGameFailedAction action, IDispatcher dispatcher)
     {
-        _toastService.ShowError("Unable to connect to game.");
+        _toastService.ShowError($"Unable to connect to game: [{action.Error}]");
+        dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
         _navigationManager.NavigateTo("/");
         return Task.CompletedTask;
     }

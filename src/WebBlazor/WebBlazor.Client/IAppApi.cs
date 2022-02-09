@@ -11,6 +11,9 @@ public interface IAppApi
     [Post("g/game/{gameId}/flip")]
     Task FlipCards([Path] string gameId, [Body] FlipCardsRequest request, CancellationToken cancellationToken = default);
 
+    [Get("g/game/{gameId}")]
+    Task<bool> GameExists([Path] string gameId, CancellationToken cancellationToken = default);
+
     [Post("g/game/{gameId}/join")]
     Task<JoinGameResponse> JoinGame([Path] string gameId, [Body] JoinGameRequest request, CancellationToken cancellationToken = default);
 

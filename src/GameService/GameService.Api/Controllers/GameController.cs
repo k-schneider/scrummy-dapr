@@ -34,6 +34,13 @@ public class GameController : ControllerBase
         return Ok();
     }
 
+    [HttpGet("game/{gameId}")]
+    public async Task<IActionResult> GameExists(string gameId, CancellationToken cancellationToken)
+    {
+        var exists = await GetLobbyActor().GameExists(gameId, cancellationToken);
+        return Ok(exists);
+    }
+
     [HttpPost("game/{gameId}/join")]
     public async Task<IActionResult> JoinGame(string gameId, JoinGameRequest request, CancellationToken cancellationToken)
     {
