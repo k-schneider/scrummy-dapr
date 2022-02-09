@@ -24,10 +24,10 @@
 @code {
     private string WrapperElementId = Guid.NewGuid().ToString();
     private Dictionary<string, int> Votes = new();
-    private string Min = "-";
-    private string Max = "-";
-    private string Average = "-";
-    private string Popular = "-";
+    private string? Min;
+    private string? Max;
+    private string? Average;
+    private string? Popular;
 
     protected override Task OnInitializedAsync()
     {

@@ -1,12 +1,37 @@
-<div class="flex flex-col items-center gap-1 bg-stone-700 py-1 px-8 rounded-md text-white">
+@inject IState<GameState> GameState
+
+<div class="flex flex-col items-center gap-1 bg-stone-700 py-1 px-8 rounded-md text-white" title="@Title">
     <span class="text-sm uppercase opacity-75">@Label</span>
-    <span class="text-4xl">@Value</span>
+    <span class="text-4xl">@(Value ?? "-")</span>
 </div>
 
 @code {
+    private string? Title;
+
     [Parameter]
     public string? Label { get; set; }
 
     [Parameter]
     public string? Value { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (Value is null)
+        {
+            Title = null;
+        }
+        else
+        {
+            Title = string.Join("\n", GameState.Value.Votes
+                .Where(v => v.Value == Value)
+                .Select(v => "- " + GameState.Value.Players.First(x => x.PlayerId == v.Key).Nickname));
+        }
+
+        if (!string.IsNullOrWhiteSpace(Title))
+        {
+            Title = $"Players who voted {Value}:\n" + Title;
+        }
+
+        return base.OnParametersSetAsync();
+    }
 }
