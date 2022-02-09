@@ -57,7 +57,11 @@
                     .ToString("0");
             }
 
-            Popular = parsedVotes.OrderByDescending(x => x.Count).First().StringValue;
+            // Don't render the popular vote if everyone voted differently
+            if (GameState.Value.Votes.Count == 1 || parsedVotes.Count() != GameState.Value.Votes.Count)
+            {
+                Popular = parsedVotes.OrderByDescending(x => x.Count).First().StringValue;
+            }
         }
 
         return base.OnInitializedAsync();
