@@ -7,38 +7,51 @@
     <div class="mt-2 grow overflow-auto">
         @foreach (var player in GameState.Value.Players.OrderByDescending(p => p.IsHost).ThenBy(p => p.Nickname))
         {
-            <div class="px-2 py-2 even:bg-indigo-300/50 flex gap-x-2 items-center">
-                @if (!player.IsConnected)
-                {
-                    <Icon Type="circle-xmark" Class="text-slate-500 text-2xl opacity-50" />
-                }
-                else if (GameState.Value.Votes.ContainsKey(player.PlayerId))
-                {
-                    <Icon Type="circle-check" Class="text-emerald-700 text-2xl" />
-                }
-                else
-                {
-                    <Icon Type="circle-notch" Spin="true" Class="text-white opacity-50 text-2xl" />
-                }
-                <span class="text-xl @(player.IsConnected ? "" : "opacity-50")">@player.Nickname</span>
-                @if (player.IsHost)
-                {
-                    <Icon Type="crown" Class="text-amber-600 text-xs" Title="Host" />
-                }
-                @if (player.PlayerId != GameState.Value.PlayerId && (player.IsConnected || GameState.Value.IsHost()))
-                {
-                    <div class="relative ml-auto">
-                        <button @onclick="() => OpenOtherPlayerMenu(player.PlayerId)" class="rounded-full hover:bg-black/10 p-1 text-slate-700 rounded-full hover:bg-black/10 p-1 text-slate-700 text-xl w-8 h-8 flex items-center justify-center">
-                            <Icon Type="ellipsis-vertical" />
-                        </button>
-
-                        @if (GameState.Value.OtherPlayerIdMenuOpen == player.PlayerId)
+            <div class="px-2 py-2 even:bg-indigo-300/50 flex gap-x-2 items-center h-12">
+                <div class="w-8 shrink-0 flex flex-col items-center">
+                    @if (!player.IsConnected)
+                    {
+                        <Icon Type="circle-xmark" Class="text-slate-500 text-2xl opacity-50" />
+                    }
+                    else if (GameState.Value.GamePhase == GamePhases.Results)
+                    {
+                        <span class="font-bold text-indigo-900">@(GameState.Value.Votes.TryGetValue(player.PlayerId, out var vote) ? vote : "-")</span>
+                    }
+                    else
+                    {
+                        if (GameState.Value.Votes.ContainsKey(player.PlayerId))
                         {
-                            <Backdrop OnClick="CloseOtherPlayerMenu" />
-                            <OtherPlayerMenu PlayerId="@player.PlayerId" />
+                            <Icon Type="circle-check" Class="text-emerald-700 text-2xl" />
                         }
-                    </div>
-                }
+                        else
+                        {
+                            <Icon Type="circle-notch" Spin="true" Class="text-white opacity-50 text-2xl" />
+                        }
+                    }
+                </div>
+                <div class="grow flex gap-1 items-center min-w-0">
+                    <span class="text-xl truncate @(player.IsConnected ? "" : "opacity-50")">@player.Nickname</span>
+                    @if (player.IsHost)
+                    {
+                        <Icon Type="crown" Class="text-amber-600 text-xs" Title="Host" />
+                    }
+                </div>
+                <div class="w-8 shrink-0">
+                    @if (player.PlayerId != GameState.Value.PlayerId && (player.IsConnected || GameState.Value.IsHost()))
+                    {
+                        <div class="relative">
+                            <button @onclick="() => OpenOtherPlayerMenu(player.PlayerId)" class="rounded-full hover:bg-black/10 p-1 text-slate-700 rounded-full hover:bg-black/10 p-1 text-slate-700 text-xl w-8 h-8 flex items-center justify-center">
+                                <Icon Type="ellipsis-vertical" />
+                            </button>
+
+                            @if (GameState.Value.OtherPlayerIdMenuOpen == player.PlayerId)
+                            {
+                                <Backdrop OnClick="CloseOtherPlayerMenu" />
+                                <OtherPlayerMenu PlayerId="@player.PlayerId" />
+                            }
+                        </div>
+                    }
+                </div>
             </div>
         }
     </div>

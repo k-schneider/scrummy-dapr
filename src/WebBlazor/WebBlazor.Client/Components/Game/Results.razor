@@ -49,10 +49,13 @@
             Min = parsedVotes.First().StringValue;
             Max = parsedVotes.Last().StringValue;
 
-            Average = parsedVotes
-                .Where(x => x.NumericValue.HasValue)
-                .Average(x => x.NumericValue!.Value)
-                .ToString("0");
+            if (parsedVotes.Where(x => x.NumericValue.HasValue).Any())
+            {
+                Average = parsedVotes
+                    .Where(x => x.NumericValue.HasValue)
+                    .Average(x => x.NumericValue!.Value)
+                    .ToString("0");
+            }
 
             Popular = parsedVotes.OrderByDescending(x => x.Count).First().StringValue;
         }
