@@ -6,6 +6,10 @@ public record CreateGameAction(string Nickname);
 public record CreateGameSuccessAction(GameMembership Game);
 public record CreateGameFailedAction(string Error);
 
+public record EnsureGameExistsAction(string GameId);
+public record EnsureGameExistsSuccessAction(bool Exists);
+public record EnsureGameExistsFailedAction(string Error);
+
 public record ForgetGameAction(string GameId);
 
 public record JoinGameAction(string GameId, string Nickname);

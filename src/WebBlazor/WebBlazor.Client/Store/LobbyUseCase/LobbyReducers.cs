@@ -47,6 +47,20 @@ public static class LobbyReducers
     }
 
     [ReducerMethod]
+    public static LobbyState ReduceEnsureGameExistsAction(LobbyState state, EnsureGameExistsAction _) =>
+        state with
+        {
+            GameExists = false
+        };
+
+    [ReducerMethod]
+    public static LobbyState ReduceEnsureGameExistsSuccessAction(LobbyState state, EnsureGameExistsSuccessAction action) =>
+        state with
+        {
+            GameExists = action.Exists
+        };
+
+    [ReducerMethod]
     public static LobbyState ReduceForgetGameAction(LobbyState state, ForgetGameAction action)
     {
         var games = new Dictionary<string, GameMembership>()

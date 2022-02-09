@@ -76,6 +76,39 @@ public class LobbyEffects
     }
 
     [EffectMethod]
+    public async Task HandleEnsureGameExistsAction(EnsureGameExistsAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            var exists = await _appApi.GameExists(action.GameId);
+            dispatcher.Dispatch(new EnsureGameExistsSuccessAction(exists));
+        }
+        catch (ApiException exc)
+        {
+            dispatcher.Dispatch(new EnsureGameExistsFailedAction(exc.GetError()));
+        }
+    }
+
+    [EffectMethod]
+    public Task HandleEnsureGameExistsFailedAction(EnsureGameExistsFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to determine status of game: [{action.Error}]");
+        _navigationManager.NavigateTo("/");
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public Task HandleEnsureGameExistsSuccessAction(EnsureGameExistsSuccessAction action, IDispatcher _)
+    {
+        if (!action.Exists)
+        {
+            _toastService.ShowError("Game not found.");
+            _navigationManager.NavigateTo("/");
+        }
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
     public async Task HandleJoinGameAction(JoinGameAction action, IDispatcher dispatcher)
     {
         await RememberNickname();
