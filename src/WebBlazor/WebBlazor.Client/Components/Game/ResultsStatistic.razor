@@ -1,0 +1,12 @@
+<div class="flex flex-col items-center gap-1 bg-stone-700 py-1 px-8 rounded-md text-white">
+    <span class="text-sm uppercase opacity-75">@Label</span>
+    <span class="text-4xl">@Value</span>
+</div>
+
+@code {
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? Value { get; set; }
+}
