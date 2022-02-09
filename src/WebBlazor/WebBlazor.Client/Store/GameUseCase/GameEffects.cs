@@ -241,6 +241,14 @@ public class GameEffects
     }
 
     [EffectMethod]
+    public Task HandleLeaveGameSuccessAction(LeaveGameSuccessAction _, IDispatcher dispatcher)
+    {
+        dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
+        _navigationManager.NavigateTo($"/");
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
     public Task HandleGameEndedAction(GameEndedAction _, IDispatcher dispatcher)
     {
         dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
@@ -307,7 +315,7 @@ public class GameEffects
     [EffectMethod]
     public Task HandlePlayerLeftAction(PlayerLeftAction action, IDispatcher dispatcher)
     {
-        if (action.PlayerId == _gameState.Value.PlayerId)
+        if (action.PlayerId == _gameState.Value.PlayerId && !_gameState.Value.Leaving)
         {
             dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
             _navigationManager.NavigateTo($"/");
