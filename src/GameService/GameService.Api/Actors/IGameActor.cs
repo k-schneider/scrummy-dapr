@@ -16,7 +16,7 @@ public interface IGameActor : IActor
     Task RemovePlayer(string sid, int playerId, CancellationToken cancellationToken = default);
     Task ResetGame(CancellationToken cancellationToken = default);
     Task ResetVotes(string sid, CancellationToken cancellationToken = default);
-    Task StartGame(CancellationToken cancellationToken = default);
+    Task StartGame(IEnumerable<Card> deck, CancellationToken cancellationToken = default);
     Task StartSpectating(string sid, CancellationToken cancellationToken = default);
     Task StopSpectating(string sid, CancellationToken cancellationToken = default);
     Task UpdateNickname(string sid, string nickname, CancellationToken cancellationToken = default);

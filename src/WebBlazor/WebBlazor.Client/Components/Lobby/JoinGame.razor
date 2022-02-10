@@ -9,8 +9,8 @@
     <div class="grid place-items-center h-screen">
         <div class="bg-white rounded-lg shadow-xl px-4 py-5 flex flex-col items-center gap-3">
             <h1 class="text-xl leading-6 font-medium text-gray-900">Welcome to Scrummy</h1>
-            <p class="text-gray-500">To join the game, choose a nickname.</p>
-            <Input Name="nickname" @bind-Value="Nickname" MaxLength="50" Block="true" Placeholder="Enter your nickname" />
+            <label for="nickname" class="text-gray-500">To join the game, choose a nickname.</label>
+            <Input Id="nickname" Name="nickname" @bind-Value="Nickname" MaxLength="50" Block="true" Placeholder="Enter your nickname" />
             <Button OnClick="Continue" Icon="dice" Block="true" Disabled="@LobbyState.Value.JoiningGame" Loading="@LobbyState.Value.JoiningGame">Join Game</Button>
         </div>
     </div>

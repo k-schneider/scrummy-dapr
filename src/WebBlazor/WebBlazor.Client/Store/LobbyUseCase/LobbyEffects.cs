@@ -51,7 +51,7 @@ public class LobbyEffects
 
         try
         {
-            var response = await _appApi.CreateGame(new CreateGameRequest(action.Nickname));
+            var response = await _appApi.CreateGame(new CreateGameRequest(action.Nickname, action.Deck));
             var gameMembership = new GameMembership(response.GameId, response.PlayerId, response.Sid);
             dispatcher.Dispatch(new CreateGameSuccessAction(gameMembership));
         }

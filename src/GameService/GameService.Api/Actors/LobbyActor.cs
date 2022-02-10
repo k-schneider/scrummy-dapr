@@ -21,11 +21,11 @@ public class LobbyActor : Actor, ILobbyActor
         await base.OnActivateAsync();
     }
 
-    public async Task<string> CreateGame(CancellationToken cancellationToken = default)
+    public async Task<string> CreateGame(IEnumerable<Card> deck, CancellationToken cancellationToken = default)
     {
         string gameId = GenerateGameId();
 
-        await GetGameActor(gameId).StartGame(cancellationToken);
+        await GetGameActor(gameId).StartGame(deck, cancellationToken);
 
         _lobbyState.Games.Add(gameId);
 

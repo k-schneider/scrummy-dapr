@@ -21,7 +21,7 @@ public class GameController : ControllerBase
     [HttpPost("lobby/create")]
     public async Task<IActionResult> CreateGame(CreateGameRequest request, CancellationToken cancellationToken)
     {
-        var gameId = await GetLobbyActor().CreateGame(cancellationToken);
+        var gameId = await GetLobbyActor().CreateGame(request.Deck, cancellationToken);
         var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);
 
         return Ok(new CreateGameResponse(gameId, playerId, sid));

@@ -360,7 +360,7 @@ public class GameActor : Actor, IGameActor, IRemindable
         await SetInactivityReminder();
     }
 
-    public async Task StartGame(CancellationToken cancellationToken = default)
+    public async Task StartGame(IEnumerable<Card> deck, CancellationToken cancellationToken = default)
     {
         if (_gameState.GameStatus != GameStatuses.None)
         {
@@ -368,6 +368,7 @@ public class GameActor : Actor, IGameActor, IRemindable
         }
 
         _gameState.GameStatus = GameStatuses.InProgress;
+        _gameState.Deck.AddRange(deck);
 
         await SaveGameState(cancellationToken);
 

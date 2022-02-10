@@ -2,7 +2,7 @@ namespace Scrummy.WebBlazor.Client.Store.LobbyUseCase;
 
 public record InitializeLobbyAction(string Nickname, Dictionary<string, GameMembership> Games);
 
-public record CreateGameAction(string Nickname);
+public record CreateGameAction(string Nickname, IEnumerable<Card> Deck);
 public record CreateGameSuccessAction(GameMembership Game);
 public record CreateGameFailedAction(string Error);
 
