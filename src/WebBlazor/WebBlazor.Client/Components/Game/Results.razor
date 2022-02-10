@@ -31,16 +31,18 @@
 
     protected override Task OnInitializedAsync()
     {
+        var deck = GameState.Value.Deck.ToList();
+
         var groupedVotes = GameState.Value.Votes.Select(v => v.Value)
             .GroupBy(v => v)
             .Select(g => new
             {
-                Card = GameState.Value.Deck.First(c => c.Id == g.Key),
+                Card = deck.First(c => c.Id == g.Key),
                 Count = g.Count()
             })
             .OrderByDescending(x => x.Card.NumericValue.HasValue)
             .ThenBy(x => x.Card.NumericValue)
-            .ThenBy(x => x.Card.Label);
+            .ThenBy(x => deck.IndexOf(x.Card));
 
         if (groupedVotes.Any())
         {
