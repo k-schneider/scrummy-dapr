@@ -6,11 +6,11 @@
     {
         @if (!string.IsNullOrEmpty(Card.Image))
         {
-            <img src="@Card.Image" class="w-8 my-1" />
+            <img src="@Card.Image" alt="@Card.Label" class="w-8 my-1" />
         }
         else
         {
-           <span class="text-4xl">@(string.IsNullOrEmpty(Card.Label) ? Card.NumericValue : Card.Label)</span>
+           <span class="text-4xl">@Card.Label</span>
         }
     }
     else

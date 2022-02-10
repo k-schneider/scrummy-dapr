@@ -24,11 +24,11 @@
                             {
                                 @if (!string.IsNullOrEmpty(card!.Image))
                                 {
-                                    <img src="@card.Image" class="p-1" />
+                                    <img src="@card.Image" alt="@card.Label" class="p-1" />
                                 }
                                 else
                                 {
-                                    <span>@(string.IsNullOrEmpty(card.Label) ? card.NumericValue : card.Label)</span>
+                                    <span>@card.Label</span>
                                 }
                             }
                             else

@@ -42,10 +42,9 @@
             .ThenBy(x => x.Card.NumericValue)
             .ThenBy(x => x.Card.Label);
 
-        Votes = groupedVotes.ToDictionary(x => x.Card.Id, x => x.Count);
-
-        if (Votes.Any())
+        if (groupedVotes.Any())
         {
+            Votes = groupedVotes.ToDictionary(x => x.Card.Label, x => x.Count);
             Min = groupedVotes.First().Card;
             Max = groupedVotes.Last().Card;
 
