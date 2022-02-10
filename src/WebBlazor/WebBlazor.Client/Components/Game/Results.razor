@@ -4,10 +4,10 @@
 
 <div class="flex flex-col gap-8 sm:gap-16 items-center">
     <div class="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <ResultsStatistic Label="Min" Value="@Min" />
-        <ResultsStatistic Label="Max" Value="@Max" />
-        <ResultsStatistic Label="Average" Value="@Average" />
-        <ResultsStatistic Label="Popular" Value="@Popular" />
+        <ResultsAggregate Label="Min" Card="@Min" />
+        <ResultsAggregate Label="Max" Card="@Max" />
+        <ResultsAggregate Label="Popular" Card="@Popular" />
+        <ResultsAggregate Label="Average" Value="@Average" />
     </div>
     @if (Votes.Any())
     {
@@ -24,43 +24,45 @@
 @code {
     private string WrapperElementId = Guid.NewGuid().ToString();
     private Dictionary<string, int> Votes = new();
-    private string? Min;
-    private string? Max;
+    private Card? Min;
+    private Card? Max;
+    private Card? Popular;
     private string? Average;
-    private string? Popular;
 
     protected override Task OnInitializedAsync()
     {
-        var parsedVotes = GameState.Value.Votes.Select(v => v.Value)
+        var groupedVotes = GameState.Value.Votes.Select(v => v.Value)
             .GroupBy(v => v)
-            .Select(g => new { Value = g.Key!, Count = g.Count() })
-            .Select(v => {
-                int? numericValue = int.TryParse(v.Value, out int i) ? (int?)i : null;
-                return new { StringValue = v.Value, NumericValue = numericValue, Count = v.Count };
+            .Select(g => new
+            {
+                Card = GameState.Value.Deck.First(c => c.Id == g.Key),
+                Count = g.Count()
             })
-            .OrderByDescending(x => x.NumericValue.HasValue)
-            .ThenBy(x => x.NumericValue)
-            .ThenBy(x => x.StringValue);
+            .OrderByDescending(x => x.Card.NumericValue.HasValue)
+            .ThenBy(x => x.Card.NumericValue)
+            .ThenBy(x => x.Card.Label);
 
-        Votes = parsedVotes.ToDictionary(x => x.StringValue, x => x.Count);
+        Votes = groupedVotes.ToDictionary(x => x.Card.Id, x => x.Count);
 
         if (Votes.Any())
         {
-            Min = parsedVotes.First().StringValue;
-            Max = parsedVotes.Last().StringValue;
+            Min = groupedVotes.First().Card;
+            Max = groupedVotes.Last().Card;
 
-            if (parsedVotes.Where(x => x.NumericValue.HasValue).Any())
+            if (groupedVotes.Where(x => x.Card.NumericValue.HasValue).Any())
             {
-                Average = parsedVotes
-                    .Where(x => x.NumericValue.HasValue)
-                    .Average(x => x.NumericValue!.Value)
-                    .ToString("0");
+                var average = groupedVotes
+                    .Where(x => x.Card.NumericValue.HasValue)
+                    .Average(x => x.Card.NumericValue!.Value);
+
+                // Round to nearest half
+                Average = (Math.Round(average * 2, MidpointRounding.AwayFromZero) / 2).ToString("0.#");
             }
 
             // Don't render the popular vote if everyone voted differently
-            if (GameState.Value.Votes.Count == 1 || parsedVotes.Count() != GameState.Value.Votes.Count)
+            if (GameState.Value.Votes.Count == 1 || groupedVotes.Count() != GameState.Value.Votes.Count)
             {
-                Popular = parsedVotes.OrderByDescending(x => x.Count).First().StringValue;
+                Popular = groupedVotes.OrderByDescending(x => x.Count).First().Card;
             }
         }
 

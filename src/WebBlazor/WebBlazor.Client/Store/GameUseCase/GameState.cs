@@ -6,7 +6,7 @@ public record GameState
     public bool Connecting { get; init; }
     public bool Connected { get; init; }
     public bool ConnectionClosed { get; init; }
-    public IEnumerable<string> Deck { get; init; } = Enumerable.Empty<string>();
+    public IEnumerable<Card> Deck { get; init; } = Enumerable.Empty<Card>();
     public bool Disconnecting { get; init; }
     public bool Flipping { get; init; }
     public string? GameId { get; init; }

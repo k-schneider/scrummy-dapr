@@ -1,0 +1,61 @@
+@inherits FluxorComponent
+@inject IDispatcher Dispatcher
+@inject IState<GameState> GameState
+
+@if (Card is not null)
+{
+    <button type="button" @onclick="Vote" disabled="@Disabled" class="transition-all ease-in-out shadow-md select-none cursor-pointer bg-neutral-200 rounded-xl flex h-32 w-20 lg:h-44 lg:w-28 text-4xl lg:text-5xl text-black flex items-center justify-center border-8 hover:-mt-1 hover:shadow-xl relative @(Card.Id == GameState.Value.MyVote() ? "border-orange-500 -mt-1 " : "border-transparent ") @(GameState.Value.Me()!.IsSpectator ? "cursor-not-allowed" : string.Empty)">
+        @if (!string.IsNullOrEmpty(LabelOrNumeric) && !string.IsNullOrEmpty(Card.Image))
+        {
+            <span class="absolute top-0 left-0 text-sm @(ChangingVote ? "animate-pulse" : string.Empty)">@LabelOrNumeric</span>
+        }
+
+        @if (!string.IsNullOrEmpty(Card.Image))
+        {
+            <img src="@Card.Image" class="w-1/2 @(ChangingVote ? "animate-pulse" : string.Empty)" />
+        }
+        else
+        {
+           <span class="@(ChangingVote ? "animate-pulse" : null)">@LabelOrNumeric</span>
+        }
+
+        @if (!string.IsNullOrEmpty(LabelOrNumeric) && !string.IsNullOrEmpty(Card.Image))
+        {
+            <span class="absolute bottom-0 right-0 text-sm @(ChangingVote ? "animate-pulse" : string.Empty)">@LabelOrNumeric</span>
+        }
+    </button>
+}
+
+@code {
+    [Parameter]
+    public Card? Card { get; set; }
+
+    private bool ChangingVote =>
+        (GameState.Value.Voting && GameState.Value.MyVote() == Card?.Id) ||
+        (GameState.Value.RecallingVote && GameState.Value.PreviousVote == Card?.Id);
+
+    private bool Disabled =>
+        GameState.Value.Me()!.IsSpectator ||
+        GameState.Value.Voting ||
+        GameState.Value.RecallingVote;
+
+    private string? LabelOrNumeric =>
+        string.IsNullOrEmpty(Card?.Label) ? Card?.NumericValue?.ToString() : Card.Label;
+
+    private void Vote()
+    {
+        if (GameState.Value.Voting)
+        {
+            return;
+        }
+
+        if (Card!.Id == GameState.Value.MyVote())
+        {
+            Dispatcher.Dispatch(new RecallVoteAction());
+        }
+        else
+        {
+            Dispatcher.Dispatch(new CastVoteAction(Card!.Id));
+        }
+    }
+}

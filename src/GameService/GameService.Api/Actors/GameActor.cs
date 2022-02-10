@@ -61,7 +61,7 @@ public class GameActor : Actor, IGameActor, IRemindable
     {
         EnsureGameInProgress();
 
-        if (!_gameState.Deck.Contains(vote))
+        if (!_gameState.Deck.Any(c => c.Id == vote))
         {
             throw new InvalidOperationException("Invalid vote");
         }

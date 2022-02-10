@@ -20,4 +20,18 @@ public static class GameExtensions
         state.Votes.TryGetValue(state.PlayerId, out var vote);
         return vote;
     }
+
+    public static bool TryGetPlayerCard(this GameState state, int playerId, out Card? card)
+    {
+        if (state.Votes.TryGetValue(playerId, out var vote))
+        {
+            card = state.Deck.FirstOrDefault(c => c.Id == vote);
+        }
+        else
+        {
+            card = null;
+        }
+
+        return card is not null;
+    }
 }

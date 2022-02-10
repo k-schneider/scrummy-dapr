@@ -1,8 +1,22 @@
 @inject IState<GameState> GameState
 
-<div class="flex flex-col items-center gap-1 bg-stone-700 py-1 px-8 rounded-md text-white" title="@Title">
+<div class="flex flex-col items-center gap-1 bg-neutral-200 py-1 px-8 rounded-md text-black" title="@Title">
     <span class="text-sm uppercase opacity-75">@Label</span>
-    <span class="text-4xl">@(Value ?? "-")</span>
+    @if (Card is not null)
+    {
+        @if (!string.IsNullOrEmpty(Card.Image))
+        {
+            <img src="@Card.Image" class="w-8 my-1" />
+        }
+        else
+        {
+           <span class="text-4xl">@(string.IsNullOrEmpty(Card.Label) ? Card.NumericValue : Card.Label)</span>
+        }
+    }
+    else
+    {
+        <span class="text-4xl">@(Value ?? "-")</span>
+    }
 </div>
 
 @code {
@@ -12,18 +26,21 @@
     public string? Label { get; set; }
 
     [Parameter]
+    public Card? Card { get; set; }
+
+    [Parameter]
     public string? Value { get; set; }
 
     protected override Task OnParametersSetAsync()
     {
-        if (Value is null)
+        if (Card is null)
         {
             Title = null;
         }
         else
         {
             Title = string.Join("\n", GameState.Value.Votes
-                .Where(v => v.Value == Value)
+                .Where(v => v.Value == Card.Id)
                 .Select(v => "- " + GameState.Value.Players.First(x => x.PlayerId == v.Key).Nickname));
         }
 

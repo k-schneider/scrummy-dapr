@@ -8,7 +8,7 @@
         @foreach (var player in GameState.Value.Players.OrderByDescending(p => p.IsHost).ThenBy(p => p.Nickname))
         {
             <div class="px-2 py-2 even:bg-indigo-300/50 flex gap-x-2 items-center h-12">
-                <div class="w-8 shrink-0 flex flex-col items-center">
+                <div class="h-full w-8 shrink-0 flex flex-col items-center">
                     @if (!player.IsConnected)
                     {
                         <Icon Type="circle-xmark" Class="text-slate-500 text-2xl opacity-50" Title="Disconnected" />
@@ -19,11 +19,27 @@
                     }
                     else if (GameState.Value.GamePhase == GamePhases.Results)
                     {
-                        <span class="font-bold text-indigo-900">@(GameState.Value.Votes.TryGetValue(player.PlayerId, out var vote) ? vote : "-")</span>
+                        <div class="h-full w-full flex items-center justify-center font-bold bg-white rounded-md">
+                            @if (GameState.Value.TryGetPlayerCard(player.PlayerId, out var card))
+                            {
+                                @if (!string.IsNullOrEmpty(card!.Image))
+                                {
+                                    <img src="@card.Image" class="p-1" />
+                                }
+                                else
+                                {
+                                    <span>@(string.IsNullOrEmpty(card.Label) ? card.NumericValue : card.Label)</span>
+                                }
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </div>
                     }
                     else
                     {
-                        if (GameState.Value.Votes.ContainsKey(player.PlayerId))
+                        @if (GameState.Value.Votes.ContainsKey(player.PlayerId))
                         {
                             <Icon Type="circle-check" Class="text-emerald-700 text-2xl" Title="Voted" />
                         }
