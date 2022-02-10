@@ -7,25 +7,11 @@
 @if (LobbyState.Value.GameExists)
 {
     <div class="grid place-items-center h-screen">
-        <div class="bg-white rounded-lg shadow-xl sm:max-w-lg mx-4">
-            <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="mt-3 text-center">
-                    <h1 class="text-xl leading-6 font-medium text-gray-900">
-                        Welcome to Scrummy
-                    </h1>
-                    <div class="mt-3">
-                        <p class="text-gray-500">
-                            To enter the game, choose a nickname.
-                        </p>
-                    </div>
-                    <div class="mt-3">
-                        <Input Name="nickname" @bind-Value="Nickname" MaxLength="50" Block="true" Placeholder="Enter your nickname" />
-                    </div>
-                </div>
-            </div>
-            <div class="px-4 py-3 sm:px-6">
-                <Button OnClick="Continue" Icon="dice" Block="true" Disabled="@LobbyState.Value.JoiningGame" Loading="@LobbyState.Value.JoiningGame">Join Game</Button>
-            </div>
+        <div class="bg-white rounded-lg shadow-xl px-4 py-5 flex flex-col items-center gap-3">
+            <h1 class="text-xl leading-6 font-medium text-gray-900">Welcome to Scrummy</h1>
+            <p class="text-gray-500">To join the game, choose a nickname.</p>
+            <Input Name="nickname" @bind-Value="Nickname" MaxLength="50" Block="true" Placeholder="Enter your nickname" />
+            <Button OnClick="Continue" Icon="dice" Block="true" Disabled="@LobbyState.Value.JoiningGame" Loading="@LobbyState.Value.JoiningGame">Join Game</Button>
         </div>
     </div>
 }
