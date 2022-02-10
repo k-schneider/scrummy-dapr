@@ -19,7 +19,7 @@
                         </p>
                     </div>
                     <div class="mt-3">
-                        <Input Id="nickname" Name="nickname" @bind-Value="nickname" MaxLength="50" Block="true" Placeholder="Enter your nickname" />
+                        <Input Name="nickname" @bind-Value="Nickname" MaxLength="50" Block="true" Placeholder="Enter your nickname" />
                     </div>
                 </div>
             </div>
@@ -35,14 +35,14 @@ else
 }
 
 @code {
+    private string Nickname = string.Empty;
+
     [Parameter]
     public string GameId { get; set; } = null!;
 
-    private string nickname = string.Empty;
-
     protected override Task OnInitializedAsync()
     {
-        nickname = LobbyState.Value.Nickname;
+        Nickname = LobbyState.Value.Nickname;
 
         Dispatcher.Dispatch(new EnsureGameExistsAction(GameId));
 
@@ -51,11 +51,11 @@ else
 
     private void Continue()
     {
-        if (string.IsNullOrWhiteSpace(nickname))
+        if (string.IsNullOrWhiteSpace(Nickname))
         {
             return;
         }
 
-        Dispatcher.Dispatch(new JoinGameAction(GameId, nickname));
+        Dispatcher.Dispatch(new JoinGameAction(GameId, Nickname));
     }
 }

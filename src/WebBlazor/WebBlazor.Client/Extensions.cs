@@ -11,7 +11,7 @@ public static class Extensions
             case HttpStatusCode.BadRequest:
             case HttpStatusCode.Forbidden:
             case HttpStatusCode.NotFound:
-                result = exc.Content ?? result;
+                result = string.IsNullOrWhiteSpace(exc.Content) ? result : exc.Content;
                 break;
             case HttpStatusCode.BadGateway:
             case HttpStatusCode.ServiceUnavailable:

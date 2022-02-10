@@ -1,0 +1,42 @@
+<div class="flex items-center gap-3">
+    <div class="w-16 h-10 flex items-center bg-gray-300 rounded-full p-1 duration-300 ease-in-out cursor-pointer @(Checked ? "bg-green-400" : string.Empty)"
+        role="checkbox" aria-checked="@Checked.ToString().ToLower()" tabindex="@TabIndex" aria-labelledby="@(string.IsNullOrEmpty(Label) ? null : LabelId)"
+        @onclick="ToggleChecked" @onkeypress="KeyPressed" @onkeypress:preventDefault="true">
+        <div class="bg-white w-8 h-8 rounded-full shadow-md transform duration-300 ease-in-out @(Checked ? "translate-x-6" : string.Empty)"></div>
+    </div>
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label id="@LabelId" class="ml-2 text-gray-700">@Label</label>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public bool Checked { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string LabelId { get; set; } = Guid.NewGuid().ToString();
+
+    [Parameter]
+    public int TabIndex { get; set; } = 0;
+
+    [Parameter]
+    public EventCallback<bool> CheckedChanged { get; set; }
+
+    private void ToggleChecked()
+    {
+        Checked = !Checked;
+        CheckedChanged.InvokeAsync(Checked);
+    }
+
+    private void KeyPressed(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "Space" || e.Code == "NumpadEnter")
+        {
+            ToggleChecked();
+        }
+    }
+}

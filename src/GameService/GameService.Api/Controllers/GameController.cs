@@ -103,6 +103,13 @@ public class GameController : ControllerBase
         return Ok();
     }
 
+    [HttpPut("game/{gameId}/spectating")]
+    public async Task<IActionResult> UpdateSpectating(string gameId, UpdateSpectatingRequest request, CancellationToken cancellationToken)
+    {
+        await GetGameActor(gameId).UpdateSpectating(request.Sid, request.Spectating, cancellationToken);
+        return Ok();
+    }
+
     [HttpPut("game/{gameId}/nickname")]
     public async Task<IActionResult> UpdateNickname(string gameId, UpdateNicknameRequest request, CancellationToken cancellationToken)
     {

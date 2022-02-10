@@ -115,6 +115,9 @@ public class GameEffects
                 _hubConnection.On<PlayerRemovedMessage>(GameHubMethods.PlayerRemoved, message =>
                     dispatcher.Dispatch(new PlayerRemovedAction(message.PlayerId)));
 
+                _hubConnection.On<PlayerIsSpectatorChangedMessage>(GameHubMethods.PlayerIsSpectatorChanged, message =>
+                    dispatcher.Dispatch(new PlayerIsSpectatorChangedAction(message.PlayerId, message.IsSpectator)));
+
                 _hubConnection.On<PlayerVoteCastMessage>(GameHubMethods.PlayerVoteCast, message =>
                     dispatcher.Dispatch(new PlayerVoteCastAction(message.PlayerId, message.HadPreviousVote, message.Vote)));
 
@@ -504,6 +507,27 @@ public class GameEffects
     public Task HandleUpdateNicknameSuccessAction(UpdateNicknameSuccessAction _, IDispatcher dispatcher)
     {
         dispatcher.Dispatch(new ClosePlayerPopoverAction());
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public async Task HandleUpdateSpectatingAction(UpdateSpectatingAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _appApi.UpdateSpectating(_gameState.Value.GameId!, new UpdateSpectatingRequest(_gameState.Value.Sid!, action.Spectating));
+            dispatcher.Dispatch(new UpdateSpectatingSuccessAction());
+        }
+        catch (ApiException exc)
+        {
+            dispatcher.Dispatch(new UpdateSpectatingFailedAction(exc.GetError()));
+        }
+    }
+
+    [EffectMethod]
+    public Task HandleUpdateSpectatingFailedAction(UpdateSpectatingFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to change spectator mode: [{action.Error}]");
         return Task.CompletedTask;
     }
 }

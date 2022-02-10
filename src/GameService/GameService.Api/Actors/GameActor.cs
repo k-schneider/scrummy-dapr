@@ -68,6 +68,11 @@ public class GameActor : Actor, IGameActor, IRemindable
 
         var self = GetRequiredPlayer(sid);
 
+        if (self.IsSpectator)
+        {
+            throw new InvalidOperationException("Spectators cannot vote");
+        }
+
         _gameState.Votes.TryGetValue(self.PlayerId, out var previousVote);
         _gameState.Votes[self.PlayerId] = vote;
 
@@ -107,7 +112,8 @@ public class GameActor : Actor, IGameActor, IRemindable
             p.PlayerId,
             p.Nickname,
             p.IsHost,
-            p.IsConnected)).ToList();
+            p.IsConnected,
+            p.IsSpectator)).ToList();
 
         var votes = _gameState.Votes.ToDictionary(kvp =>
             kvp.Key,
@@ -374,11 +380,39 @@ public class GameActor : Actor, IGameActor, IRemindable
 
         self.Nickname = nickname;
 
+        await SaveGameState(cancellationToken);
+
         await _eventBus.PublishAsync(
             new PlayerNicknameChangedIntegrationEvent(
                 self.Sid,
                 self.PlayerId,
                 nickname,
+                GameId),
+            cancellationToken);
+
+        await SetInactivityReminder(cancellationToken);
+    }
+
+    public async Task UpdateSpectating(string sid, bool spectating, CancellationToken cancellationToken = default)
+    {
+        EnsureGameInProgress();
+
+        var self = GetRequiredPlayer(sid);
+
+        self.IsSpectator = spectating;
+
+        if (spectating)
+        {
+            _gameState.Votes.Remove(self.PlayerId);
+        }
+
+        await SaveGameState(cancellationToken);
+
+        await _eventBus.PublishAsync(
+            new PlayerIsSpectatorChangedIntegrationEvent(
+                self.Sid,
+                self.PlayerId,
+                spectating,
                 GameId),
             cancellationToken);
 

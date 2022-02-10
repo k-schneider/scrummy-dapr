@@ -117,6 +117,18 @@ public class GameEventController : ControllerBase
         }
     }
 
+    [HttpPost("PlayerIsSpectatorChanged")]
+    [Topic(DAPR_PUBSUB_NAME, "PlayerIsSpectatorChangedIntegrationEvent")]
+    public async Task HandleAsync(PlayerIsSpectatorChangedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
+    {
+        await _hubContext.Clients
+            .Group(integrationEvent.GameId)
+            .SendAsync(
+                GameHubMethods.PlayerIsSpectatorChanged,
+                new PlayerIsSpectatorChangedMessage(integrationEvent.PlayerId, integrationEvent.IsSpectator),
+                cancellationToken);
+    }
+
     [HttpPost("PlayerJoined")]
     [Topic(DAPR_PUBSUB_NAME, "PlayerJoinedIntegrationEvent")]
     public async Task HandleAsync(PlayerJoinedIntegrationEvent integrationEvent, CancellationToken cancellationToken)

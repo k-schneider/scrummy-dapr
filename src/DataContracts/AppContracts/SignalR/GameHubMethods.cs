@@ -8,6 +8,7 @@ public static class GameHubMethods
     public const string NewVoteStarted = "NewVoteStarted";
     public const string PlayerConnected = "PlayerConnected";
     public const string PlayerDisconnected = "PlayerDisconnected";
+    public const string PlayerIsSpectatorChanged = "PlayerIsSpectatorChanged";
     public const string PlayerJoined = "PlayerJoined";
     public const string PlayerLeft = "PlayerLeft";
     public const string PlayerNicknameChanged = "PlayerNicknameChanged";

@@ -11,7 +11,11 @@
                 <div class="w-8 shrink-0 flex flex-col items-center">
                     @if (!player.IsConnected)
                     {
-                        <Icon Type="circle-xmark" Class="text-slate-500 text-2xl opacity-50" />
+                        <Icon Type="circle-xmark" Class="text-slate-500 text-2xl opacity-50" Title="Disconnected" />
+                    }
+                    else if (player.IsSpectator)
+                    {
+                        <Icon Type="eye" Class="text-slate-600 text-2xl" Title="Spectating" />
                     }
                     else if (GameState.Value.GamePhase == GamePhases.Results)
                     {
@@ -21,11 +25,11 @@
                     {
                         if (GameState.Value.Votes.ContainsKey(player.PlayerId))
                         {
-                            <Icon Type="circle-check" Class="text-emerald-700 text-2xl" />
+                            <Icon Type="circle-check" Class="text-emerald-700 text-2xl" Title="Voted" />
                         }
                         else
                         {
-                            <Icon Type="circle-notch" Spin="true" Class="text-white opacity-50 text-2xl" />
+                            <Icon Type="circle-notch" Spin="true" Class="text-white opacity-50 text-2xl" Title="Voting" />
                         }
                     }
                 </div>
@@ -40,7 +44,7 @@
                     @if (player.PlayerId != GameState.Value.PlayerId && (player.IsConnected || GameState.Value.IsHost()))
                     {
                         <div class="relative">
-                            <button @onclick="() => OpenOtherPlayerMenu(player.PlayerId)" class="rounded-full hover:bg-black/10 p-1 text-slate-700 rounded-full hover:bg-black/10 p-1 text-slate-700 text-xl w-8 h-8 flex items-center justify-center">
+                            <button @onclick="() => OpenOtherPlayerMenu(player.PlayerId)" class="rounded-full hover:bg-black/10 p-1 text-slate-700 rounded-full hover:bg-black/10 p-1 text-slate-700 text-xl w-8 h-8 flex items-center justify-center" title="Player Menu">
                                 <Icon Type="ellipsis-vertical" />
                             </button>
 

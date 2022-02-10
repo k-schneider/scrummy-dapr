@@ -13,7 +13,7 @@
             <span>Recalling vote</span>
             <Icon Type="circle-notch" Spin="true" />
         }
-        else if (GameState.Value.Votes.ContainsKey(GameState.Value.PlayerId))
+        else if (GameState.Value.Me()!.IsSpectator || GameState.Value.Votes.ContainsKey(GameState.Value.PlayerId))
         {
             <span>Wait for the flip...</span>
         }

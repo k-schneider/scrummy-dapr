@@ -314,10 +314,36 @@ public static class GameReducers
     }
 
     [ReducerMethod]
+    public static GameState ReducePlayerIsSpectatorChangedAction(GameState state, PlayerIsSpectatorChangedAction action)
+    {
+        var players = state.Players.Select(p => p with
+        {
+            IsSpectator = p.PlayerId == action.PlayerId ? action.IsSpectator : p.IsSpectator
+        });
+
+        var name = state.PlayerId == action.PlayerId ? "You" : state.Players.First(p => p.PlayerId == action.PlayerId).Nickname;
+        var verb = action.IsSpectator ? "started" : "stopped";
+
+        var votes = new Dictionary<int, string?>(state.Votes);
+
+        if (action.IsSpectator)
+        {
+            votes.Remove(action.PlayerId);
+        }
+
+        return state with
+        {
+            Players = players,
+            Votes = votes,
+            Log = state.Log.Append(new LogEntry($"{name} {verb} spectating."))
+        };
+    }
+
+    [ReducerMethod]
     public static GameState ReducePlayerJoinedAction(GameState state, PlayerJoinedAction action) =>
         state with
         {
-            Players = state.Players.Append(new Player(action.PlayerId, action.Nickname, false, false)),
+            Players = state.Players.Append(new Player(action.PlayerId, action.Nickname, false, false, false)),
             Log = state.Log.Append(new LogEntry($"{action.Nickname} joined the game."))
         };
 
@@ -524,7 +550,7 @@ public static class GameReducers
             GamePhase = action.Game.GamePhase,
             GameVersion = action.Game.GameVersion,
             Deck = action.Game.Deck,
-            Players = action.Game.Players.Select(p => new Player(p.PlayerId, p.Nickname, p.IsHost, p.IsConnected)),
+            Players = action.Game.Players,
             Votes = action.Game.Votes
         };
 
@@ -575,6 +601,27 @@ public static class GameReducers
         state with
         {
             ResettingVotes = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceUpdateSpectatingAction(GameState state, UpdateSpectatingAction _) =>
+        state with
+        {
+            UpdatingSpectating = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceUpdateSpectatingFailedAction(GameState state, UpdateSpectatingFailedAction _) =>
+        state with
+        {
+            UpdatingSpectating = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceUpdateSpectatingSuccessAction(GameState state, UpdateSpectatingSuccessAction _) =>
+        state with
+        {
+            UpdatingSpectating = false
         };
 
     [ReducerMethod]
