@@ -94,8 +94,12 @@ public record UpdateNicknameAction(string Nickname);
 public record UpdateNicknameFailedAction(string Error);
 public record UpdateNicknameSuccessAction();
 
-public record UpdateSpectatingAction(bool Spectating);
-public record UpdateSpectatingFailedAction(string Error);
-public record UpdateSpectatingSuccessAction();
+public record StartSpectatingAction();
+public record StartSpectatingFailedAction(string Error);
+public record StartSpectatingSuccessAction();
+
+public record StopSpectatingAction();
+public record StopSpectatingFailedAction(string Error);
+public record StopSpectatingSuccessAction();
 
 public record VotesResetAction();

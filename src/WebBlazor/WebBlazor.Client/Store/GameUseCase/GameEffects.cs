@@ -511,23 +511,44 @@ public class GameEffects
     }
 
     [EffectMethod]
-    public async Task HandleUpdateSpectatingAction(UpdateSpectatingAction action, IDispatcher dispatcher)
+    public async Task HandleStartSpectatingAction(StartSpectatingAction action, IDispatcher dispatcher)
     {
         try
         {
-            await _appApi.UpdateSpectating(_gameState.Value.GameId!, new UpdateSpectatingRequest(_gameState.Value.Sid!, action.Spectating));
-            dispatcher.Dispatch(new UpdateSpectatingSuccessAction());
+            await _appApi.StartSpectating(_gameState.Value.GameId!, new StartSpectatingRequest(_gameState.Value.Sid!));
+            dispatcher.Dispatch(new StartSpectatingSuccessAction());
         }
         catch (ApiException exc)
         {
-            dispatcher.Dispatch(new UpdateSpectatingFailedAction(exc.GetError()));
+            dispatcher.Dispatch(new StartSpectatingFailedAction(exc.GetError()));
         }
     }
 
     [EffectMethod]
-    public Task HandleUpdateSpectatingFailedAction(UpdateSpectatingFailedAction action, IDispatcher _)
+    public Task HandleStartSpectatingFailedAction(StartSpectatingFailedAction action, IDispatcher _)
     {
-        _toastService.ShowError($"Unable to change spectator mode: [{action.Error}]");
+        _toastService.ShowError($"Unable to start spectating: [{action.Error}]");
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public async Task HandleStopSpectatingAction(StopSpectatingAction action, IDispatcher dispatcher)
+    {
+        try
+        {
+            await _appApi.StopSpectating(_gameState.Value.GameId!, new StopSpectatingRequest(_gameState.Value.Sid!));
+            dispatcher.Dispatch(new StopSpectatingSuccessAction());
+        }
+        catch (ApiException exc)
+        {
+            dispatcher.Dispatch(new StopSpectatingFailedAction(exc.GetError()));
+        }
+    }
+
+    [EffectMethod]
+    public Task HandleStopSpectatingFailedAction(StopSpectatingFailedAction action, IDispatcher _)
+    {
+        _toastService.ShowError($"Unable to stop spectating: [{action.Error}]");
         return Task.CompletedTask;
     }
 }

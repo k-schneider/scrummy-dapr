@@ -604,24 +604,45 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReduceUpdateSpectatingAction(GameState state, UpdateSpectatingAction _) =>
+    public static GameState ReduceStartSpectatingAction(GameState state, StartSpectatingAction _) =>
         state with
         {
-            UpdatingSpectating = true
+            SpectateChanging = true
         };
 
     [ReducerMethod]
-    public static GameState ReduceUpdateSpectatingFailedAction(GameState state, UpdateSpectatingFailedAction _) =>
+    public static GameState ReduceStartSpectatingFailedAction(GameState state, StartSpectatingFailedAction _) =>
         state with
         {
-            UpdatingSpectating = false
+            SpectateChanging = false
         };
 
     [ReducerMethod]
-    public static GameState ReduceUpdateSpectatingSuccessAction(GameState state, UpdateSpectatingSuccessAction _) =>
+    public static GameState ReduceStartSpectatingSuccessAction(GameState state, StartSpectatingSuccessAction _) =>
         state with
         {
-            UpdatingSpectating = false
+            SpectateChanging = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceStopSpectatingAction(GameState state, StopSpectatingAction _) =>
+        state with
+        {
+            SpectateChanging = true
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceStopSpectatingFailedAction(GameState state, StopSpectatingFailedAction _) =>
+        state with
+        {
+            SpectateChanging = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceStopSpectatingSuccessAction(GameState state, StopSpectatingSuccessAction _) =>
+        state with
+        {
+            SpectateChanging = false
         };
 
     [ReducerMethod]

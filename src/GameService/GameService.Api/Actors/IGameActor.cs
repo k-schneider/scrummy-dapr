@@ -17,6 +17,7 @@ public interface IGameActor : IActor
     Task ResetGame(CancellationToken cancellationToken = default);
     Task ResetVotes(string sid, CancellationToken cancellationToken = default);
     Task StartGame(CancellationToken cancellationToken = default);
+    Task StartSpectating(string sid, CancellationToken cancellationToken = default);
+    Task StopSpectating(string sid, CancellationToken cancellationToken = default);
     Task UpdateNickname(string sid, string nickname, CancellationToken cancellationToken = default);
-    Task UpdateSpectating(string sid, bool spectating, CancellationToken cancellationToken = default);
 }

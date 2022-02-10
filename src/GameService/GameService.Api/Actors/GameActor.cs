@@ -372,6 +372,49 @@ public class GameActor : Actor, IGameActor, IRemindable
         await SetInactivityReminder();
     }
 
+    public async Task StartSpectating(string sid, CancellationToken cancellationToken = default)
+    {
+        EnsureGameInProgress();
+
+        var self = GetRequiredPlayer(sid);
+
+        self.IsSpectator = true;
+        _gameState.Votes.Remove(self.PlayerId);
+
+        await SaveGameState(cancellationToken);
+
+        await _eventBus.PublishAsync(
+            new PlayerIsSpectatorChangedIntegrationEvent(
+                self.Sid,
+                self.PlayerId,
+                self.IsSpectator,
+                GameId),
+            cancellationToken);
+
+        await SetInactivityReminder(cancellationToken);
+    }
+
+    public async Task StopSpectating(string sid, CancellationToken cancellationToken = default)
+    {
+        EnsureGameInProgress();
+
+        var self = GetRequiredPlayer(sid);
+
+        self.IsSpectator = false;
+
+        await SaveGameState(cancellationToken);
+
+        await _eventBus.PublishAsync(
+            new PlayerIsSpectatorChangedIntegrationEvent(
+                self.Sid,
+                self.PlayerId,
+                self.IsSpectator,
+                GameId),
+            cancellationToken);
+
+        await SetInactivityReminder(cancellationToken);
+    }
+
     public async Task UpdateNickname(string sid, string nickname, CancellationToken cancellationToken = default)
     {
         EnsureGameInProgress();
@@ -387,32 +430,6 @@ public class GameActor : Actor, IGameActor, IRemindable
                 self.Sid,
                 self.PlayerId,
                 nickname,
-                GameId),
-            cancellationToken);
-
-        await SetInactivityReminder(cancellationToken);
-    }
-
-    public async Task UpdateSpectating(string sid, bool spectating, CancellationToken cancellationToken = default)
-    {
-        EnsureGameInProgress();
-
-        var self = GetRequiredPlayer(sid);
-
-        self.IsSpectator = spectating;
-
-        if (spectating)
-        {
-            _gameState.Votes.Remove(self.PlayerId);
-        }
-
-        await SaveGameState(cancellationToken);
-
-        await _eventBus.PublishAsync(
-            new PlayerIsSpectatorChangedIntegrationEvent(
-                self.Sid,
-                self.PlayerId,
-                spectating,
                 GameId),
             cancellationToken);
 

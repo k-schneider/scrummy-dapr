@@ -53,10 +53,18 @@
 
     private void SpectatingChanged(bool value)
     {
-        @if (!GameState.Value.UpdatingSpectating)
+        @if (!GameState.Value.SpectateChanging)
         {
             Spectating = value;
-            Dispatcher.Dispatch(new UpdateSpectatingAction(value));
+
+            if (value)
+            {
+                Dispatcher.Dispatch(new StartSpectatingAction());
+            }
+            else
+            {
+                Dispatcher.Dispatch(new StopSpectatingAction());
+            }
         }
     }
 
