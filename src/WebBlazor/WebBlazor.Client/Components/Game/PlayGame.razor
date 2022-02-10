@@ -62,7 +62,7 @@ else if (GameState.Value.Connected)
             }
         </div>
 
-        @if (GameState.Value.Nudged)
+        @if (GameState.Value.Nudged && !GameState.Value.MuteNudges)
         {
             <audio autoplay><source src="sounds/door_bell.mp3" /></audio>
         }

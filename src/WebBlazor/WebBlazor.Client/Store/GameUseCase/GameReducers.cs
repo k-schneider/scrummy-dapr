@@ -192,6 +192,13 @@ public static class GameReducers
         };
 
     [ReducerMethod]
+    public static GameState ReduceMuteNudgesAction(GameState state, MuteNudgesAction _) =>
+        state with
+        {
+            MuteNudges = true
+        };
+
+    [ReducerMethod]
     public static GameState ReduceNewVoteStartedAction(GameState state, NewVoteStartedAction _)
     {
         var host = state.Players.First(p => p.IsHost);
@@ -643,6 +650,13 @@ public static class GameReducers
         state with
         {
             SpectateChanging = false
+        };
+
+    [ReducerMethod]
+    public static GameState ReduceUnmuteNudgesAction(GameState state, UnmuteNudgesAction _) =>
+        state with
+        {
+            MuteNudges = false
         };
 
     [ReducerMethod]

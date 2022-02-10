@@ -36,6 +36,8 @@ public record LeaveGameSuccessAction();
 
 public record NewVoteStartedAction();
 
+public record MuteNudgesAction();
+
 public record NudgePlayerAction(int PlayerId);
 public record NudgePlayerFailedAction(string Error);
 public record NudgePlayerSuccessAction();
@@ -88,7 +90,7 @@ public record ResetVotesAction();
 public record ResetVotesFailedAction(string Error);
 public record ResetVotesSuccessAction();
 
-public record UpdateMuteNudgesAction(bool MuteNudges);
+public record UnmuteNudgesAction();
 
 public record UpdateNicknameAction(string Nickname);
 public record UpdateNicknameFailedAction(string Error);

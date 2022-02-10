@@ -24,11 +24,12 @@
 
 @code {
     private bool MuteNudges = false;
-    private bool Spectating = false;
     private string Nickname = string.Empty;
+    private bool Spectating = false;
 
     protected override Task OnInitializedAsync()
     {
+        MuteNudges = GameState.Value.MuteNudges;
         Nickname = GameState.Value.Me()!.Nickname;
         Spectating = GameState.Value.Me()!.IsSpectator;
         return base.OnInitializedAsync();
@@ -71,6 +72,14 @@
     private void MuteNudgesChanged(bool value)
     {
         MuteNudges = value;
-        Dispatcher.Dispatch(new UpdateMuteNudgesAction(value));
+
+        if (value)
+        {
+            Dispatcher.Dispatch(new MuteNudgesAction());
+        }
+        else
+        {
+            Dispatcher.Dispatch(new UnmuteNudgesAction());
+        }
     }
 }
