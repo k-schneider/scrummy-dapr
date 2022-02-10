@@ -328,9 +328,15 @@ public class GameActor : Actor, IGameActor, IRemindable
 
     public async Task ResetGame(CancellationToken cancellationToken = default)
     {
-        if (_gameState.GameStatus != GameStatuses.GameOver)
+        if (_gameState.GameStatus == GameStatuses.None)
         {
-            throw new InvalidOperationException("Game must be over to reset");
+            // noop - shouldnt happen but just in case
+            return;
+        }
+
+        if (_gameState.GameStatus == GameStatuses.InProgress)
+        {
+            throw new InvalidOperationException("Can't reset a game in progress");
         }
 
         await Task.WhenAll(_gameState.Players.Select(p => GetSessionActor(p.Sid).Reset()));
