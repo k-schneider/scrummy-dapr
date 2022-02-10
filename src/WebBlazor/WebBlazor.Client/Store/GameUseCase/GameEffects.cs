@@ -2,11 +2,14 @@ namespace Scrummy.WebBlazor.Client.Store.GameUseCase;
 
 public class GameEffects
 {
+    private const string MuteNudgesKey = "muteNudges";
+
     private readonly IAppApi _appApi;
     private readonly IState<GameState> _gameState;
     private readonly HttpClient _httpClient;
     private readonly IJSRuntime _jsRuntime;
     private readonly IState<LobbyState> _lobbyState;
+    private readonly ILocalStorageService _localStorage;
     private readonly NavigationManager _navigationManager;
     private readonly IToastService _toastService;
     private HubConnection? _hubConnection;
@@ -18,6 +21,7 @@ public class GameEffects
         HttpClient httpClient,
         IJSRuntime jsRuntime,
         IState<LobbyState> lobbyState,
+        ILocalStorageService localStorage,
         NavigationManager navigationManager,
         IToastService toastService)
     {
@@ -26,8 +30,20 @@ public class GameEffects
         _httpClient = httpClient;
         _jsRuntime = jsRuntime;
         _lobbyState = lobbyState;
+        _localStorage = localStorage;
         _navigationManager = navigationManager;
         _toastService = toastService;
+    }
+
+    [EffectMethod]
+    public async Task HandleStoreInitializedAction(StoreInitializedAction _, IDispatcher dispatcher)
+    {
+        var muteNudges = await _localStorage.GetItemAsync<bool>(MuteNudgesKey);
+
+        if (muteNudges)
+        {
+            dispatcher.Dispatch(new MuteNudgesAction());
+        }
     }
 
     [EffectMethod]
@@ -227,6 +243,18 @@ public class GameEffects
     }
 
     [EffectMethod]
+    public Task HandleGameEndedAction(GameEndedAction _, IDispatcher dispatcher)
+    {
+        if (!_gameState.Value.Leaving && !_gameState.Value.Disconnecting)
+        {
+            dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
+            _navigationManager.NavigateTo($"/");
+            _toastService.ShowWarning("Game has ended.");
+        }
+        return Task.CompletedTask;
+    }
+
+    [EffectMethod]
     public async Task HandleLeaveGameAction(LeaveGameAction action, IDispatcher dispatcher)
     {
         try
@@ -258,15 +286,9 @@ public class GameEffects
     }
 
     [EffectMethod]
-    public Task HandleGameEndedAction(GameEndedAction _, IDispatcher dispatcher)
+    public async Task HandleMuteNudgesAction(MuteNudgesAction _, IDispatcher _1)
     {
-        if (!_gameState.Value.Leaving && !_gameState.Value.Disconnecting)
-        {
-            dispatcher.Dispatch(new ForgetGameAction(_gameState.Value.GameId!));
-            _navigationManager.NavigateTo($"/");
-            _toastService.ShowWarning("Game has ended.");
-        }
-        return Task.CompletedTask;
+        await _localStorage.SetItemAsync<bool>(MuteNudgesKey, true);
     }
 
     [EffectMethod]
@@ -550,5 +572,11 @@ public class GameEffects
     {
         _toastService.ShowError($"Unable to stop spectating: [{action.Error}]");
         return Task.CompletedTask;
+    }
+
+    [EffectMethod]
+    public async Task HandleUnmuteNudgesAction(UnmuteNudgesAction _, IDispatcher _1)
+    {
+        await _localStorage.RemoveItemAsync(MuteNudgesKey);
     }
 }
