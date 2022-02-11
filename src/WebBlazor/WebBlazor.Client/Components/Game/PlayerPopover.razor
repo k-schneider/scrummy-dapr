@@ -14,7 +14,7 @@
         <p class="w-full text-center text-lg font-semibold">Player Settings</p>
         <div class="flex flex-col gap-4">
             <Toggle Checked="Spectating" CheckedChanged="SpectatingChanged" Label="Spectator mode (opt-out of voting)" />
-            <Toggle Checked="MuteNudges" CheckedChanged="MuteNudgesChanged" Label="Mute nudge sound effects" />
+            <Toggle Checked="MuteSounds" CheckedChanged="MuteSoundsChanged" Label="Mute sound effects" />
         </div>
     </div>
     <div class="p-4">
@@ -23,13 +23,13 @@
 </div>
 
 @code {
-    private bool MuteNudges = false;
+    private bool MuteSounds = false;
     private string Nickname = string.Empty;
     private bool Spectating = false;
 
     protected override Task OnInitializedAsync()
     {
-        MuteNudges = GameState.Value.MuteNudges;
+        MuteSounds = GameState.Value.MuteSounds;
         Nickname = GameState.Value.Me()!.Nickname;
         Spectating = GameState.Value.Me()!.IsSpectator;
         return base.OnInitializedAsync();
@@ -69,17 +69,17 @@
         }
     }
 
-    private void MuteNudgesChanged(bool value)
+    private void MuteSoundsChanged(bool value)
     {
-        MuteNudges = value;
+        MuteSounds = value;
 
         if (value)
         {
-            Dispatcher.Dispatch(new MuteNudgesAction());
+            Dispatcher.Dispatch(new MuteSoundsAction());
         }
         else
         {
-            Dispatcher.Dispatch(new UnmuteNudgesAction());
+            Dispatcher.Dispatch(new UnmuteSoundsAction());
         }
     }
 }

@@ -192,10 +192,10 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReduceMuteNudgesAction(GameState state, MuteNudgesAction _) =>
+    public static GameState ReduceMuteSoundsAction(GameState state, MuteSoundsAction _) =>
         state with
         {
-            MuteNudges = true
+            MuteSounds = true
         };
 
     [ReducerMethod]
@@ -653,10 +653,10 @@ public static class GameReducers
         };
 
     [ReducerMethod]
-    public static GameState ReduceUnmuteNudgesAction(GameState state, UnmuteNudgesAction _) =>
+    public static GameState ReduceUnmuteSoundsAction(GameState state, UnmuteSoundsAction _) =>
         state with
         {
-            MuteNudges = false
+            MuteSounds = false
         };
 
     [ReducerMethod]

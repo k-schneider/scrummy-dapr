@@ -2,7 +2,7 @@ namespace Scrummy.WebBlazor.Client.Store.GameUseCase;
 
 public class GameEffects
 {
-    private const string MuteNudgesKey = "muteNudges";
+    private const string MuteSoundsKey = "muteSounds";
 
     private readonly IAppApi _appApi;
     private readonly IState<GameState> _gameState;
@@ -38,11 +38,11 @@ public class GameEffects
     [EffectMethod]
     public async Task HandleStoreInitializedAction(StoreInitializedAction _, IDispatcher dispatcher)
     {
-        var muteNudges = await _localStorage.GetItemAsync<bool>(MuteNudgesKey);
+        var muteSounds = await _localStorage.GetItemAsync<bool>(MuteSoundsKey);
 
-        if (muteNudges)
+        if (muteSounds)
         {
-            dispatcher.Dispatch(new MuteNudgesAction());
+            dispatcher.Dispatch(new MuteSoundsAction());
         }
     }
 
@@ -286,9 +286,9 @@ public class GameEffects
     }
 
     [EffectMethod]
-    public async Task HandleMuteNudgesAction(MuteNudgesAction _, IDispatcher _1)
+    public async Task HandleMuteSoundsAction(MuteSoundsAction _, IDispatcher _1)
     {
-        await _localStorage.SetItemAsync<bool>(MuteNudgesKey, true);
+        await _localStorage.SetItemAsync<bool>(MuteSoundsKey, true);
     }
 
     [EffectMethod]
@@ -575,8 +575,8 @@ public class GameEffects
     }
 
     [EffectMethod]
-    public async Task HandleUnmuteNudgesAction(UnmuteNudgesAction _, IDispatcher _1)
+    public async Task HandleUnmuteSoundsAction(UnmuteSoundsAction _, IDispatcher _1)
     {
-        await _localStorage.RemoveItemAsync(MuteNudgesKey);
+        await _localStorage.RemoveItemAsync(MuteSoundsKey);
     }
 }
