@@ -1,14 +1,40 @@
 version: '3.4'
 
 services:
+
+  redis:
+    image: redis:alpine
+
+  seq:
+    image: datalust/seq:latest
+
+  zipkin:
+    image: openzipkin/zipkin-slim
+
   game-service:
     image: ${DOCKER_REGISTRY-}game.service
     build:
       context: .
       dockerfile: src/GameService/GameService.Api/Dockerfile
+    depends_on:
+      - redis
+      - dapr-placement
+
+  game-service-dapr:
+    image: "daprio/daprd:1.5.1"
+    depends_on:
+      - game-service
+    network_mode: "service:game-service"
 
   web-blazor:
     image: ${DOCKER_REGISTRY-}web-blazor
     build:
       context: .
       dockerfile: src/WebBlazor/WebBlazor.Server/Dockerfile
+
+  webstatus:
+    image: xabarilcoding/healthchecksui:5.0.0
+    container_name: webstatus
+
+  dapr-placement:
+    image: "daprio/dapr:1.5.1"

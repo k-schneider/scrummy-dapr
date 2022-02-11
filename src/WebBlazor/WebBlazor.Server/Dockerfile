@@ -3,11 +3,12 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 EXPOSE 80
-EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["src/WebBlazor/WebBlazor.Server/WebBlazor.Server.csproj", "src/WebBlazor/WebBlazor.Server/"]
+COPY ["src/WebBlazor/WebBlazor.Client/WebBlazor.Client.csproj", "src/WebBlazor/WebBlazor.Client/"]
+COPY ["src/DataContracts/AppContracts/AppContracts.csproj", "src/DataContracts/AppContracts/"]
 RUN dotnet restore "src/WebBlazor/WebBlazor.Server/WebBlazor.Server.csproj"
 COPY . .
 WORKDIR "/src/src/WebBlazor/WebBlazor.Server"

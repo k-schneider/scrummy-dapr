@@ -1,7 +1,16 @@
-﻿namespace Scrummy.WebBlazor.Server;
+﻿// Only use in this file to avoid conflicts with Microsoft.Extensions.Logging
+using Serilog;
+
+namespace Scrummy.WebBlazor.Server;
 
 public static class ProgramExtensions
 {
+    private const string AppName = "Web Blazor";
+
+    public static void AddCustomHealthChecks(this WebApplicationBuilder builder) =>
+        builder.Services.AddHealthChecks()
+            .AddCheck("self", () => HealthCheckResult.Healthy());
+
     public static void AddCustomReverseProxy(this WebApplicationBuilder builder)
     {
         var routes = new[]
@@ -62,5 +71,19 @@ public static class ProgramExtensions
 
         builder.Services.AddReverseProxy()
             .LoadFromMemory(routes, clusters);
+    }
+
+    public static void AddCustomSerilog(this WebApplicationBuilder builder)
+    {
+        var seqServerUrl = builder.Configuration["SeqServerUrl"];
+
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(builder.Configuration)
+            .WriteTo.Console()
+            .WriteTo.Seq(seqServerUrl)
+            .Enrich.WithProperty("ApplicationName", AppName)
+            .CreateLogger();
+
+        builder.Host.UseSerilog();
     }
 }

@@ -1,5 +1,8 @@
-﻿global using Microsoft.AspNetCore.Mvc;
+﻿global using HealthChecks.UI.Client;
+global using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.RazorPages;
+global using Microsoft.Extensions.Diagnostics.HealthChecks;
 global using Microsoft.Extensions.Primitives;
 global using Scrummy.WebBlazor.Server;
 global using System.Diagnostics;

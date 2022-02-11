@@ -1,7 +1,11 @@
+var appName = "Web Blazor";
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.AddCustomReverseProxy();
+builder.AddCustomSerilog();
+builder.AddCustomHealthChecks();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -29,6 +33,26 @@ app.UseRouting();
 app.MapReverseProxy();
 app.MapRazorPages();
 app.MapControllers();
+
+app.MapHealthChecks("/hc", new HealthCheckOptions()
+{
+    Predicate = _ => true,
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
 app.MapFallbackToFile("index.html");
 
-app.Run();
+try
+{
+    app.Run();
+    return 0;
+}
+catch (Exception ex)
+{
+    app.Logger.LogCritical(ex, "Host terminated unexpectedly ({ApplicationName})...", appName);
+    return 1;
+}
+finally
+{
+    Serilog.Log.CloseAndFlush();
+}

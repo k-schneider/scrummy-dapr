@@ -1,17 +1,61 @@
 version: '3.4'
 
 services:
+
+  redis:
+    ports:
+      - "5379:6379"
+
+  seq:
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - "5340:80"
+
+  zipkin:
+    ports:
+      - "5411:9411"
+
   game-service:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
+      - SeqServerUrl=http://seq
     ports:
       - "5101:80"
+      - "50001:50001"
+
+  game-service-dapr:
+    command: ["./daprd",
+      "-app-id", "game-service",
+      "-app-port", "80",
+      "-placement-host-address", "dapr-placement:50000",
+      "-components-path", "/components",
+      "-config", "/configuration/scrummy-config.yaml"]
+    volumes:
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   web-blazor:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - GameServiceUrl=http://game-service
+      - SeqServerUrl=http://seq
     ports:
       - "5102:80"
+
+  webstatus:
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - HealthChecksUI__HealthChecks__0__Name=Game Service
+      - HealthChecksUI__HealthChecks__0__Uri=http://game-service/hc
+      - HealthChecksUI__HealthChecks__1__Name=Web Blazor
+      - HealthChecksUI__HealthChecks__1__Uri=http://web-blazor/hc
+    ports:
+      - "5103:80"
+
+  dapr-placement:
+    command: ["./placement", "-port", "50000", "-log-level", "debug"]
+    ports:
+      - "50000:50000"
