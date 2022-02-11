@@ -14,6 +14,11 @@
         <div class="w-full px-16 sm:p-0 lg:w-96 md:w-80 sm:w-72 overflow-hidden">
             <canvas id="@WrapperElementId"></canvas>
         </div>
+
+        @if (Votes.Count == 1 && !GameState.Value.MuteSounds)
+        {
+            <audio autoplay><source src="sounds/tada.mp3" /></audio>
+        }
     }
     else
     {
