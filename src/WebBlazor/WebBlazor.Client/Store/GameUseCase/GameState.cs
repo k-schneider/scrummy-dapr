@@ -7,6 +7,7 @@ public record GameState
     public bool Connected { get; init; }
     public bool ConnectionClosed { get; init; }
     public IEnumerable<Card> Deck { get; init; } = Enumerable.Empty<Card>();
+    public bool DisableNudgeAnimation { get; init; }
     public bool Disconnecting { get; init; }
     public bool Flipping { get; init; }
     public string? GameId { get; init; }

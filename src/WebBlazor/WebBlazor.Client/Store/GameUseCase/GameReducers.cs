@@ -107,6 +107,13 @@ public static class GameReducers
         };
 
     [ReducerMethod]
+    public static GameState ReduceDisableNudgeAnimationAction(GameState state, DisableNudgeAnimationAction _) =>
+        state with
+        {
+            DisableNudgeAnimation = true
+        };
+
+    [ReducerMethod]
     public static GameState ReduceDisconnectFromGameAction(GameState state, DisconnectFromGameAction _) =>
         state with
         {
@@ -123,6 +130,13 @@ public static class GameReducers
     [ReducerMethod]
     public static GameState ReduceDisconnectFromGameSuccessAction(GameState _, DisconnectFromGameSuccessAction _1) =>
         new GameState();
+
+    [ReducerMethod]
+    public static GameState ReduceEnableNudgeAnimationAction(GameState state, EnableNudgeAnimationAction _) =>
+        state with
+        {
+            DisableNudgeAnimation = false
+        };
 
     [ReducerMethod]
     public static GameState ReduceFlipCardsAction(GameState state, FlipCardsAction _) =>

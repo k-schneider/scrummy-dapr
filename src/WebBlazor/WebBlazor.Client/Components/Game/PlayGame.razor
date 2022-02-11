@@ -21,7 +21,7 @@ else if (GameState.Value.Connected)
     }
     else
     {
-        <div class="@(GameState.Value.Nudged ? "shake-hard shake-constant" : null)">
+        <div class="@(GameState.Value.Nudged && !GameState.Value.DisableNudgeAnimation ? "shake-hard shake-constant" : null)">
             <div class="mb-24 sm:mb-12">
                 <div class="flex justify-between py-4 px-4 md:px-8">
                     <InviteButton />

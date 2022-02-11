@@ -15,6 +15,7 @@
         <div class="flex flex-col gap-4">
             <Toggle Checked="Spectating" CheckedChanged="SpectatingChanged" Label="Spectator mode (opt-out of voting)" />
             <Toggle Checked="MuteSounds" CheckedChanged="MuteSoundsChanged" Label="Mute sound effects" />
+            <Toggle Checked="DisableNudgeAnimation" CheckedChanged="DisableNudgeAnimationChanged" Label="Disable nudge screen shake" />
         </div>
     </div>
     <div class="p-4">
@@ -23,12 +24,14 @@
 </div>
 
 @code {
+    private bool DisableNudgeAnimation = false;
     private bool MuteSounds = false;
     private string Nickname = string.Empty;
     private bool Spectating = false;
 
     protected override Task OnInitializedAsync()
     {
+        DisableNudgeAnimation = GameState.Value.DisableNudgeAnimation;
         MuteSounds = GameState.Value.MuteSounds;
         Nickname = GameState.Value.Me()!.Nickname;
         Spectating = GameState.Value.Me()!.IsSpectator;
@@ -80,6 +83,20 @@
         else
         {
             Dispatcher.Dispatch(new UnmuteSoundsAction());
+        }
+    }
+
+    private void DisableNudgeAnimationChanged(bool value)
+    {
+        DisableNudgeAnimation = value;
+
+        if (value)
+        {
+            Dispatcher.Dispatch(new DisableNudgeAnimationAction());
+        }
+        else
+        {
+            Dispatcher.Dispatch(new EnableNudgeAnimationAction());
         }
     }
 }

@@ -2,6 +2,7 @@ namespace Scrummy.WebBlazor.Client.Store.GameUseCase;
 
 public class GameEffects
 {
+    private const string DisableNudgeAnimationKey = "disableNudgeAnimation";
     private const string MuteSoundsKey = "muteSounds";
 
     private readonly IAppApi _appApi;
@@ -38,9 +39,12 @@ public class GameEffects
     [EffectMethod]
     public async Task HandleStoreInitializedAction(StoreInitializedAction _, IDispatcher dispatcher)
     {
-        var muteSounds = await _localStorage.GetItemAsync<bool>(MuteSoundsKey);
+        if (await _localStorage.GetItemAsync<bool>(DisableNudgeAnimationKey))
+        {
+            dispatcher.Dispatch(new DisableNudgeAnimationAction());
+        }
 
-        if (muteSounds)
+        if (await _localStorage.GetItemAsync<bool>(MuteSoundsKey))
         {
             dispatcher.Dispatch(new MuteSoundsAction());
         }
@@ -185,6 +189,12 @@ public class GameEffects
     }
 
     [EffectMethod]
+    public async Task HandleDisableNudgeAnimationAction(DisableNudgeAnimationAction _, IDispatcher _1)
+    {
+        await _localStorage.SetItemAsync<bool>(DisableNudgeAnimationKey, true);
+    }
+
+    [EffectMethod]
     public async Task HandleDisconnectFromGameAction(DisconnectFromGameAction _, IDispatcher dispatcher)
     {
         try
@@ -201,6 +211,12 @@ public class GameEffects
         {
             dispatcher.Dispatch(new DisconnectFromGameFailedAction(exc.Message));
         }
+    }
+
+    [EffectMethod]
+    public async Task HandleEnableNudgeAnimationAction(EnableNudgeAnimationAction _, IDispatcher _1)
+    {
+        await _localStorage.RemoveItemAsync(DisableNudgeAnimationKey);
     }
 
     [EffectMethod]

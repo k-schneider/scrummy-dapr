@@ -16,9 +16,13 @@ public record ConnectToGameSuccessAction(string Sid, int PlayerId);
 
 public record CopyLinkToClipboardAction();
 
+public record DisableNudgeAnimationAction();
+
 public record DisconnectFromGameAction();
 public record DisconnectFromGameFailedAction(string Error);
 public record DisconnectFromGameSuccessAction();
+
+public record EnableNudgeAnimationAction();
 
 public record FlipCardsAction();
 public record FlipCardsFailedAction(string Error);
