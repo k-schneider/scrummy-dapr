@@ -6,4 +6,4 @@
 
 ## TODO
 
-- Custom decks (introduce new Setup phase)
+- Custom decks

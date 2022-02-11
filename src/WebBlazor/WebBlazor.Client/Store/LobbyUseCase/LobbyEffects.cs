@@ -145,6 +145,12 @@ public class LobbyEffects
         await RememberGames();
     }
 
+    [EffectMethod]
+    public async Task HandleUpdateNicknameAction(UpdateNicknameAction action, IDispatcher _)
+    {
+        await RememberNickname();
+    }
+
     private async Task RememberGames()
     {
         await _localStorage.SetItemAsync(GamesKey, _lobbyState.Value.Games);

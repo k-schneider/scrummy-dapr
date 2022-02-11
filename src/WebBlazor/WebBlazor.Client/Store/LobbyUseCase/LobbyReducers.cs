@@ -107,4 +107,11 @@ public static class LobbyReducers
             Games = games
         };
     }
+
+    [ReducerMethod]
+    public static LobbyState ReduceUpdateNicknameAction(LobbyState state, UpdateNicknameAction action) =>
+        state with
+        {
+            Nickname = action.Nickname
+        };
 }

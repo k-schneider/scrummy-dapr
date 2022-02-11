@@ -1,3 +1,5 @@
+namespace Scrummy.WebBlazor.Client;
+
 public static class NamedDecks
 {
     public static NamedDeck ModifiedFibonacci = new NamedDeck("modfib", "Modified Fibonacci",
