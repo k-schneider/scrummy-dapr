@@ -46,7 +46,7 @@
 
         if (!string.IsNullOrWhiteSpace(Title))
         {
-            Title = $"Players who voted {Value}:\n" + Title;
+            Title = $"Players who voted {Card?.Label}:\n" + Title;
         }
 
         return base.OnParametersSetAsync();
