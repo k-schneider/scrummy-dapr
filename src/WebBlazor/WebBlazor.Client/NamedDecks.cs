@@ -43,11 +43,12 @@ public static class NamedDecks
     public static NamedDeck TShirtSizes = new NamedDeck("tshirt", "T-Shirt Sizes",
         new[]
         {
-            new Card("XS"),
-            new Card("SM"),
-            new Card("M"),
-            new Card("L"),
-            new Card("XL"),
+            new Card("XS", image: "img/tshirt-xs.png"),
+            new Card("S", image: "img/tshirt-s.png"),
+            new Card("M", image: "img/tshirt-m.png"),
+            new Card("L", image: "img/tshirt-l.png"),
+            new Card("XL", image: "img/tshirt-xl.png"),
+            new Card("XXL", image: "img/tshirt-xxl.png"),
         });
 
     public static IEnumerable<NamedDeck> All => new[]

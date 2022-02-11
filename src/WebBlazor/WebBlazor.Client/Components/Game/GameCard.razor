@@ -7,7 +7,7 @@
     <button type="button" @onclick="Vote" disabled="@Disabled" class="transition-all ease-in-out shadow-md select-none cursor-pointer bg-neutral-200 rounded-xl flex h-32 w-20 lg:h-44 lg:w-28 text-4xl lg:text-5xl text-black flex items-center justify-center border-8 hover:-mt-1 hover:shadow-xl relative @(Card.Id == GameState.Value.MyVote() ? "border-orange-500 -mt-1 " : "border-transparent ") @(GameState.Value.Me()!.IsSpectator ? "cursor-not-allowed" : string.Empty)">
         @if (!string.IsNullOrEmpty(Card.Image))
         {
-            <img src="@Card.Image" alt="@Card.Label" class="w-1/2 @(ChangingVote ? "animate-pulse" : string.Empty)" />
+            <img src="@Card.Image" alt="@Card.Label" class="@(ChangingVote ? "animate-pulse" : string.Empty)" />
         }
         else
         {
