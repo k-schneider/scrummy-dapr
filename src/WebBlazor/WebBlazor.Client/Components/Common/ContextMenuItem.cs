@@ -1,5 +1,7 @@
-@implements IDisposable
-@code {
+namespace Scrummy.WebBlazor.Client.Components.Common;
+
+public class ContextMenuItem : ComponentBase, IDisposable
+{
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 

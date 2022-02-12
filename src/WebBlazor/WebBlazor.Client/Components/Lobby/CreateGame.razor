@@ -13,13 +13,13 @@
         </div>
         <div>
             <label for="deck" class="text-gray-500">Select a card deck:</label>
-            <select id="deck" @bind="DeckId" class="text-2xl bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 p-2.5 block w-full">
-                <option value="">Select a deck... </option>
+            <Select Id="deck" @bind-Value="DeckId" Block="true">
+                <Option Value="">Select a deck...</Option>
                 @foreach (var deck in NamedDecks.All)
                 {
-                    <option value="@deck.Id">@deck.Name</option>
+                    <Option Value="@deck.Id">@deck.Name</Option>
                 }
-            </select>
+            </Select>
         </div>
         <Button OnClick="Continue" Icon="dice" Block="true" Disabled="@LobbyState.Value.CreatingGame" Loading="@LobbyState.Value.CreatingGame">Create Game</Button>
     </div>

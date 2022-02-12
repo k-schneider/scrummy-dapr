@@ -1,0 +1,87 @@
+<CascadingValue Value="@this">
+    @ChildContent
+</CascadingValue>
+
+<select @bind="Value" name="@Name" id="@Id" disabled="@(Disabled ? "disabled" : null)" class="text-2xl bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 p-2.5 @ClassList">
+    @foreach (var option in Options)
+    {
+        <option value="@option.Value">@option.ChildContent</option>
+    }
+</select>
+
+@code {
+    private string ClassList = string.Empty;
+
+    [Parameter]
+    public string? Id { get; set;}
+
+    [Parameter]
+    public string? Name { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public bool Block { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private List<Option> Options { get; set; } = new();
+
+    [Parameter]
+    public string? Value
+    {
+        get => _value;
+        set
+        {
+            if (_value != value)
+            {
+                _value = value;
+                ValueChanged.InvokeAsync(value);
+            }
+        }
+    }
+    private string? _value;
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        BuildClassList();
+    }
+
+    public void AddOption(Option option)
+    {
+        Options.Add(option);
+        this.StateHasChanged();
+    }
+
+    public void RemoveOption(Option option)
+    {
+        Options.Remove(option);
+        this.StateHasChanged();
+    }
+
+    private void BuildClassList()
+    {
+        var classList = new List<string>();
+
+        if (Block)
+        {
+            classList.Add("block w-full");
+        }
+
+        if (!string.IsNullOrEmpty(Class))
+        {
+            classList.Add(Class);
+        }
+
+        ClassList = string.Join(' ', classList);
+    }
+}
