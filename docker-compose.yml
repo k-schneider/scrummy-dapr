@@ -27,7 +27,7 @@ services:
     network_mode: "service:game-service"
 
   web-blazor:
-    image: ${DOCKER_REGISTRY-}web-blazor
+    image: ${DOCKER_REGISTRY-}web.blazor
     build:
       context: .
       dockerfile: src/WebBlazor/WebBlazor.Server/Dockerfile
