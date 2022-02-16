@@ -1,0 +1,55 @@
+name: game-service
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+
+    paths:
+    - src/BuildingBlocks/**
+    - src/DataContracts/**
+    - src/GameService/**
+    - .github/workflows/game-service.yml
+
+  pull_request:
+    branches:
+    - main
+
+    paths:
+    - src/BuildingBlocks/**
+    - src/DataContracts/**
+    - src/GameService/**
+    - .github/workflows/game-service.yml
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/game.service
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Checkout Github Action'
+      uses: actions/checkout@v2
+
+    - name: Extract metadata for the Docker image
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+    - name: Log in to GitHub container registry
+      uses: docker/login-action@v1.10.0
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v2
+      with:
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        file: ./src/GameService/GameService.Api/Dockerfile
