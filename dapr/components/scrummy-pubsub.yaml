@@ -10,4 +10,8 @@ spec:
   - name: redisHost
     value: redis:6379
   - name: redisPassword
-    value: ""
+    secretKeyRef:
+      name: State.RedisPassword
+      key: State.RedisPassword
+auth:
+  secretStore: scrummy-secretstore
