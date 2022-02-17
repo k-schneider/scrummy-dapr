@@ -38,13 +38,19 @@ public static class ProgramExtensions
 
     public static void AddCustomSerilog(this WebApplicationBuilder builder)
     {
-        var seqServerUrl = builder.Configuration["SeqServerUrl"];
-
-        Log.Logger = new LoggerConfiguration()
+        var loggerConfig = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
-            .WriteTo.Console()
-            .WriteTo.Seq(seqServerUrl)
-            .Enrich.WithProperty("ApplicationName", AppName)
+            .WriteTo.Console();
+
+        var seqServerUrl = builder.Configuration["SeqServerUrl"];
+        if (!string.IsNullOrWhiteSpace(seqServerUrl))
+        {
+            loggerConfig = loggerConfig.WriteTo.Seq(seqServerUrl);
+        }
+
+        Log.Logger = loggerConfig
+            .ReadFrom.Configuration(builder.Configuration)
+            .WriteTo.Console().Enrich.WithProperty("ApplicationName", AppName)
             .CreateLogger();
 
         builder.Host.UseSerilog();
