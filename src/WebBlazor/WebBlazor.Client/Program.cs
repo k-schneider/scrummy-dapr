@@ -9,10 +9,7 @@ builder.Services.AddRestEaseClient<IAppApi>(builder.HostEnvironment.BaseAddress)
 
 builder.Services.AddFluxor(options => options
     .ScanAssemblies(typeof(Anchor).Assembly)
-#if DEBUG
-    .UseReduxDevTools()
-#endif
-    );
+    .UseReduxDevTools());
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
