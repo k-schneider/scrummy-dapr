@@ -1,3 +1,3 @@
 namespace Scrummy.AppContracts.Rest;
 
-public record UpdateNicknameRequest(string Sid, string Nickname);
+public record UpdateNicknameRequest(string Nickname);

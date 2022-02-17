@@ -13,7 +13,7 @@ public static class ProgramExtensions
         {
             options.Actors.RegisterActor<GameActor>();
             options.Actors.RegisterActor<LobbyActor>();
-            options.Actors.RegisterActor<SessionActor>();
+            options.Actors.RegisterActor<PlayerActor>();
         });
     }
 

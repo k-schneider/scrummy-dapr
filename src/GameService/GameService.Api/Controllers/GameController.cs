@@ -11,10 +11,10 @@ public class GameController : ControllerBase
         _actorProxyFactory = actorProxyFactory;
     }
 
-    [HttpPost("game/{gameId}/vote")]
-    public async Task<IActionResult> CastVote(string gameId, CastVoteRequest request, CancellationToken cancellationToken)
+    [HttpPost("player/{sid}/vote")]
+    public async Task<IActionResult> CastVote(string sid, CastVoteRequest request, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).CastVote(request.Sid, request.Vote, cancellationToken);
+        await GetPlayerActor(sid).CastVote(request.Vote, cancellationToken);
         return Ok();
     }
 
@@ -22,15 +22,17 @@ public class GameController : ControllerBase
     public async Task<IActionResult> CreateGame(CreateGameRequest request, CancellationToken cancellationToken)
     {
         var gameId = await GetLobbyActor().CreateGame(request.Deck, cancellationToken);
-        var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);
+
+        var sid = NewSid();
+        var playerId = await GetPlayerActor(sid).JoinGame(gameId, request.Nickname, cancellationToken);
 
         return Ok(new CreateGameResponse(gameId, playerId, sid));
     }
 
-    [HttpPost("game/{gameId}/flip")]
-    public async Task<IActionResult> FlipCards(string gameId, FlipCardsRequest request, CancellationToken cancellationToken)
+    [HttpPost("player/{sid}/flip")]
+    public async Task<IActionResult> FlipCards(string sid, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).FlipCards(request.Sid, cancellationToken);
+        await GetPlayerActor(sid).FlipCards(cancellationToken);
         return Ok();
     }
 
@@ -49,88 +51,91 @@ public class GameController : ControllerBase
             return NotFound("Game does not exist");
         }
 
-        var (sid, playerId) = await GetGameActor(gameId).AddPlayer(request.Nickname, cancellationToken);
+        var sid = NewSid();
+        var playerId = await GetPlayerActor(sid).JoinGame(gameId, request.Nickname, cancellationToken);
 
         return Ok(new JoinGameResponse(gameId, playerId, sid));
     }
 
-    [HttpPost("game/{gameId}/leave")]
-    public async Task<IActionResult> LeaveGame(string gameId, LeaveGameRequest request, CancellationToken cancellationToken)
+    [HttpPost("player/{sid}/leave")]
+    public async Task<IActionResult> LeaveGame(string sid, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).LeaveGame(request.Sid, cancellationToken);
+        await GetPlayerActor(sid).LeaveGame(cancellationToken);
         return Ok();
     }
 
-    [HttpPost("game/{gameId}/nudge")]
-    public async Task<IActionResult> NudgePlayer(string gameId, NudgePlayerRequest request, CancellationToken cancellationToken)
+    [HttpPost("player/{sid}/nudge")]
+    public async Task<IActionResult> NudgePlayer(string sid, NudgePlayerRequest request, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).NudgePlayer(request.Sid, request.PlayerId, cancellationToken);
+        await GetPlayerActor(sid).NudgePlayer(request.PlayerId, cancellationToken);
         return Ok();
     }
 
-    [HttpPost("game/{gameId}/next")]
-    public async Task<IActionResult> PlayAgain(string gameId, PlayAgainRequest request, CancellationToken cancellationToken)
+    [HttpPost("player/{sid}/next")]
+    public async Task<IActionResult> PlayAgain(string sid, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).PlayAgain(request.Sid, cancellationToken);
+        await GetPlayerActor(sid).PlayAgain(cancellationToken);
         return Ok();
     }
 
-    [HttpPost("game/{gameId}/promote")]
-    public async Task<IActionResult> PromotePlayer(string gameId, PromotePlayerRequest request, CancellationToken cancellationToken)
+    [HttpPost("player/{sid}/promote")]
+    public async Task<IActionResult> PromotePlayer(string sid, PromotePlayerRequest request, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).PromotePlayer(request.Sid, request.PlayerId, cancellationToken);
+        await GetPlayerActor(sid).PromotePlayer(request.PlayerId, cancellationToken);
         return Ok();
     }
 
-    [HttpDelete("game/{gameId}/vote")]
-    public async Task<IActionResult> RecallVote(string gameId, RecallVoteRequest request, CancellationToken cancellationToken)
+    [HttpDelete("player/{sid}/vote")]
+    public async Task<IActionResult> RecallVote(string sid, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).RecallVote(request.Sid, cancellationToken);
+        await GetPlayerActor(sid).RecallVote(cancellationToken);
         return Ok();
     }
 
-    [HttpDelete("game/{gameId}/player")]
-    public async Task<IActionResult> RemovePlayer(string gameId, RemovePlayerRequest request, CancellationToken cancellationToken)
+    [HttpDelete("player/{sid}/player")]
+    public async Task<IActionResult> RemovePlayer(string sid, RemovePlayerRequest request, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).RemovePlayer(request.Sid, request.PlayerId, cancellationToken);
+        await GetPlayerActor(sid).RemovePlayer(request.PlayerId, cancellationToken);
         return Ok();
     }
 
-    [HttpDelete("game/{gameId}/votes")]
-    public async Task<IActionResult> ResetVotes(string gameId, ResetVotesRequest request, CancellationToken cancellationToken)
+    [HttpDelete("player/{sid}/votes")]
+    public async Task<IActionResult> ResetVotes(string sid, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).ResetVotes(request.Sid, cancellationToken);
+        await GetPlayerActor(sid).ResetVotes(cancellationToken);
         return Ok();
     }
 
-    [HttpPost("game/{gameId}/spectating")]
-    public async Task<IActionResult> StartSpectating(string gameId, StartSpectatingRequest request, CancellationToken cancellationToken)
+    [HttpPost("player/{sid}/spectating")]
+    public async Task<IActionResult> StartSpectating(string sid, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).StartSpectating(request.Sid, cancellationToken);
+        await GetPlayerActor(sid).StartSpectating(cancellationToken);
         return Ok();
     }
 
-    [HttpDelete("game/{gameId}/spectating")]
-    public async Task<IActionResult> StopSpectating(string gameId, StopSpectatingRequest request, CancellationToken cancellationToken)
+    [HttpDelete("player/{sid}/spectating")]
+    public async Task<IActionResult> StopSpectating(string sid, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).StopSpectating(request.Sid, cancellationToken);
+        await GetPlayerActor(sid).StopSpectating(cancellationToken);
         return Ok();
     }
 
-    [HttpPut("game/{gameId}/nickname")]
-    public async Task<IActionResult> UpdateNickname(string gameId, UpdateNicknameRequest request, CancellationToken cancellationToken)
+    [HttpPut("player/{sid}/nickname")]
+    public async Task<IActionResult> UpdateNickname(string sid, UpdateNicknameRequest request, CancellationToken cancellationToken)
     {
-        await GetGameActor(gameId).UpdateNickname(request.Sid, request.Nickname, cancellationToken);
+        await GetPlayerActor(sid).UpdateNickname(request.Nickname, cancellationToken);
         return Ok();
     }
-
-    private IGameActor GetGameActor(string gameId) =>
-        _actorProxyFactory.CreateActorProxy<IGameActor>(
-            new ActorId(gameId),
-            typeof(GameActor).Name);
 
     private ILobbyActor GetLobbyActor() =>
         _actorProxyFactory.CreateActorProxy<ILobbyActor>(
             new ActorId(Guid.Empty.ToString()),
             typeof(LobbyActor).Name);
+
+    private IPlayerActor GetPlayerActor(string sid) =>
+        _actorProxyFactory.CreateActorProxy<IPlayerActor>(
+            new ActorId(sid),
+            typeof(PlayerActor).Name);
+
+    private string NewSid() => Guid.NewGuid().ToString();
 }

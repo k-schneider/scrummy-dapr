@@ -21,12 +21,24 @@ public class GameEventController : ControllerBase
     [Topic(DAPR_PUBSUB_NAME, "CardsFlippedIntegrationEvent")]
     public async Task HandleAsync(CardsFlippedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
+        // Gather up player votes and send to players
+        var gameState = await GetGameActor(integrationEvent.GameId).GetGameState();
+
+        var playerStates = await Task.WhenAll(gameState.Players.Select(p =>
+            GetPlayerActor(p.Sid).GetPlayerState(cancellationToken)));
+
+        var votes = playerStates
+            .Where(p => p.Vote is not null)
+            .ToDictionary(p => p.PlayerId, p => p.Vote!);
+
         await _hubContext.Clients
             .Group(integrationEvent.GameId)
             .SendAsync(
                 GameHubMethods.CardsFlipped,
-                new CardsFlippedMessage(integrationEvent.Votes),
+                new CardsFlippedMessage(votes),
                 cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
     }
 
     [HttpPost("GameEnded")]
@@ -39,12 +51,16 @@ public class GameEventController : ControllerBase
                 GameHubMethods.GameEnded,
                 cancellationToken);
 
+        // Remove game from lobby active game list
         await GetLobbyActor().NotifyGameEnded(
             integrationEvent.GameId,
             cancellationToken);
 
-        await GetGameActor(integrationEvent.GameId)
-            .ResetGame(cancellationToken);
+        // Clean up player and game actor state
+        var game = GetGameActor(integrationEvent.GameId);
+        var gameState = await game.GetGameState();
+        await Task.WhenAll(gameState.Players.Select(p => GetPlayerActor(p.Sid).Reset()));
+        await game.Reset(cancellationToken);
     }
 
     [HttpPost("HostChanged")]
@@ -55,31 +71,36 @@ public class GameEventController : ControllerBase
             .Group(integrationEvent.GameId)
             .SendAsync(
                 GameHubMethods.HostChanged,
-                new HostChangedMessage(integrationEvent.NewHostPlayerId),
+                new HostChangedMessage(integrationEvent.PlayerId),
                 cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
     }
 
     [HttpPost("NewVoteStarted")]
     [Topic(DAPR_PUBSUB_NAME, "NewVoteStartedIntegrationEvent")]
     public async Task HandleAsync(NewVoteStartedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
+        // Reset player votes
+        var gameState = await GetGameActor(integrationEvent.GameId).GetGameState();
+
+        await Task.WhenAll(gameState.Players.Select(p => GetPlayerActor(p.Sid).ResetVote()));
+
         await _hubContext.Clients
             .Group(integrationEvent.GameId)
             .SendAsync(
                 GameHubMethods.NewVoteStarted,
                 cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
     }
 
     [HttpPost("PlayerConnected")]
     [Topic(DAPR_PUBSUB_NAME, "PlayerConnectedIntegrationEvent")]
     public async Task HandleAsync(PlayerConnectedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        var game = GetGameActor(integrationEvent.GameId);
-
         if (integrationEvent.ConnectionCount == 1)
         {
-            await game.NotifyPlayerConnected(integrationEvent.PlayerId, cancellationToken);
-
             // Let everyone in the game know this player is now online
             await _hubContext.Clients
                 .GroupExcept(integrationEvent.GameId, integrationEvent.ConnectionId)
@@ -89,13 +110,42 @@ public class GameEventController : ControllerBase
                     cancellationToken);
         }
 
-        // Send the new connection the games current state
+        // Build a snapshot of the current game to send to the new connection
+        var gameState = await GetGameActor(integrationEvent.GameId).GetGameState(cancellationToken);
+
+        var playerStates = await Task.WhenAll(gameState.Players.Select(p =>
+            GetPlayerActor(p.Sid).GetPlayerState(cancellationToken)));
+
+        var players = playerStates.Select(p => new Player(
+            p.PlayerId,
+            p.Nickname!,
+            p.IsHost,
+            p.ConnectionIds.Any(),
+            p.IsSpectator));
+
+        var votes = playerStates
+            .Where(p => p.Vote is not null)
+            .ToDictionary(
+                p => p.PlayerId,
+                // Only return vote values for other players when showing results
+                p => p.Sid == integrationEvent.Sid || gameState.GamePhase == GamePhases.Results ? p.Vote : null);
+
+        var game = new Game(
+            gameState.GameId,
+            gameState.GameVersion,
+            gameState.GamePhase,
+            players,
+            gameState.Deck,
+            votes);
+
         await _hubContext.Clients
             .Client(integrationEvent.ConnectionId)
             .SendAsync(
                 GameHubMethods.ReceiveGameState,
-                new ReceiveGameStateMessage(await game.GetGameState(integrationEvent.PlayerId, cancellationToken)),
+                new ReceiveGameStateMessage(game),
                 cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
     }
 
     [HttpPost("PlayerDisconnected")]
@@ -104,9 +154,6 @@ public class GameEventController : ControllerBase
     {
         if (integrationEvent.ConnectionCount == 0)
         {
-            var game = GetGameActor(integrationEvent.GameId);
-            await game.NotifyPlayerDisconnected(integrationEvent.PlayerId, cancellationToken);
-
             // Let everyone in the game know this player is now offline
             await _hubContext.Clients
                 .GroupExcept(integrationEvent.GameId, integrationEvent.ConnectionId)
@@ -127,6 +174,8 @@ public class GameEventController : ControllerBase
                 GameHubMethods.PlayerIsSpectatorChanged,
                 new PlayerIsSpectatorChangedMessage(integrationEvent.PlayerId, integrationEvent.IsSpectator),
                 cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
     }
 
     [HttpPost("PlayerJoined")]
@@ -139,6 +188,8 @@ public class GameEventController : ControllerBase
                 GameHubMethods.PlayerJoined,
                 new PlayerJoinedMessage(integrationEvent.PlayerId, integrationEvent.Nickname),
                 cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
     }
 
     [HttpPost("PlayerLeft")]
@@ -151,6 +202,16 @@ public class GameEventController : ControllerBase
                 GameHubMethods.PlayerLeft,
                 new PlayerLeftMessage(integrationEvent.PlayerId),
                 cancellationToken);
+
+        if (integrationEvent.PlayerCount == 0)
+        {
+            await GetGameActor(integrationEvent.GameId).EndGame();
+        }
+        else if (integrationEvent.IsHost)
+        {
+            var gameState = await GetGameActor(integrationEvent.GameId).GetGameState(cancellationToken);
+            await GetPlayerActor(gameState.Players.First().Sid).PromoteToHost();
+        }
     }
 
     [HttpPost("PlayerNicknameChanged")]
@@ -163,6 +224,8 @@ public class GameEventController : ControllerBase
                 GameHubMethods.PlayerNicknameChanged,
                 new PlayerNicknameChangedMessage(integrationEvent.PlayerId, integrationEvent.Nickname),
                 cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
     }
 
     [HttpPost("PlayerNudged")]
@@ -175,6 +238,8 @@ public class GameEventController : ControllerBase
                 GameHubMethods.PlayerNudged,
                 new PlayerNudgedMessage(integrationEvent.FromPlayerId, integrationEvent.ToPlayerId),
                 cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
     }
 
     [HttpPost("PlayerRemoved")]
@@ -187,19 +252,21 @@ public class GameEventController : ControllerBase
                 GameHubMethods.PlayerRemoved,
                 new PlayerRemovedMessage(integrationEvent.PlayerId),
                 cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
     }
 
     [HttpPost("PlayerVoteCast")]
     [Topic(DAPR_PUBSUB_NAME, "PlayerVoteCastIntegrationEvent")]
     public async Task HandleAsync(PlayerVoteCastIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        var session = GetSessionActor(integrationEvent.Sid);
-        var connectionIds = await session.GetConnectionIds(cancellationToken);
+        var player = GetPlayerActor(integrationEvent.Sid);
+        var playerState = await player.GetPlayerState(cancellationToken);
         var hadPreviousVote = integrationEvent.PreviousVote is not null;
 
         // Send players a notification that the player has voted excluding the vote value
         await _hubContext.Clients
-            .GroupExcept(integrationEvent.GameId, connectionIds)
+            .GroupExcept(integrationEvent.GameId, playerState.ConnectionIds)
             .SendAsync(
                 GameHubMethods.PlayerVoteCast,
                 new PlayerVoteCastMessage(integrationEvent.PlayerId, hadPreviousVote, null),
@@ -207,12 +274,14 @@ public class GameEventController : ControllerBase
 
         // Send the player a notification to sync their vote across connections
         await _hubContext.Clients
-            .Clients(connectionIds)
+            .Clients(playerState.ConnectionIds)
             .SendAsync(
                 GameHubMethods.PlayerVoteCast,
                 new PlayerVoteCastMessage(
                     integrationEvent.PlayerId, hadPreviousVote, integrationEvent.Vote),
                 cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
     }
 
     [HttpPost("PlayerVoteRecalled")]
@@ -226,6 +295,8 @@ public class GameEventController : ControllerBase
                 GameHubMethods.PlayerVoteRecalled,
                 new PlayerVoteRecalledMessage(integrationEvent.PlayerId),
                 cancellationToken);
+
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
     }
 
     [HttpPost("VotesReset")]
@@ -237,20 +308,22 @@ public class GameEventController : ControllerBase
             .SendAsync(
                 GameHubMethods.VotesReset,
                 cancellationToken);
-    }
 
-    private IGameActor GetGameActor(string gameId) =>
-        _actorProxyFactory.CreateActorProxy<IGameActor>(
-            new ActorId(gameId),
-            typeof(GameActor).Name);
+        await GetGameActor(integrationEvent.GameId).SlideInactivityReminder(cancellationToken);
+    }
 
     private ILobbyActor GetLobbyActor() =>
         _actorProxyFactory.CreateActorProxy<ILobbyActor>(
             new ActorId(Guid.Empty.ToString()),
             typeof(LobbyActor).Name);
 
-    private ISessionActor GetSessionActor(string sid) =>
-        _actorProxyFactory.CreateActorProxy<ISessionActor>(
+    private IGameActor GetGameActor(string gameId) =>
+        _actorProxyFactory.CreateActorProxy<IGameActor>(
+            new ActorId(gameId),
+            typeof(GameActor).Name);
+
+    private IPlayerActor GetPlayerActor(string sid) =>
+        _actorProxyFactory.CreateActorProxy<IPlayerActor>(
             new ActorId(sid),
-            typeof(SessionActor).Name);
+            typeof(PlayerActor).Name);
 }

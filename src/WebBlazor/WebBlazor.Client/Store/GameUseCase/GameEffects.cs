@@ -56,8 +56,8 @@ public class GameEffects
         try
         {
             await _appApi.CastVote(
-                _gameState.Value.GameId!,
-                new CastVoteRequest(_gameState.Value.Sid!, action.Vote));
+                _gameState.Value.Sid!,
+                new CastVoteRequest(action.Vote));
 
             dispatcher.Dispatch(new CastVoteSuccessAction());
         }
@@ -224,9 +224,7 @@ public class GameEffects
     {
         try
         {
-            await _appApi.FlipCards(
-                _gameState.Value.GameId!,
-                new FlipCardsRequest(_gameState.Value.Sid!));
+            await _appApi.FlipCards(_gameState.Value.Sid!);
 
             dispatcher.Dispatch(new FlipCardsSuccessAction());
         }
@@ -275,9 +273,7 @@ public class GameEffects
     {
         try
         {
-            await _appApi.LeaveGame(
-                _gameState.Value.GameId!,
-                new LeaveGameRequest(_gameState.Value.Sid!));
+            await _appApi.LeaveGame(_gameState.Value.Sid!);
             dispatcher.Dispatch(new LeaveGameSuccessAction());
         }
         catch (ApiException exc)
@@ -313,8 +309,8 @@ public class GameEffects
         try
         {
             await _appApi.NudgePlayer(
-                _gameState.Value.GameId!,
-                new NudgePlayerRequest(_gameState.Value.Sid!, action.PlayerId));
+                _gameState.Value.Sid!,
+                new NudgePlayerRequest(action.PlayerId));
 
             dispatcher.Dispatch(new NudgePlayerSuccessAction());
         }
@@ -343,9 +339,7 @@ public class GameEffects
     {
         try
         {
-            await _appApi.PlayAgain(
-                _gameState.Value.GameId!,
-                new PlayAgainRequest(_gameState.Value.Sid!));
+            await _appApi.PlayAgain(_gameState.Value.Sid!);
 
             dispatcher.Dispatch(new PlayAgainSuccessAction());
         }
@@ -406,8 +400,8 @@ public class GameEffects
         try
         {
             await _appApi.PromotePlayer(
-                _gameState.Value.GameId!,
-                new PromotePlayerRequest(_gameState.Value.Sid!, action.PlayerId));
+                _gameState.Value.Sid!,
+                new PromotePlayerRequest(action.PlayerId));
 
             dispatcher.Dispatch(new PromotePlayerSuccessAction());
         }
@@ -436,9 +430,7 @@ public class GameEffects
     {
         try
         {
-            await _appApi.RecallVote(
-                _gameState.Value.GameId!,
-                new RecallVoteRequest(_gameState.Value.Sid!));
+            await _appApi.RecallVote(_gameState.Value.Sid!);
 
             dispatcher.Dispatch(new RecallVoteSuccessAction());
         }
@@ -468,8 +460,8 @@ public class GameEffects
         try
         {
             await _appApi.RemovePlayer(
-                _gameState.Value.GameId!,
-                new RemovePlayerRequest(_gameState.Value.Sid!, action.PlayerId));
+                _gameState.Value.Sid!,
+                new RemovePlayerRequest(action.PlayerId));
 
             dispatcher.Dispatch(new RemovePlayerSuccessAction());
         }
@@ -498,9 +490,7 @@ public class GameEffects
     {
         try
         {
-            await _appApi.ResetVotes(
-                _gameState.Value.GameId!,
-                new ResetVotesRequest(_gameState.Value.Sid!));
+            await _appApi.ResetVotes(_gameState.Value.Sid!);
 
             dispatcher.Dispatch(new ResetVotesSuccessAction());
         }
@@ -523,8 +513,8 @@ public class GameEffects
         try
         {
             await _appApi.UpdateNickname(
-                _gameState.Value.GameId!,
-                new UpdateNicknameRequest(_gameState.Value.Sid!, action.Nickname));
+                _gameState.Value.Sid!,
+                new UpdateNicknameRequest(action.Nickname));
 
             dispatcher.Dispatch(new UpdateNicknameSuccessAction());
         }
@@ -553,7 +543,7 @@ public class GameEffects
     {
         try
         {
-            await _appApi.StartSpectating(_gameState.Value.GameId!, new StartSpectatingRequest(_gameState.Value.Sid!));
+            await _appApi.StartSpectating(_gameState.Value.Sid!);
             dispatcher.Dispatch(new StartSpectatingSuccessAction());
         }
         catch (ApiException exc)
@@ -574,7 +564,7 @@ public class GameEffects
     {
         try
         {
-            await _appApi.StopSpectating(_gameState.Value.GameId!, new StopSpectatingRequest(_gameState.Value.Sid!));
+            await _appApi.StopSpectating(_gameState.Value.Sid!);
             dispatcher.Dispatch(new StopSpectatingSuccessAction());
         }
         catch (ApiException exc)

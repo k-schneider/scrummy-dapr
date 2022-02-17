@@ -11,35 +11,35 @@ public class GameHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        var session = GetSessionActor();
-        var gameId = await session.GetGameId();
+        var player = GetPlayerActor();
+        var playerState = await player.GetPlayerState();
 
-        if (gameId is null)
+        if (playerState.GameId is null)
         {
-            throw new InvalidOperationException("Session is not associated with a game");
+            throw new InvalidOperationException("Player has not joined a game");
         }
 
-        await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
+        await Groups.AddToGroupAsync(Context.ConnectionId, playerState.GameId);
         await Groups.AddToGroupAsync(Context.ConnectionId, Context.UserIdentifier!);
-        await session.AddConnection(Context.ConnectionId);
+        await player.AddConnection(Context.ConnectionId);
         await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? ex)
     {
-        await GetSessionActor().RemoveConnection(Context.ConnectionId);
+        await GetPlayerActor().RemoveConnection(Context.ConnectionId);
         await base.OnDisconnectedAsync(ex);
     }
 
-    private ISessionActor GetSessionActor()
+    private IPlayerActor GetPlayerActor()
     {
         if (string.IsNullOrEmpty(Context.UserIdentifier))
         {
             throw new UnauthorizedAccessException("Sid not provided");
         }
 
-        return _actorProxyFactory.CreateActorProxy<ISessionActor>(
+        return _actorProxyFactory.CreateActorProxy<IPlayerActor>(
             new ActorId(Context.UserIdentifier),
-            typeof(SessionActor).Name);
+            typeof(PlayerActor).Name);
     }
 }

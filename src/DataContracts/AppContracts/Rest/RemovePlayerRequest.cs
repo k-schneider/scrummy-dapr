@@ -1,3 +1,3 @@
 namespace Scrummy.AppContracts.Rest;
 
-public record RemovePlayerRequest(string Sid, int PlayerId);
+public record RemovePlayerRequest(int PlayerId);

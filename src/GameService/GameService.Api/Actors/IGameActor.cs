@@ -2,22 +2,13 @@ namespace Scrummy.GameService.Api.Actors;
 
 public interface IGameActor : IActor
 {
-    Task<(string sid, int playerId)> AddPlayer(string nickname, CancellationToken cancellationToken = default);
-    Task CastVote(string sid, string vote, CancellationToken cancellationToken = default);
-    Task FlipCards(string sid, CancellationToken cancellationToken = default);
-    Task<Game> GetGameState(int playerId, CancellationToken cancellationToken = default);
-    Task LeaveGame(string sid, CancellationToken cancellationToken = default);
-    Task NotifyPlayerConnected(int playerId, CancellationToken cancellationToken = default);
-    Task NotifyPlayerDisconnected(int playerId, CancellationToken cancellationToken = default);
-    Task NudgePlayer(string sid, int playerId, CancellationToken cancellationToken = default);
-    Task PlayAgain(string sid, CancellationToken cancellationToken = default);
-    Task PromotePlayer(string sid, int playerId, CancellationToken cancellationToken = default);
-    Task RecallVote(string sid, CancellationToken cancellationToken = default);
-    Task RemovePlayer(string sid, int playerId, CancellationToken cancellationToken = default);
-    Task ResetGame(CancellationToken cancellationToken = default);
-    Task ResetVotes(string sid, CancellationToken cancellationToken = default);
+    Task<(int PlayerId, int PlayerCount)> AddPlayer(string sid, CancellationToken cancellationToken = default);
+    Task BeginVoting(CancellationToken cancellationToken = default);
+    Task EndGame(CancellationToken cancellationToken = default);
+    Task<GameState> GetGameState(CancellationToken cancellationToken = default);
+    Task<int> RemovePlayer(string sid, CancellationToken cancellationToken = default);
+    Task Reset(CancellationToken cancellationToken = default);
+    Task SlideInactivityReminder(CancellationToken cancellationToken = default);
+    Task ShowResults(CancellationToken cancellationToken = default);
     Task StartGame(IEnumerable<Card> deck, CancellationToken cancellationToken = default);
-    Task StartSpectating(string sid, CancellationToken cancellationToken = default);
-    Task StopSpectating(string sid, CancellationToken cancellationToken = default);
-    Task UpdateNickname(string sid, string nickname, CancellationToken cancellationToken = default);
 }

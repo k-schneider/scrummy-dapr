@@ -1,3 +1,3 @@
 namespace Scrummy.AppContracts.Rest;
 
-public record NudgePlayerRequest(string Sid, int PlayerId);
+public record NudgePlayerRequest(int PlayerId);
