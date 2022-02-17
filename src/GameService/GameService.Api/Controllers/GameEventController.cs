@@ -110,7 +110,7 @@ public class GameEventController : ControllerBase
                     cancellationToken);
         }
 
-        // Build a snapshot of the current game to send to the new connection
+        // Build a snapshot of the current game and players to send to the new connection
         var gameState = await GetGameActor(integrationEvent.GameId).GetGameState(cancellationToken);
 
         var playerStates = await Task.WhenAll(gameState.Players.Select(p =>
@@ -121,22 +121,16 @@ public class GameEventController : ControllerBase
             p.Nickname!,
             p.IsHost,
             p.ConnectionIds.Any(),
-            p.IsSpectator));
-
-        var votes = playerStates
-            .Where(p => p.Vote is not null)
-            .ToDictionary(
-                p => p.PlayerId,
-                // Only return vote values for other players when showing results
-                p => p.Sid == integrationEvent.Sid || gameState.GamePhase == GamePhases.Results ? p.Vote : null);
+            p.IsSpectator,
+            p.Sid == integrationEvent.Sid || gameState.GamePhase == GamePhases.Results ? p.Vote : null,
+            p.Vote is not null));
 
         var game = new Game(
             gameState.GameId,
             gameState.GameVersion,
             gameState.GamePhase,
             players,
-            gameState.Deck,
-            votes);
+            gameState.Deck);
 
         await _hubContext.Clients
             .Client(integrationEvent.ConnectionId)

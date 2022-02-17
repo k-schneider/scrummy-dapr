@@ -38,8 +38,9 @@
     {
         var deck = GameState.Value.Deck.ToList();
 
-        var groupedVotes = GameState.Value.Votes.Select(v => v.Value)
-            .GroupBy(v => v)
+        var groupedVotes = GameState.Value.Players
+            .Where(p => p.HasVoted)
+            .GroupBy(p => p.Vote)
             .Select(g => new
             {
                 Card = deck.First(c => c.Id == g.Key),
@@ -66,7 +67,8 @@
             }
 
             // Don't render the popular vote if everyone voted differently
-            if (GameState.Value.Votes.Count == 1 || groupedVotes.Count() != GameState.Value.Votes.Count)
+            var countedVotes = GameState.Value.Players.Where(p => p.HasVoted).Count();
+            if (countedVotes == 1 || groupedVotes.Count() != countedVotes)
             {
                 Popular = groupedVotes.OrderByDescending(x => x.Count).First().Card;
             }

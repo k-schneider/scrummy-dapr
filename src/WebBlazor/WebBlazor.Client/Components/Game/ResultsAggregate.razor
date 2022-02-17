@@ -39,9 +39,9 @@
         }
         else
         {
-            Title = string.Join("\n", GameState.Value.Votes
-                .Where(v => v.Value == Card.Id)
-                .Select(v => "- " + GameState.Value.Players.First(x => x.PlayerId == v.Key).Nickname));
+            Title = string.Join("\n", GameState.Value.Players
+                .Where(p => p.Vote == Card.Id)
+                .Select(p => "- " + p.Nickname));
         }
 
         if (!string.IsNullOrWhiteSpace(Title))

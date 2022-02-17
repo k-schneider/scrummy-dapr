@@ -5,13 +5,18 @@ public static class GameReducers
     [ReducerMethod]
     public static GameState ReduceCardsFlippedAction(GameState state, CardsFlippedAction action)
     {
-        var host = state.Players.First(p => p.IsHost);
+        var players = state.Players.Select(p => p with {
+            HasVoted = action.Votes.ContainsKey(p.PlayerId),
+            Vote = action.Votes.ContainsKey(p.PlayerId) ? action.Votes[p.PlayerId] : null
+        });
+
+        var host = players.First(p => p.IsHost);
         var name = host.PlayerId == state.PlayerId ? "You" : host.Nickname;
 
         return state with
         {
             GamePhase = GamePhases.Results,
-            Votes = action.Votes.ToDictionary(kvp => kvp.Key, kvp => kvp.Value ?? null),
+            Players = players,
             Log = state.Log.Append(new LogEntry($"{name} flipped the cards."))
         };
     }
@@ -19,14 +24,17 @@ public static class GameReducers
     [ReducerMethod]
     public static GameState ReduceCastVoteAction(GameState state, CastVoteAction action)
     {
-        var previousVote = state.Votes.ContainsKey(state.PlayerId) ? state.Votes[state.PlayerId] : null;
-        var votes = new Dictionary<int, string?>(state.Votes);
-        votes[state.PlayerId] = action.Vote;
+        var previousVote = state.Me()!.Vote;
+
+        var players = state.Players.Select(p => p with {
+            HasVoted = p.PlayerId == state.PlayerId ? true : p.HasVoted,
+            Vote = p.PlayerId == state.PlayerId ? action.Vote : p.Vote
+        });
 
         return state with
         {
+            Players = players,
             PreviousVote = previousVote,
-            Votes = votes,
             Voting = true
         };
     }
@@ -34,20 +42,14 @@ public static class GameReducers
     [ReducerMethod]
     public static GameState ReduceCastVoteFailedAction(GameState state, CastVoteFailedAction _)
     {
-        var votes = new Dictionary<int, string?>(state.Votes);
-
-        if (state.PreviousVote is null)
-        {
-            votes.Remove(state.PlayerId);
-        }
-        else
-        {
-            votes[state.PlayerId] = state.PreviousVote;
-        }
+        var players = state.Players.Select(p => p with {
+            HasVoted = p.PlayerId == state.PlayerId ? state.PreviousVote is not null : p.HasVoted,
+            Vote = p.PlayerId == state.PlayerId ? state.PreviousVote : p.Vote
+        });
 
         return state with
         {
-            Votes = votes,
+            Players = players,
             Voting = false
         };
     }
@@ -218,10 +220,15 @@ public static class GameReducers
         var host = state.Players.First(p => p.IsHost);
         var name = host.PlayerId == state.PlayerId ? "You" : host.Nickname;
 
+        var players = state.Players.Select(p => p with {
+            HasVoted = false,
+            Vote = null
+        });
+
         return state with
         {
             GamePhase = GamePhases.Voting,
-            Votes = new(),
+            Players = players,
             Log = state.Log.Append(new LogEntry($"{name} started a new round of voting."))
         };
     }
@@ -339,23 +346,17 @@ public static class GameReducers
     {
         var players = state.Players.Select(p => p with
         {
-            IsSpectator = p.PlayerId == action.PlayerId ? action.IsSpectator : p.IsSpectator
+            IsSpectator = p.PlayerId == action.PlayerId ? action.IsSpectator : p.IsSpectator,
+            Vote = null,
+            HasVoted = false
         });
 
         var name = state.PlayerId == action.PlayerId ? "You" : state.Players.First(p => p.PlayerId == action.PlayerId).Nickname;
         var verb = action.IsSpectator ? "started" : "stopped";
 
-        var votes = new Dictionary<int, string?>(state.Votes);
-
-        if (action.IsSpectator)
-        {
-            votes.Remove(action.PlayerId);
-        }
-
         return state with
         {
             Players = players,
-            Votes = votes,
             Log = state.Log.Append(new LogEntry($"{name} {verb} spectating."))
         };
     }
@@ -364,7 +365,7 @@ public static class GameReducers
     public static GameState ReducePlayerJoinedAction(GameState state, PlayerJoinedAction action) =>
         state with
         {
-            Players = state.Players.Append(new Player(action.PlayerId, action.Nickname, false, false, false)),
+            Players = state.Players.Append(new Player(action.PlayerId, action.Nickname, false, false, false, null, false)),
             Log = state.Log.Append(new LogEntry($"{action.Nickname} joined the game."))
         };
 
@@ -381,13 +382,9 @@ public static class GameReducers
             .Where(p => p.PlayerId == action.PlayerId)
             .First();
 
-        var votes = new Dictionary<int, string?>(state.Votes);
-        votes.Remove(action.PlayerId);
-
         return state with
         {
             Players = state.Players.Where(p => p.PlayerId != player.PlayerId),
-            Votes = votes,
             Log = state.Log.Append(new LogEntry($"{player.Nickname} left the game."))
         };
     }
@@ -444,13 +441,9 @@ public static class GameReducers
             .Where(p => p.PlayerId == action.PlayerId)
             .First();
 
-        var votes = new Dictionary<int, string?>(state.Votes);
-        votes.Remove(action.PlayerId);
-
         return state with
         {
             Players = state.Players.Where(p => p.PlayerId != player.PlayerId),
-            Votes = votes,
             Log = state.Log.Append(new LogEntry($"{player.Nickname} was removed from the game."))
         };
     }
@@ -469,12 +462,13 @@ public static class GameReducers
             ? $"{name} changed {pronoun} vote."
             : $"{name} voted.";
 
-        var votes = new Dictionary<int, string?>(state.Votes);
-        votes[action.PlayerId] = action.Vote;
+        var players = state.Players.Select(p => p with {
+            HasVoted = p.PlayerId == action.PlayerId ? true : p.HasVoted
+        });
 
         return state with
         {
-            Votes = votes,
+            Players = players,
             Log = state.Log.Append(new LogEntry(logMessage))
         };
     }
@@ -489,12 +483,13 @@ public static class GameReducers
         var name = state.PlayerId == action.PlayerId ? "You" : player.Nickname;
         var pronoun = state.PlayerId == action.PlayerId ? "your" : "their";
 
-        var votes = new Dictionary<int, string?>(state.Votes);
-        votes.Remove(action.PlayerId);
+        var players = state.Players.Select(p => p with {
+            HasVoted = p.PlayerId == action.PlayerId ? false : p.HasVoted
+        });
 
         return state with
         {
-            Votes = votes,
+            Players = players,
             Log = state.Log.Append(new LogEntry($"{name} recalled {pronoun} vote."))
         };
     }
@@ -523,14 +518,17 @@ public static class GameReducers
     [ReducerMethod]
     public static GameState ReduceRecallVoteAction(GameState state, RecallVoteAction _)
     {
-        var previousVote = state.Votes.ContainsKey(state.PlayerId) ? state.Votes[state.PlayerId] : null;
-        var votes = new Dictionary<int, string?>(state.Votes);
-        votes.Remove(state.PlayerId);
+        var previousVote = state.Me()!.Vote;
+
+        var players = state.Players.Select(p => p with {
+            HasVoted = p.PlayerId == state.PlayerId ? false : p.HasVoted,
+            Vote = p.PlayerId == state.PlayerId ? null : p.Vote
+        });
 
         return state with
         {
+            Players = players,
             PreviousVote = previousVote,
-            Votes = votes,
             RecallingVote = true
         };
     }
@@ -538,20 +536,14 @@ public static class GameReducers
     [ReducerMethod]
     public static GameState ReduceRecallVoteFailedAction(GameState state, RecallVoteFailedAction _)
     {
-        var votes = new Dictionary<int, string?>(state.Votes);
-
-        if (state.PreviousVote is null)
-        {
-            votes.Remove(state.PlayerId);
-        }
-        else
-        {
-            votes[state.PlayerId] = state.PreviousVote;
-        }
+        var players = state.Players.Select(p => p with {
+            HasVoted = p.PlayerId == state.PlayerId ? state.PreviousVote is not null : p.HasVoted,
+            Vote = p.PlayerId == state.PlayerId ? state.PreviousVote : p.Vote
+        });
 
         return state with
         {
-            Votes = votes,
+            Players = players,
             RecallingVote = false
         };
     }
@@ -571,8 +563,7 @@ public static class GameReducers
             GamePhase = action.Game.GamePhase,
             GameVersion = action.Game.GameVersion,
             Deck = action.Game.Deck,
-            Players = action.Game.Players,
-            Votes = action.Game.Votes
+            Players = action.Game.Players
         };
 
     [ReducerMethod]
@@ -700,9 +691,14 @@ public static class GameReducers
         var host = state.Players.First(p => p.IsHost);
         var name = host.PlayerId == state.PlayerId ? "You" : host.Nickname;
 
+        var players = state.Players.Select(p => p with {
+            HasVoted = false,
+            Vote = null
+        });
+
         return state with
         {
-            Votes = new(),
+            Players = players,
             Log = state.Log.Append(new LogEntry($"{name} reset the votes."))
         };
     }

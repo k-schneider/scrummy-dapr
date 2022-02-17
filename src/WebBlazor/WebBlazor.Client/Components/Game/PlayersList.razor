@@ -39,7 +39,7 @@
                     }
                     else
                     {
-                        @if (GameState.Value.Votes.ContainsKey(player.PlayerId))
+                        @if (GameState.Value.GetPlayerHasVoted(player.PlayerId))
                         {
                             <Icon Type="circle-check" Class="text-emerald-700 text-2xl" Title="Voted" />
                         }

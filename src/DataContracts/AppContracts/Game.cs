@@ -7,7 +7,6 @@ public record Game
     public string GamePhase { get; init; } = null!;
     public IEnumerable<Player> Players { get; init; } = null!;
     public IEnumerable<Card> Deck { get; init; } = null!;
-    public Dictionary<int, string?> Votes { get; init; } = null!;
 
     // Needed for serialization
     private Game() { }
@@ -17,14 +16,12 @@ public record Game
         int gameVersion,
         string gamePhase,
         IEnumerable<Player> players,
-        IEnumerable<Card> deck,
-        Dictionary<int, string?> votes)
+        IEnumerable<Card> deck)
     {
         GameId = gameId;
         GameVersion = gameVersion;
         GamePhase = gamePhase;
         Players = players;
         Deck = deck;
-        Votes = votes;
     }
 };

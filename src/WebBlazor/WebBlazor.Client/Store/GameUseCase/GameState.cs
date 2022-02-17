@@ -33,6 +33,5 @@ public record GameState
     public string? Sid { get; init; }
     public bool SpectateChanging { get; init; }
     public bool UpdatingNickname { get; init; }
-    public Dictionary<int, string?> Votes { get; init; } = new();
     public bool Voting { get; init; }
 }

@@ -2,7 +2,12 @@ public static class GameExtensions
 {
     public static bool AllVotesIn(this GameState state)
     {
-        return state.Votes.Any() && state.Votes.Count == state.Players.Where(p => !p.IsSpectator).Count();
+        return state.Players.All(p => !p.IsConnected || p.IsSpectator || p.HasVoted);
+    }
+
+    public static bool GetPlayerHasVoted(this GameState state, int playerId)
+    {
+        return state.Players.First(p => p.PlayerId == playerId).HasVoted;
     }
 
     public static bool IsHost(this GameState state)
@@ -17,13 +22,14 @@ public static class GameExtensions
 
     public static string? MyVote(this GameState state)
     {
-        state.Votes.TryGetValue(state.PlayerId, out var vote);
-        return vote;
+        return state.Players.First(p => p.PlayerId == state.PlayerId).Vote;
     }
 
     public static bool TryGetPlayerCard(this GameState state, int playerId, out Card? card)
     {
-        if (state.Votes.TryGetValue(playerId, out var vote))
+        var vote = state.Players.First(p => p.PlayerId == playerId).Vote;
+
+        if (vote is not null)
         {
             card = state.Deck.FirstOrDefault(c => c.Id == vote);
         }
