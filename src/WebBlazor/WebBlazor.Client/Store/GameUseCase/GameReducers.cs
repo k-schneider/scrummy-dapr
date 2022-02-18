@@ -463,7 +463,8 @@ public static class GameReducers
             : $"{name} voted.";
 
         var players = state.Players.Select(p => p with {
-            HasVoted = p.PlayerId == action.PlayerId ? true : p.HasVoted
+            HasVoted = p.PlayerId == action.PlayerId ? true : p.HasVoted,
+            Vote = p.PlayerId == action.PlayerId ? action.Vote : p.Vote
         });
 
         return state with

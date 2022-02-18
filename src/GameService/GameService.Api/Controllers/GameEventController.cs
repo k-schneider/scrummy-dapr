@@ -81,11 +81,6 @@ public class GameEventController : ControllerBase
     [Topic(DAPR_PUBSUB_NAME, "NewVoteStartedIntegrationEvent")]
     public async Task HandleAsync(NewVoteStartedIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        // Reset player votes
-        var gameState = await GetGameActor(integrationEvent.GameId).GetGameState();
-
-        await Task.WhenAll(gameState.Players.Select(p => GetPlayerActor(p.Sid).ResetVote()));
-
         await _hubContext.Clients
             .Group(integrationEvent.GameId)
             .SendAsync(

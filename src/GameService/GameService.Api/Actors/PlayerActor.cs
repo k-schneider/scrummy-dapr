@@ -161,6 +161,8 @@ public class PlayerActor : Actor, IPlayerActor
     {
         EnsureHost("Only the host can choose to play again");
 
+        await ResetAllVotes(cancellationToken);
+
         await GetGameActor(_playerState.GameId!).BeginVoting(cancellationToken);
 
         await _eventBus.PublishAsync(
@@ -291,15 +293,7 @@ public class PlayerActor : Actor, IPlayerActor
     {
         EnsureHost("Only the host can reset votes");
 
-        var gameState = await GetGameActor(_playerState.GameId!).GetGameState(cancellationToken);
-
-        // Reset my vote
-        await ResetVote(cancellationToken);
-
-        // Reset other player votes
-        await Task.WhenAll(gameState.Players
-            .Where(p => p.Sid != Sid)
-            .Select(p => GetPlayerActor(p.Sid).ResetVote(cancellationToken)));
+        await ResetAllVotes(cancellationToken);
 
         await _eventBus.PublishAsync(
             new VotesResetIntegrationEvent(_playerState.GameId!),
@@ -386,6 +380,19 @@ public class PlayerActor : Actor, IPlayerActor
         ProxyFactory.CreateActorProxy<IPlayerActor>(
             new ActorId(sid),
             typeof(PlayerActor).Name);
+
+    private async Task ResetAllVotes(CancellationToken cancellationToken = default)
+    {
+        var gameState = await GetGameActor(_playerState.GameId!).GetGameState();
+
+        // Reset my vote
+        await ResetVote(cancellationToken);
+
+        // Reset other player votes
+        await Task.WhenAll(gameState.Players
+            .Where(p => p.Sid != Sid)
+            .Select(p => GetPlayerActor(p.Sid).ResetVote(cancellationToken)));
+    }
 
     private Task SavePlayerState(CancellationToken cancellationToken = default) =>
         StateManager.SetStateAsync(PlayerStateName, _playerState, cancellationToken);
