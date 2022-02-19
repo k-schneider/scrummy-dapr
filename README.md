@@ -46,6 +46,16 @@ Once all services are running you can access the following services:
 - Zipkin Traces: [http://localhost:5411/zipkin](http://localhost:5411/zipkin)
 - Seq Logs: [http://localhost:5340](http://localhost:5340)
 
+## Deployment
+
+To deploy a standalone instance of Scrummy to Azure you can use the [bicep templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep) in the `/deploy` directory. Included is a sample [parameter file](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/parameter-files).
+
+To deploy using the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) execute the following command from the `/deploy` directory:
+
+`az deployment sub create --location canadacentral --template-file main.bicep --parameters @main.parameters.json`
+
+You can replace `canadacentral` with any other region that supports Azure Container Apps.
+
 ## Roadmap
 
 - [x] Common agile poker decks
