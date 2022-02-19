@@ -2,6 +2,7 @@ var appName = "Game Service";
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.AddCustomSignalR();
 builder.AddCustomSerilog();
 builder.AddCustomSwagger();
 builder.AddCustomHealthChecks();
@@ -11,7 +12,6 @@ builder.AddCustomControllers();
 
 builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddDaprClient();
-builder.Services.AddSignalR().AddJsonProtocol();
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();

@@ -56,6 +56,19 @@ public static class ProgramExtensions
         builder.Host.UseSerilog();
     }
 
+    public static void AddCustomSignalR(this WebApplicationBuilder builder)
+    {
+        var signalRBuilder = builder.Services
+            .AddSignalR()
+            .AddJsonProtocol();
+
+        var azureSignalRConnectionString = builder.Configuration["AzureSignalRConnectionString"];
+        if (!string.IsNullOrWhiteSpace(azureSignalRConnectionString))
+        {
+            signalRBuilder.AddAzureSignalR(azureSignalRConnectionString);
+        }
+    }
+
     public static void AddCustomSwagger(this WebApplicationBuilder builder)
     {
         builder.Services.AddSwaggerGen(c =>
