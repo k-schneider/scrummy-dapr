@@ -25,7 +25,7 @@ public class GameEventController : ControllerBase
         var gameState = await GetGameActor(integrationEvent.GameId).GetGameState();
 
         var playerStates = await Task.WhenAll(gameState.Players.Select(p =>
-            GetPlayerActor(p.Sid).GetPlayerState(cancellationToken)));
+            GetPlayerActor(p.Value).GetPlayerState(cancellationToken)));
 
         var votes = playerStates
             .Where(p => p.Vote is not null)
@@ -59,7 +59,7 @@ public class GameEventController : ControllerBase
         // Clean up player and game actor state
         var game = GetGameActor(integrationEvent.GameId);
         var gameState = await game.GetGameState();
-        await Task.WhenAll(gameState.Players.Select(p => GetPlayerActor(p.Sid).Reset()));
+        await Task.WhenAll(gameState.Players.Select(p => GetPlayerActor(p.Value).Reset()));
         await game.Reset(cancellationToken);
     }
 
@@ -109,7 +109,7 @@ public class GameEventController : ControllerBase
         var gameState = await GetGameActor(integrationEvent.GameId).GetGameState(cancellationToken);
 
         var playerStates = await Task.WhenAll(gameState.Players.Select(p =>
-            GetPlayerActor(p.Sid).GetPlayerState(cancellationToken)));
+            GetPlayerActor(p.Value).GetPlayerState(cancellationToken)));
 
         var players = playerStates.Select(p => new Player(
             p.PlayerId,
@@ -199,7 +199,12 @@ public class GameEventController : ControllerBase
         else if (integrationEvent.IsHost)
         {
             var gameState = await GetGameActor(integrationEvent.GameId).GetGameState(cancellationToken);
-            await GetPlayerActor(gameState.Players.First().Sid).PromoteToHost();
+
+            if (gameState.Players.Any())
+            {
+                var newHostSid = gameState.Players.OrderBy(p => p.Key).First().Value;
+                await GetPlayerActor(newHostSid).PromoteToHost();
+            }
         }
     }
 

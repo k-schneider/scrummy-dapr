@@ -140,19 +140,19 @@ public class PlayerActor : Actor, IPlayerActor
 
         var gameState = await GetGameActor(_playerState.GameId!).GetGameState(cancellationToken);
 
-        var player = gameState.Players.FirstOrDefault(p => p.PlayerId == playerId);
-
-        if (player == default)
+        if (!gameState.Players.ContainsKey(playerId))
         {
             throw new InvalidOperationException("Player not found");
         }
+
+        var playerSid = gameState.Players[playerId];
 
         await _eventBus.PublishAsync(
             new PlayerNudgedIntegrationEvent(
                 Sid,
                 _playerState.PlayerId,
-                player.Sid,
-                player.PlayerId,
+                playerSid,
+                playerId,
                 _playerState.GameId!),
             cancellationToken);
     }
@@ -176,14 +176,14 @@ public class PlayerActor : Actor, IPlayerActor
 
         var gameState = await GetGameActor(_playerState.GameId!).GetGameState(cancellationToken);
 
-        var player = gameState.Players.FirstOrDefault(p => p.PlayerId == playerId);
-
-        if (player == default)
+        if (!gameState.Players.ContainsKey(playerId))
         {
             throw new InvalidOperationException("Player not found");
         }
 
-        await GetPlayerActor(player.Sid).PromoteToHost(cancellationToken);
+        var playerSid = gameState.Players[playerId];
+
+        await GetPlayerActor(playerSid).PromoteToHost(cancellationToken);
 
         _playerState.IsHost = false;
         await SavePlayerState(cancellationToken);
@@ -260,19 +260,19 @@ public class PlayerActor : Actor, IPlayerActor
 
         var gameState = await GetGameActor(_playerState.GameId!).GetGameState(cancellationToken);
 
-        var player = gameState.Players.FirstOrDefault(p => p.PlayerId == playerId);
-
-        if (player == default)
+        if (!gameState.Players.ContainsKey(playerId))
         {
             throw new InvalidOperationException("Player not found");
         }
 
-        await GetGameActor(_playerState.GameId!).RemovePlayer(player.Sid, cancellationToken);
+        var playerSid = gameState.Players[playerId];
+
+        await GetGameActor(_playerState.GameId!).RemovePlayer(playerSid, cancellationToken);
 
         await _eventBus.PublishAsync(
             new PlayerRemovedIntegrationEvent(
-                player.Sid,
-                player.PlayerId,
+                playerSid,
+                playerId,
                 _playerState.GameId!),
             cancellationToken);
     }
@@ -390,8 +390,8 @@ public class PlayerActor : Actor, IPlayerActor
 
         // Reset other player votes
         await Task.WhenAll(gameState.Players
-            .Where(p => p.Sid != Sid)
-            .Select(p => GetPlayerActor(p.Sid).ResetVote(cancellationToken)));
+            .Where(p => p.Value != Sid)
+            .Select(p => GetPlayerActor(p.Value).ResetVote(cancellationToken)));
     }
 
     private Task SavePlayerState(CancellationToken cancellationToken = default) =>

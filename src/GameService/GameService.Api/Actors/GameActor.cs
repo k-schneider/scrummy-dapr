@@ -31,7 +31,7 @@ public class GameActor : Actor, IGameActor , IRemindable
 
         var playerId = ++_gameState.PlayerCounter;
 
-        _gameState.Players.Add((sid, playerId));
+        _gameState.Players[playerId] = sid;
 
         await SaveGameState(cancellationToken);
 
@@ -70,14 +70,12 @@ public class GameActor : Actor, IGameActor , IRemindable
     {
         EnsureGameInProgress();
 
-        var player = _gameState.Players.FirstOrDefault(p => p.Sid == sid);
-
-        if (player == default)
+        if (!_gameState.Players.ContainsValue(sid))
         {
             throw new InvalidOperationException("Player is not in the game");
         }
 
-        _gameState.Players.Remove(player);
+        _gameState.Players.Remove(_gameState.Players.First(p => p.Value == sid).Key);
 
         await SaveGameState(cancellationToken);
 

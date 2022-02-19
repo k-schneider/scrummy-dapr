@@ -16,5 +16,5 @@ public class GameState
     public string GamePhase { get; set; } = GamePhases.Voting;
     public int PlayerCounter { get; set; }
     public List<Card> Deck { get; init; } = new();
-    public List<(string Sid, int PlayerId)> Players { get; init; } = new();
+    public Dictionary<int, string> Players { get; init; } = new();
 }
