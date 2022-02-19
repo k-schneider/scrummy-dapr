@@ -7,6 +7,7 @@ builder.AddCustomReverseProxy();
 builder.AddCustomSerilog();
 builder.AddCustomHealthChecks();
 
+builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 

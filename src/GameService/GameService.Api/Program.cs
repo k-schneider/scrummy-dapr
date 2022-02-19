@@ -9,6 +9,7 @@ builder.AddCustomActors();
 builder.AddCustomApplicationServices();
 builder.AddCustomControllers();
 
+builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddDaprClient();
 builder.Services.AddSignalR().AddJsonProtocol();
 builder.Services.AddEndpointsApiExplorer();
