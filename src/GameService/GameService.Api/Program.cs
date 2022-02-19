@@ -18,14 +18,13 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseHttpLogging();
+app.MapGet("/", () => Results.LocalRedirect("~/swagger"));
 app.UseCustomSwagger();
 app.UseCloudEvents();
 app.UseAuthorization();
-
-app.MapGet("/", () => Results.LocalRedirect("~/swagger"));
+app.UseSignalR();
 app.MapActorsHandlers();
 app.MapControllers();
-app.MapHubs();
 app.MapSubscribeHandler();
 app.MapHealthChecks("/hc", new HealthCheckOptions
 {

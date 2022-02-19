@@ -6,6 +6,7 @@ namespace Scrummy.GameService.Api;
 public static class ProgramExtensions
 {
     private const string AppName = "Game Service";
+    private const string AzureSignalRConnectionStringKey = "AzureSignalRConnectionString";
 
     public static void AddCustomActors(this WebApplicationBuilder builder)
     {
@@ -62,10 +63,14 @@ public static class ProgramExtensions
             .AddSignalR()
             .AddJsonProtocol();
 
-        var azureSignalRConnectionString = builder.Configuration["AzureSignalRConnectionString"];
+        var azureSignalRConnectionString = builder.Configuration[AzureSignalRConnectionStringKey];
         if (!string.IsNullOrWhiteSpace(azureSignalRConnectionString))
         {
-            signalRBuilder.AddAzureSignalR(azureSignalRConnectionString);
+            signalRBuilder.AddAzureSignalR(options => {
+                options.ConnectionString = azureSignalRConnectionString;
+                options.TransportTypeDetector = (httpContext) =>
+                    Microsoft.AspNetCore.Http.Connections.HttpTransportType.WebSockets;
+            });
         }
     }
 
@@ -77,11 +82,21 @@ public static class ProgramExtensions
         });
     }
 
-    public static void MapHubs(this IEndpointRouteBuilder builder)
+    public static void UseSignalR(this WebApplication app)
     {
-        builder.MapHub<GameHub>("/hub/gamehub", o => {
-            o.Transports = HttpTransportType.WebSockets;
-        });
+        var azureSignalRConnectionString = app.Configuration[AzureSignalRConnectionStringKey];
+        if (!string.IsNullOrWhiteSpace(azureSignalRConnectionString))
+        {
+            app.UseAzureSignalR(routes => {
+                routes.MapHub<GameHub>("/hub/gamehub");
+            });
+        }
+        else
+        {
+            app.MapHub<GameHub>("/hub/gamehub", o => {
+                o.Transports = HttpTransportType.WebSockets;
+            });
+        }
     }
 
     public static void UseCustomSwagger(this WebApplication app)
