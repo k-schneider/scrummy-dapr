@@ -96,10 +96,7 @@ public class GameEffects
                 _hubConnection = new HubConnectionBuilder()
                     .WithUrl(_navigationManager.ToAbsoluteUri(
                         $"/h/gamehub?sid={game.Sid}"),
-                        options => {
-                            options.Transports = HttpTransportType.WebSockets;
-                            options.SkipNegotiation = true;
-                        })
+                        options => options.Transports = HttpTransportType.WebSockets)
                     .Build();
 
                 _hubConnection.On<CardsFlippedMessage>(GameHubMethods.CardsFlipped, message =>
