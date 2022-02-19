@@ -83,6 +83,9 @@ param webBlazorMemorySize string = '1'
 
 targetScope = 'subscription'
 
+// If game service has more than one replica then we need Azure SignalR
+var createAzureSignalR = gameServiceMaxReplicas > 1
+
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: '${resourceBaseName}-rg'
   location: location
@@ -119,6 +122,15 @@ module serviceBusDeploy 'service-bus.bicep' = {
   }
 }
 
+module signalRDeploy 'signalr.bicep' = if (createAzureSignalR) {
+  name: 'signalRDeploy'
+  scope: rg
+  params: {
+    location: location
+    resourceBaseName: resourceBaseName
+  }
+}
+
 module gameServiceDeploy 'game-service.bicep' = {
   name: 'gameServiceDeploy'
   scope: rg
@@ -136,6 +148,7 @@ module gameServiceDeploy 'game-service.bicep' = {
     cosmosDbContainerName: cosmosDbDeploy.outputs.containerName
     appInsightsName: environmentDeploy.outputs.appInsightsName
     serviceBusName: serviceBusDeploy.outputs.serviceBusName
+    signalRName: createAzureSignalR ? signalRDeploy.outputs.signalRName : ''
     minReplicas: gameServiceMinReplicas
     maxReplicas: gameServiceMaxReplicas
     cpuCore: gameServiceCpuCore

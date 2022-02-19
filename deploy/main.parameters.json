@@ -12,13 +12,13 @@
       "value": "k-schneider/scrummy-dapr/game.service:main"
     },
     "gameServiceMaxReplicas": {
-      "value": 1
+      "value": 3
     },
     "webBlazorContainerImage": {
       "value": "k-schneider/scrummy-dapr/web.blazor:main"
     },
     "webBlazorMaxReplicas": {
-      "value": 1
+      "value": 3
     }
   }
 }

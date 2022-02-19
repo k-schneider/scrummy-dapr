@@ -21,17 +21,6 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appInsightsName
 }
 
-var environmentVars = [
-  {
-    'name': 'APPINSIGHTS_INSTRUMENTATIONKEY'
-    'value': appInsights.properties.InstrumentationKey
-  }
-  {
-    'name': 'GameServiceUrl'
-    'value': 'http://${gameServiceFqdn}'
-  }
-]
-
 resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
   name: containerAppName
   kind: 'containerapp'
@@ -69,7 +58,16 @@ resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
         {
           image: '${containerRegistry}/${containerImage}'
           name: containerAppName
-          env: environmentVars
+          env: [
+            {
+              name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+              value: appInsights.properties.InstrumentationKey
+            }
+            {
+              name: 'GameServiceUrl'
+              value: 'http://${gameServiceFqdn}'
+            }
+          ]
           resources: {
             cpu: cpuCore
             memory: '${memorySize}Gi'

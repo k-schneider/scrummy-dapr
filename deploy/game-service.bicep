@@ -12,6 +12,7 @@ param cosmosDbDatabaseName string
 param cosmosDbContainerName string
 param appInsightsName string
 param serviceBusName string
+param signalRName string
 param cpuCore string
 param memorySize string
 param minReplicas int
@@ -32,18 +33,17 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2017-04-01' existing = {
   name: serviceBusName
 }
 
+resource signalR 'Microsoft.SignalRService/signalR@2021-10-01' existing = if(signalRName != '') {
+  name: signalRName
+}
+
 var cosmosDbMasterKey = databaseAccount.listKeys().primaryMasterKey
 var cosmosDbEndpoint = databaseAccount.properties.documentEndpoint
 
 var serviceBusEndpoint = '${serviceBus.id}/AuthorizationRules/RootManageSharedAccessKey'
 var serviceBusConnectionString = listKeys(serviceBusEndpoint, serviceBus.apiVersion).primaryConnectionString
 
-var environmentVars = [
-  {
-    'name': 'APPINSIGHTS_INSTRUMENTATIONKEY'
-    'value': appInsights.properties.InstrumentationKey
-  }
-]
+var signalRConnectionString = signalRName == '' ? '' : signalR.listKeys().primaryConnectionString
 
 resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
   name: containerAppName
@@ -76,6 +76,10 @@ resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
           name: 'sb-connection'
           value: serviceBusConnectionString
         }
+        {
+          name: 'signalr-connection'
+          value: signalRConnectionString
+        }
       ]
       registries: containerRegistryPrivate ? [
         {
@@ -90,7 +94,16 @@ resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
         {
           image: '${containerRegistry}/${containerImage}'
           name: containerAppName
-          env: environmentVars
+          env: [
+            {
+              name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+              value: appInsights.properties.InstrumentationKey
+            }
+            {
+              name: 'AzureSignalRConnectionString'
+              secretRef: 'signalr-connection'
+            }
+          ]
           resources: {
             cpu: cpuCore
             memory: '${memorySize}Gi'
