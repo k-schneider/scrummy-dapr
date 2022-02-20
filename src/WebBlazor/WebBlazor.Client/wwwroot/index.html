@@ -2,54 +2,40 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Scrummy</title>
-    <base href="/" />
-    <link href="_content/Blazored.Toast/blazored-toast.min.css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            backgroundImage: {
-              'hero-cas': "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h20v20H0V0zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm20 0a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM10 37a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm10-17h20v20H20V20zm10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14z' fill='%237d58ba' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E\")"
-            },
-            fontFamily: {
-              'play': ['Play', 'sans-serif']
-            }
-          }
-        }
-      }
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/e59c8ad818.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/csshake/1.5.3/csshake-hard.min.css"
-      integrity="sha512-DTLjUrbAPuXkd0Ok0No8s01Ysk9i/bTv6omIE6zo+OIEUCjFg5IRKoM+Tk7kNDRS4KUB5V27jA+yOAOh0mHRsA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Scrummy</title>
+  <base href="/" />
+  <link href="_content/Blazored.Toast/blazored-toast.min.css" rel="stylesheet" />
+  <link href="css/app.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/e59c8ad818.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/csshake/1.5.3/csshake-hard.min.css"
+    integrity="sha512-DTLjUrbAPuXkd0Ok0No8s01Ysk9i/bTv6omIE6zo+OIEUCjFg5IRKoM+Tk7kNDRS4KUB5V27jA+yOAOh0mHRsA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer" />
 </head>
 
 <body class="font-play bg-[#1e132f] bg-hero-cas overflow-x-hidden">
-    <div id="app">
-      <div class="flex h-screen justify-center items-center">
-        <p class="text-center text-white text-lg font-semibold">Loading...</p>
-      </div>
+  <div id="app">
+    <div class="flex h-screen justify-center items-center">
+      <p class="text-center text-white text-lg font-semibold">Loading...</p>
     </div>
+  </div>
 
-    <div id="blazor-error-ui" class="bg-yellow-100 bottom-0 left-0 hidden py-2.5 px-5 fixed w-full z-50 shadow-md">
-        An unhandled error has occurred.
-        <a href="" class="reload text-blue-600">Reload</a>
-        <a class="dismiss cursor-pointer absolute right-3 top-2">🗙</a>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"
-      integrity="sha256-Y26AMvaIfrZ1EQU49pf6H4QzVTrOI8m9wQYKkftBt4s="
-      crossorigin="anonymous"></script>
-    <script src="js/app.js"></script>
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script src="_content/Fluxor.Blazor.Web/scripts/index.js"></script>
+  <div id="blazor-error-ui" class="bg-yellow-100 bottom-0 left-0 hidden py-2.5 px-5 fixed w-full z-50 shadow-md">
+    An unhandled error has occurred.
+    <a href="" class="reload text-blue-600">Reload</a>
+    <a class="dismiss cursor-pointer absolute right-3 top-2">🗙</a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"
+    integrity="sha256-Y26AMvaIfrZ1EQU49pf6H4QzVTrOI8m9wQYKkftBt4s="
+    crossorigin="anonymous"></script>
+  <script src="js/app.js"></script>
+  <script src="_framework/blazor.webassembly.js"></script>
+  <script src="_content/Fluxor.Blazor.Web/scripts/index.js"></script>
 </body>
 
 </html>

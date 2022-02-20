@@ -1,0 +1,28 @@
+{
+  "name": "scrummy",
+  "version": "1.0.0",
+  "description": "An Agile Poker online multiplayer game.",
+  "scripts": {
+    "buildcss:dev": "tailwindcss -i ./app.css -o ./wwwroot/css/app.css",
+    "buildcss:prod": "tailwindcss -i ./app.css -o ./wwwroot/css/app.css --minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/k-schneider/scrummy-dapr.git"
+  },
+  "keywords": [
+    "scrummy",
+    "agile",
+    "poker",
+    "dapr"
+  ],
+  "author": "Kevin Schneider",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/k-schneider/scrummy-dapr/issues"
+  },
+  "homepage": "https://github.com/k-schneider/scrummy-dapr#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.0.23"
+  }
+}

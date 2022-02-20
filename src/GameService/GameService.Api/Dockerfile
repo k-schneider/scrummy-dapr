@@ -6,6 +6,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
+COPY ["nuget.config", "."]
 COPY ["src/GameService/GameService.Api/GameService.Api.csproj", "src/GameService/GameService.Api/"]
 COPY ["src/DataContracts/AppContracts/AppContracts.csproj", "src/DataContracts/AppContracts/"]
 COPY ["src/BuildingBlocks/EventBus/EventBus.csproj", "src/BuildingBlocks/EventBus/"]

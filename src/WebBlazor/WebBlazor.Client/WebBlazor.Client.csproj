@@ -23,4 +23,14 @@
     <ProjectReference Include="..\..\DataContracts\AppContracts\AppContracts.csproj" />
   </ItemGroup>
 
+  <Target Name="NpmInstall">
+    <Exec Command="npm install" Condition="'$(Configuration)' == 'Debug' And !Exists('node_modules')" />
+    <Exec Command="npm ci" Condition="'$(Configuration)' == 'Release' And !Exists('node_modules')" />
+  </Target>
+
+  <Target Name="NpmRunBuild" DependsOnTargets="NpmInstall" BeforeTargets="BeforeBuild">
+    <Exec Command="npm run buildcss:dev" Condition=" '$(Configuration)' == 'Debug' " />
+    <Exec Command="npm run buildcss:prod" Condition=" '$(Configuration)' == 'Release' " />
+  </Target>
+
 </Project>
