@@ -82,12 +82,25 @@ public static class ProgramExtensions
         var seqServerUrl = builder.Configuration["SeqServerUrl"];
         if (!string.IsNullOrWhiteSpace(seqServerUrl))
         {
-            loggerConfig = loggerConfig.WriteTo.Seq(seqServerUrl);
+            loggerConfig = loggerConfig
+                .WriteTo.Seq(seqServerUrl)
+                .Enrich.WithProperty("ApplicationName", AppName);
+        }
+
+        var azureAnalyticsWorkspaceId = builder.Configuration["AzureAnalyticsWorkspaceId"];
+        var azureAnalyticsPrimaryKey = builder.Configuration["AzureAnalyticsPrimaryKey"];
+        if (!string.IsNullOrWhiteSpace(azureAnalyticsWorkspaceId) &&
+            !string.IsNullOrWhiteSpace(azureAnalyticsPrimaryKey))
+        {
+            loggerConfig = loggerConfig.WriteTo.AzureAnalytics(
+                azureAnalyticsWorkspaceId,
+                azureAnalyticsPrimaryKey,
+                AppName.Replace(" ", string.Empty));
         }
 
         Log.Logger = loggerConfig
             .ReadFrom.Configuration(builder.Configuration)
-            .WriteTo.Console().Enrich.WithProperty("ApplicationName", AppName)
+            .WriteTo.Console()
             .CreateLogger();
 
         builder.Host.UseSerilog();
