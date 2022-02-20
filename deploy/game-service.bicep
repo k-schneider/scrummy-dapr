@@ -10,6 +10,7 @@ param containerImage string
 param cosmosDbAccountName string
 param cosmosDbDatabaseName string
 param cosmosDbContainerName string
+param logAnalyticsWorkspaceName string
 param appInsightsName string
 param serviceBusName string
 param signalRName string
@@ -25,6 +26,10 @@ resource databaseAccount 'Microsoft.DocumentDB/databaseAccounts@2021-04-15' exis
   name: cosmosDbAccountName
 }
 
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03-01-preview' existing = {
+  name: logAnalyticsWorkspaceName
+}
+
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appInsightsName
 }
@@ -36,6 +41,9 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2017-04-01' existing = {
 resource signalR 'Microsoft.SignalRService/signalR@2021-10-01' existing = if(signalRName != '') {
   name: signalRName
 }
+
+var analyticsWorkspaceId = logAnalyticsWorkspace.properties.customerId
+var analyticsPrimaryKey = listKeys(logAnalyticsWorkspace.id, logAnalyticsWorkspace.apiVersion).primarySharedKey
 
 var cosmosDbMasterKey = databaseAccount.listKeys().primaryMasterKey
 var cosmosDbEndpoint = databaseAccount.properties.documentEndpoint
@@ -73,6 +81,10 @@ resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
           value: cosmosDbMasterKey
         }
         {
+          name: 'analytics-key'
+          value: analyticsPrimaryKey
+        }
+        {
           name: 'sb-connection'
           value: serviceBusConnectionString
         }
@@ -98,6 +110,14 @@ resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
             {
               name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
               value: appInsights.properties.InstrumentationKey
+            }
+            {
+              name: 'AzureAnalyticsWorkspaceId'
+              value: analyticsWorkspaceId
+            }
+            {
+              name: 'AzureAnalyticsPrimaryKey'
+              secretRef: 'analytics-key'
             }
             {
               name: 'AzureSignalRConnectionString'

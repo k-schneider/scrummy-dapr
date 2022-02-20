@@ -8,7 +8,7 @@
 param location string
 
 @description('Base name used when constructing all resources.')
-param resourceBaseName string = 'scrummy'
+param resourceBaseName string
 
 @description('The throughput policy for Cosmos DB')
 @allowed([
@@ -28,7 +28,7 @@ param cosmosManualProvisionedThroughput int = 400
 param cosmosAutoscaleMaxThroughput int = 4000
 
 @description('Enable free tier for Cosmos DB.')
-param cosmosEnableFreeTier bool = true
+param cosmosEnableFreeTier bool = false
 
 @description('Container registry to pull images from.')
 param containerRegistry string
@@ -146,6 +146,7 @@ module gameServiceDeploy 'game-service.bicep' = {
     cosmosDbAccountName: cosmosDbDeploy.outputs.accountName
     cosmosDbDatabaseName: cosmosDbDeploy.outputs.databaseName
     cosmosDbContainerName: cosmosDbDeploy.outputs.containerName
+    logAnalyticsWorkspaceName: environmentDeploy.outputs.logAnalyticsWorkspaceName
     appInsightsName: environmentDeploy.outputs.appInsightsName
     serviceBusName: serviceBusDeploy.outputs.serviceBusName
     signalRName: createAzureSignalR ? signalRDeploy.outputs.signalRName : ''
@@ -169,6 +170,7 @@ module webBlazorDeploy 'web-blazor.bicep' = {
     containerRegistryPassword: containerRegistryPassword
     containerImage: webBlazorContainerImage
     gameServiceFqdn: gameServiceDeploy.outputs.containerAppFqdn
+    logAnalyticsWorkspaceName: environmentDeploy.outputs.logAnalyticsWorkspaceName
     appInsightsName: environmentDeploy.outputs.appInsightsName
     minReplicas: webBlazorMinReplicas
     maxReplicas: webBlazorMaxReplicas

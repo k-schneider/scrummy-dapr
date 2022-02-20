@@ -5,6 +5,12 @@
     "location": {
       "value": "canadacentral"
     },
+    "resourceBaseName": {
+      "value": "scrummy"
+    },
+    "cosmosEnableFreeTier": {
+      "value": true
+    },
     "containerRegistry": {
       "value": "ghcr.io"
     },
