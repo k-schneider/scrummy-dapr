@@ -48,9 +48,13 @@ Once all services are running you can access the following services:
 
 ## Deployment
 
-To deploy a standalone instance of Scrummy to Azure you can use the [bicep templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep) in the `/deploy` directory. Included is a sample [parameter file](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/parameter-files).
+To deploy a standalone instance of Scrummy follow these steps.
 
-To deploy using the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) execute the following command from the `/deploy` directory:
+### Azure Container Apps
+
+Use the [bicep templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep) in the `/deploy/containerapps` directory. Choose between `basic` and `advanced` deployments. Included are sample [parameter files](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/parameter-files).
+
+To deploy using the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) execute the following command:
 
 `az deployment sub create --location canadacentral --template-file main.bicep --parameters @main.parameters.json`
 

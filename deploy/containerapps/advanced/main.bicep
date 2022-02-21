@@ -81,7 +81,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: location
 }
 
-module environmentDeploy 'environment.bicep' = {
+module environmentDeploy 'modules/environment.bicep' = {
   name: 'environmentDeploy'
   scope: rg
   params: {
@@ -90,7 +90,7 @@ module environmentDeploy 'environment.bicep' = {
   }
 }
 
-module cosmosDbDeploy 'cosmos-db.bicep' = {
+module cosmosDbDeploy 'modules/cosmos-db.bicep' = {
   name: 'cosmosDbDeploy'
   scope: rg
   params: {
@@ -103,7 +103,7 @@ module cosmosDbDeploy 'cosmos-db.bicep' = {
   }
 }
 
-module serviceBusDeploy 'service-bus.bicep' = {
+module serviceBusDeploy 'modules/service-bus.bicep' = {
   name: 'serviceBusDeploy'
   scope: rg
   params: {
@@ -112,7 +112,7 @@ module serviceBusDeploy 'service-bus.bicep' = {
   }
 }
 
-module signalRDeploy 'signalr.bicep' = if (createAzureSignalR) {
+module signalRDeploy 'modules/signalr.bicep' = if (createAzureSignalR) {
   name: 'signalRDeploy'
   scope: rg
   params: {
@@ -121,7 +121,7 @@ module signalRDeploy 'signalr.bicep' = if (createAzureSignalR) {
   }
 }
 
-module gameServiceDeploy 'game-service.bicep' = {
+module gameServiceDeploy 'modules/game-service.bicep' = {
   name: 'gameServiceDeploy'
   scope: rg
   params: {
@@ -143,7 +143,7 @@ module gameServiceDeploy 'game-service.bicep' = {
   }
 }
 
-module webBlazorDeploy 'web-blazor.bicep' = {
+module webBlazorDeploy 'modules/web-blazor.bicep' = {
   name: 'webBlazorDeploy'
   scope: rg
   params: {
