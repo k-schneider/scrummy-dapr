@@ -83,13 +83,13 @@ public static class ProgramExtensions
         if (!string.IsNullOrWhiteSpace(seqServerUrl))
         {
             loggerConfig = loggerConfig
-                .WriteTo.Seq(seqServerUrl)
-                .Enrich.WithProperty("ApplicationName", AppName);
+                .WriteTo.Seq(seqServerUrl);
         }
 
         Log.Logger = loggerConfig
             .ReadFrom.Configuration(builder.Configuration)
             .WriteTo.Console()
+            .Enrich.WithProperty("ApplicationName", AppName)
             .CreateLogger();
 
         builder.Host.UseSerilog();
