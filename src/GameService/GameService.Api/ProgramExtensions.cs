@@ -51,17 +51,6 @@ public static class ProgramExtensions
                 .Enrich.WithProperty("ApplicationName", AppName);
         }
 
-        var azureAnalyticsWorkspaceId = builder.Configuration["AzureAnalyticsWorkspaceId"];
-        var azureAnalyticsPrimaryKey = builder.Configuration["AzureAnalyticsPrimaryKey"];
-        if (!string.IsNullOrWhiteSpace(azureAnalyticsWorkspaceId) &&
-            !string.IsNullOrWhiteSpace(azureAnalyticsPrimaryKey))
-        {
-            loggerConfig = loggerConfig.WriteTo.AzureAnalytics(
-                azureAnalyticsWorkspaceId,
-                azureAnalyticsPrimaryKey,
-                AppName.Replace(" ", string.Empty));
-        }
-
         Log.Logger = loggerConfig
             .ReadFrom.Configuration(builder.Configuration)
             .WriteTo.Console()

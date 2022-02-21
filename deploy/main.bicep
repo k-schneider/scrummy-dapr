@@ -33,16 +33,6 @@ param cosmosEnableFreeTier bool = false
 @description('Container registry to pull images from.')
 param containerRegistry string
 
-@description('Is the container registry private?')
-param containerRegistryPrivate bool = false
-
-@description('Username to log into container registry.')
-param containerRegistryUsername string = ''
-
-@description('Password to log into container registry.')
-@secure()
-param containerRegistryPassword string = ''
-
 @description('Game service container image.')
 param gameServiceContainerImage string
 
@@ -139,14 +129,10 @@ module gameServiceDeploy 'game-service.bicep' = {
     resourceBaseName: resourceBaseName
     environmentId: environmentDeploy.outputs.environmentId
     containerRegistry: containerRegistry
-    containerRegistryPrivate: containerRegistryPrivate
-    containerRegistryUsername: containerRegistryUsername
-    containerRegistryPassword: containerRegistryPassword
     containerImage: gameServiceContainerImage
     cosmosDbAccountName: cosmosDbDeploy.outputs.accountName
     cosmosDbDatabaseName: cosmosDbDeploy.outputs.databaseName
     cosmosDbContainerName: cosmosDbDeploy.outputs.containerName
-    logAnalyticsWorkspaceName: environmentDeploy.outputs.logAnalyticsWorkspaceName
     appInsightsName: environmentDeploy.outputs.appInsightsName
     serviceBusName: serviceBusDeploy.outputs.serviceBusName
     signalRName: createAzureSignalR ? signalRDeploy.outputs.signalRName : ''
@@ -165,12 +151,8 @@ module webBlazorDeploy 'web-blazor.bicep' = {
     resourceBaseName: resourceBaseName
     environmentId: environmentDeploy.outputs.environmentId
     containerRegistry: containerRegistry
-    containerRegistryPrivate: containerRegistryPrivate
-    containerRegistryUsername: containerRegistryUsername
-    containerRegistryPassword: containerRegistryPassword
     containerImage: webBlazorContainerImage
     gameServiceFqdn: gameServiceDeploy.outputs.containerAppFqdn
-    logAnalyticsWorkspaceName: environmentDeploy.outputs.logAnalyticsWorkspaceName
     appInsightsName: environmentDeploy.outputs.appInsightsName
     minReplicas: webBlazorMinReplicas
     maxReplicas: webBlazorMaxReplicas

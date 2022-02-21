@@ -17,7 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseHttpLogging();
+// app.UseHttpLogging();
 app.MapGet("/", () => Results.LocalRedirect("~/swagger"));
 app.UseCustomSwagger();
 app.UseCloudEvents();
