@@ -52,7 +52,7 @@ To deploy a standalone instance of Scrummy follow these steps.
 
 ### Azure Container Apps
 
-Use the [bicep templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep) in the `/deploy/containerapps` directory. Choose between `basic` and `advanced` deployments. Included are sample [parameter files](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/parameter-files).
+Use the [bicep templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep) in the `/deploy/containerapps` directory. Choose between `minimal` and `scaleout` deployments. Included are sample [parameter files](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/parameter-files).
 
 To deploy using the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) execute the following command:
 

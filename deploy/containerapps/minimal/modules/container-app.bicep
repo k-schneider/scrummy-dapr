@@ -3,24 +3,21 @@ param resourceBaseName string
 param environmentId string
 param appInsightsName string
 
-var containerAppName = '${resourceBaseName}-game-service'
-var containerPort = 80
-
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appInsightsName
 }
 
 resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
-  name: containerAppName
+  name: '${resourceBaseName}-app'
   kind: 'containerapp'
   location: location
   properties: {
     kubeEnvironmentId: environmentId
     configuration: {
       ingress: {
-        external: false
-        targetPort: containerPort
-        allowInsecure: true
+        external: true
+        targetPort: 80
+        allowInsecure: false
         traffic: [
           {
             latestRevision: true
@@ -39,7 +36,7 @@ resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
       containers: [
         {
           image: 'redis:alpine'
-          name: '${resourceBaseName}-redis'
+          name: 'redis'
           resources: {
             cpu: '0.5'
             memory: '1Gi'
@@ -47,11 +44,36 @@ resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
         }
         {
           image: 'ghcr.io/k-schneider/scrummy-dapr/game.service:main'
-          name: containerAppName
+          name: 'game-service'
+          args: [
+            '--expose=3000'
+          ]
+          env: [
+            {
+              name: 'ASPNETCORE_URLS'
+              value: 'http://0.0.0.0:3000'
+            }
+            {
+              name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+              value: appInsights.properties.InstrumentationKey
+            }
+          ]
+          resources: {
+            cpu: '0.5'
+            memory: '1Gi'
+          }
+        }
+        {
+          image: 'ghcr.io/k-schneider/scrummy-dapr/web.blazor:main'
+          name: 'web-blazor'
           env: [
             {
               name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
               value: appInsights.properties.InstrumentationKey
+            }
+            {
+              name: 'GameServiceUrl'
+              value: 'http://localhost:3000'
             }
           ]
           resources: {
@@ -66,8 +88,8 @@ resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
       }
       dapr: {
         enabled: true
-        appPort: containerPort
-        appId: '${containerAppName}-dapr'
+        appPort: 3000
+        appId: 'game-service-dapr'
         components: [
           {
             name: 'statestore'

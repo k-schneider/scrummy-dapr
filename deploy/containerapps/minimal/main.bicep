@@ -26,25 +26,13 @@ module environmentDeploy 'modules/environment.bicep' = {
   }
 }
 
-module gameServiceDeploy 'modules/game-service.bicep' = {
-  name: 'gameServiceDeploy'
+module containerAppDeploy 'modules/container-app.bicep' = {
+  name: 'containerAppDeploy'
   scope: rg
   params: {
     location: location
     resourceBaseName: resourceBaseName
     environmentId: environmentDeploy.outputs.environmentId
-    appInsightsName: environmentDeploy.outputs.appInsightsName
-  }
-}
-
-module webBlazorDeploy 'modules/web-blazor.bicep' = {
-  name: 'webBlazorDeploy'
-  scope: rg
-  params: {
-    location: location
-    resourceBaseName: resourceBaseName
-    environmentId: environmentDeploy.outputs.environmentId
-    gameServiceFqdn: gameServiceDeploy.outputs.containerAppFqdn
     appInsightsName: environmentDeploy.outputs.appInsightsName
   }
 }
