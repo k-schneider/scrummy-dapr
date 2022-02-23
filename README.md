@@ -1,17 +1,8 @@
 # Scrummy
 
-An Agile Poker online multiplayer game built using .NET, powered by [Dapr](https://dapr.io/).
+An Agile Poker online multiplayer game built using .NET, powered by [Dapr](https://dapr.io/) and [SignalR](https://dotnet.microsoft.com/en-us/apps/aspnet/signalr).
 
 ![Scrummy](docs/media/screenshot.png)
-
-## Architecture
-
-Scrummy is composed of:
-
-- A frontend web-app written in [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)
-- A backend game service leveraging the virtual actor pattern and [SignalR](https://dotnet.microsoft.com/en-us/apps/aspnet/signalr)
-
-![Scrummy reference architecture](docs/media/buildingblocks.png)
 
 ## Getting Started
 
@@ -46,6 +37,8 @@ Once all services are running you can access the following services:
 - Zipkin Traces: [http://localhost:5411/zipkin](http://localhost:5411/zipkin)
 - Seq Logs: [http://localhost:5340](http://localhost:5340)
 
+![Scrummy reference architecture](docs/media/localdev.excalidraw.png)
+
 ## Deployment
 
 To deploy a standalone instance of Scrummy follow these steps.
@@ -59,6 +52,10 @@ To deploy using the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/insta
 `az deployment sub create --location canadacentral --template-file main.bicep --parameters @main.parameters.json`
 
 You can replace `canadacentral` with any other region that supports Azure Container Apps.
+
+![Minimal Deployment](docs/media/minimaldeploy.excalidraw.png)
+
+![Scale-out Deployment](docs/media/scaleoutdeploy.excalidraw.png)
 
 ## Roadmap
 
@@ -85,8 +82,9 @@ Don't forget to give the project a star! Thanks again!
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
-## Contact
+## Acknowledgements
 
-Kevin Schneider - k.schneider@outlook.com
+Special thanks to the people supporting the following initiatives:
 
-Project Link: [https://github.com/k-schneider/scrummy-dapr](https://github.com/k-schneider/scrummy-dapr)
+- [eShopOnDapr](https://github.com/dotnet-architecture/eShopOnDapr) for their architectural guidance
+- [Excalidraw](https://excalidraw.com/) for their hand-drawn like diagrams
