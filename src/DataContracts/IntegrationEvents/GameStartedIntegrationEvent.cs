@@ -1,3 +1,3 @@
-namespace Scrummy.GameService.Api.IntegrationEvents;
+namespace Scrummy.IntegrationEvents;
 
 public record GameStartedIntegrationEvent(string GameId) : IntegrationEvent;

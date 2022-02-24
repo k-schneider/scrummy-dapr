@@ -32,9 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\BuildingBlocks\EventBus\EventBus.csproj" />
     <ProjectReference Include="..\..\BuildingBlocks\Healthchecks\Healthchecks.csproj" />
     <ProjectReference Include="..\..\DataContracts\AppContracts\AppContracts.csproj" />
+    <ProjectReference Include="..\..\DataContracts\IntegrationEvents\IntegrationEvents.csproj" />
   </ItemGroup>
 
 </Project>

@@ -9,6 +9,7 @@ WORKDIR /src
 COPY ["nuget.config", "."]
 COPY ["src/GameService/GameService.Api/GameService.Api.csproj", "src/GameService/GameService.Api/"]
 COPY ["src/DataContracts/AppContracts/AppContracts.csproj", "src/DataContracts/AppContracts/"]
+COPY ["src/DataContracts/IntegrationEvents/IntegrationEvents.csproj", "src/DataContracts/IntegrationEvents/"]
 COPY ["src/BuildingBlocks/EventBus/EventBus.csproj", "src/BuildingBlocks/EventBus/"]
 COPY ["src/BuildingBlocks/Healthchecks/Healthchecks.csproj", "src/BuildingBlocks/Healthchecks/"]
 RUN dotnet restore "src/GameService/GameService.Api/GameService.Api.csproj"
