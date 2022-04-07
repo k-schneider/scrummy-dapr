@@ -24,5 +24,8 @@
   "homepage": "https://github.com/k-schneider/scrummy-dapr#readme",
   "devDependencies": {
     "tailwindcss": "^3.0.23"
+  },
+  "resolutions": {
+    "minimist": "1.2.6"
   }
 }
