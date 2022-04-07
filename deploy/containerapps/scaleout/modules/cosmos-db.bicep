@@ -1,5 +1,7 @@
 param location string = resourceGroup().location
-param resourceBaseName string
+param databaseAccountName string
+param databaseName string
+param databaseContainerName string
 param throughputPolicy string
 param manualProvisionedThroughput int
 param autoscaleMaxThroughput int
@@ -24,10 +26,8 @@ var throughputPolicies = {
   }
 }
 
-var containerName = 'dapr'
-
 resource databaseAccount 'Microsoft.DocumentDB/databaseAccounts@2021-04-15' = {
-  name: '${resourceBaseName}-cosmos'
+  name: databaseAccountName
   location: location
   properties: {
     consistencyPolicy: {
@@ -49,20 +49,20 @@ resource databaseAccount 'Microsoft.DocumentDB/databaseAccounts@2021-04-15' = {
 
 resource sqlDatabase 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2021-04-15' = {
   parent: databaseAccount
-  name: resourceBaseName
+  name: databaseName
   properties: {
     resource: {
-      id: resourceBaseName
+      id: databaseName
     }
   }
 }
 
 resource sqlContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2021-04-15' = {
   parent: sqlDatabase
-  name: containerName
+  name: databaseContainerName
   properties: {
     resource: {
-      id: containerName
+      id: databaseContainerName
       partitionKey: {
         paths: [
           '/partitionKey'
@@ -73,7 +73,3 @@ resource sqlContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/contai
     options: throughputPolicies[throughputPolicy]
   }
 }
-
-output accountName string = databaseAccount.name
-output databaseName string = sqlDatabase.name
-output containerName string = sqlContainer.name

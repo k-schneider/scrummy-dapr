@@ -12,6 +12,11 @@ param resourceBaseName string
 
 targetScope = 'subscription'
 
+var logAnalyticsWorkspaceName = '${resourceBaseName}-logs'
+var appInsightsName = '${resourceBaseName}-appinsights'
+var containerAppEnvName = '${resourceBaseName}-env'
+var containerAppName = '${resourceBaseName}-app'
+
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: '${resourceBaseName}-rg'
   location: location
@@ -22,7 +27,10 @@ module environmentDeploy 'modules/environment.bicep' = {
   scope: rg
   params: {
     location: location
-    resourceBaseName: resourceBaseName
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    appInsightsName: appInsightsName
+    containerAppEnvName: containerAppEnvName
+    containerAppName: containerAppName
   }
 }
 
@@ -31,8 +39,8 @@ module containerAppDeploy 'modules/container-app.bicep' = {
   scope: rg
   params: {
     location: location
-    resourceBaseName: resourceBaseName
+    containerAppName: containerAppName
     environmentId: environmentDeploy.outputs.environmentId
-    appInsightsName: environmentDeploy.outputs.appInsightsName
+    appInsightsName: appInsightsName
   }
 }

@@ -1,5 +1,5 @@
 param location string = resourceGroup().location
-param resourceBaseName string
+param containerAppName string
 param environmentId string
 param containerRegistry string
 param containerImage string
@@ -10,23 +10,19 @@ param memorySize string
 param minReplicas int
 param maxReplicas int
 
-var containerAppName = '${resourceBaseName}-web-blazor'
-var containerPort = 80
-
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appInsightsName
 }
 
-resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
+resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
   name: containerAppName
-  kind: 'containerapp'
   location: location
   properties: {
-    kubeEnvironmentId: environmentId
+    managedEnvironmentId: environmentId
     configuration: {
       ingress: {
         external: true
-        targetPort: containerPort
+        targetPort: 80
         allowInsecure: false
         traffic: [
           {
@@ -64,5 +60,3 @@ resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
     }
   }
 }
-
-output containerAppName string = containerApp.name

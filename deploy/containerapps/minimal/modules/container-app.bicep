@@ -1,5 +1,5 @@
 param location string = resourceGroup().location
-param resourceBaseName string
+param containerAppName string
 param environmentId string
 param appInsightsName string
 
@@ -7,12 +7,11 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appInsightsName
 }
 
-resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
-  name: '${resourceBaseName}-app'
-  kind: 'containerapp'
+resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
+  name: containerAppName
   location: location
   properties: {
-    kubeEnvironmentId: environmentId
+    managedEnvironmentId: environmentId
     configuration: {
       ingress: {
         external: true
@@ -25,12 +24,12 @@ resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
           }
         ]
       }
-      secrets: [
-        {
-          name: 'redis-password'
-          value: ''
-        }
-      ]
+      dapr: {
+        enabled: true
+        appId: containerAppName
+        appProtocol: 'http'
+        appPort: 3000
+      }
     }
     template: {
       containers: [
@@ -86,50 +85,6 @@ resource containerApp 'Microsoft.Web/containerApps@2021-03-01' = {
         minReplicas: 1
         maxReplicas: 1
       }
-      dapr: {
-        enabled: true
-        appPort: 3000
-        appId: 'game-service-dapr'
-        components: [
-          {
-            name: 'statestore'
-            type: 'state.redis'
-            version: 'v1'
-            metadata: [
-              {
-                name: 'redisHost'
-                value: 'localhost:6379'
-              }
-              {
-                name: 'redisPassword'
-                secretRef: 'redis-password'
-              }
-              {
-                name: 'actorStateStore'
-                value: 'true'
-              }
-            ]
-          }
-          {
-            name: 'pubsub'
-            type: 'pubsub.redis'
-            version: 'v1'
-            metadata: [
-              {
-                name: 'redisHost'
-                value: 'localhost:6379'
-              }
-              {
-                name: 'redisPassword'
-                secretRef: 'redis-password'
-              }
-            ]
-          }
-        ]
-      }
     }
   }
 }
-
-output containerAppName string = containerApp.name
-output containerAppFqdn string = containerApp.properties.configuration.ingress.fqdn

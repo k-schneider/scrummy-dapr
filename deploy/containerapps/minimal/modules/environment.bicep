@@ -1,8 +1,11 @@
 param location string = resourceGroup().location
-param resourceBaseName string
+param logAnalyticsWorkspaceName string
+param appInsightsName string
+param containerAppEnvName string
+param containerAppName string
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03-01-preview' = {
-  name: '${resourceBaseName}-logs'
+  name: logAnalyticsWorkspaceName
   location: location
   properties: any({
     retentionInDays: 30
@@ -16,7 +19,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03
 }
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: '${resourceBaseName}-appinsights'
+  name: appInsightsName
   location: location
   kind: 'web'
   properties: {
@@ -27,23 +30,79 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-resource containerAppEnv 'Microsoft.Web/kubeEnvironments@2021-02-01' = {
-  name: '${resourceBaseName}-env'
+resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' = {
+  name: containerAppEnvName
   location: location
-  kind: 'containerenvironment'
   properties: {
-    type: 'managed'
-    internalLoadBalancerEnabled: false
+    daprAIInstrumentationKey: reference(appInsights.id, '2020-02-02').InstrumentationKey
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
-        customerId: logAnalyticsWorkspace.properties.customerId
-        sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
+        customerId: reference(logAnalyticsWorkspace.id, '2020-03-01-preview').customerId
+        sharedKey: listKeys(logAnalyticsWorkspace.id, '2020-03-01-preview').primarySharedKey
       }
+    }
+  }
+  resource redisStateComponent 'daprComponents@2022-01-01-preview' = {
+    name: 'statestore'
+    properties: {
+      componentType: 'state.redis'
+      version: 'v1'
+      ignoreErrors: false
+      initTimeout: '5s'
+      secrets: [
+        {
+          name: 'redis-password'
+          value: ''
+        }
+      ]
+      metadata: [
+        {
+          name: 'redisHost'
+          value: 'localhost:6379'
+        }
+        {
+          name: 'redisPassword'
+          secretRef: 'redis-password'
+        }
+        {
+          name: 'actorStateStore'
+          value: 'true'
+        }
+      ]
+      scopes: [
+        containerAppName
+      ]
+    }
+  }
+  resource redisPubSubComponent 'daprComponents@2022-01-01-preview' = {
+    name: 'pubsub'
+    properties: {
+      componentType: 'pubsub.redis'
+      version: 'v1'
+      ignoreErrors: false
+      initTimeout: '5s'
+      secrets: [
+        {
+          name: 'redis-password'
+          value: ''
+        }
+      ]
+      metadata: [
+        {
+          name: 'redisHost'
+          value: 'localhost:6379'
+        }
+        {
+          name: 'redisPassword'
+          secretRef: 'redis-password'
+        }
+      ]
+      scopes: [
+        containerAppName
+      ]
     }
   }
 }
 
-output logAnalyticsWorkspaceName string = logAnalyticsWorkspace.name
-output appInsightsName string = appInsights.name
 output environmentId string = containerAppEnv.id

@@ -73,6 +73,17 @@ param webBlazorMemorySize string = '1'
 
 targetScope = 'subscription'
 
+var cosmosDbAccountName = '${resourceBaseName}-cosmos'
+var cosmosDbDatabaseName = resourceBaseName
+var cosmosDbContainerName = 'dapr'
+var serviceBusName = resourceBaseName
+var signalrName = resourceBaseName
+var logAnalyticsWorkspaceName = '${resourceBaseName}-logs'
+var appInsightsName = '${resourceBaseName}-appinsights'
+var containerAppEnvName = '${resourceBaseName}-env'
+var gameServiceContainerAppName = '${resourceBaseName}-game-service'
+var webBlazorContainerAppName = '${resourceBaseName}-web-blazor'
+
 // If game service has more than one replica then we need Azure SignalR
 var createAzureSignalR = gameServiceMaxReplicas > 1
 
@@ -81,21 +92,14 @@ resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: location
 }
 
-module environmentDeploy 'modules/environment.bicep' = {
-  name: 'environmentDeploy'
-  scope: rg
-  params: {
-    location: location
-    resourceBaseName: resourceBaseName
-  }
-}
-
 module cosmosDbDeploy 'modules/cosmos-db.bicep' = {
   name: 'cosmosDbDeploy'
   scope: rg
   params: {
     location: location
-    resourceBaseName: resourceBaseName
+    databaseAccountName: cosmosDbAccountName
+    databaseName: cosmosDbDatabaseName
+    databaseContainerName: cosmosDbContainerName
     throughputPolicy: cosmosThroughputPolicy
     manualProvisionedThroughput: cosmosManualProvisionedThroughput
     autoscaleMaxThroughput: cosmosAutoscaleMaxThroughput
@@ -108,7 +112,7 @@ module serviceBusDeploy 'modules/service-bus.bicep' = {
   scope: rg
   params: {
     location: location
-    resourceBaseName: resourceBaseName
+    serviceBusName: serviceBusName
   }
 }
 
@@ -117,7 +121,23 @@ module signalRDeploy 'modules/signalr.bicep' = if (createAzureSignalR) {
   scope: rg
   params: {
     location: location
-    resourceBaseName: resourceBaseName
+    signalrName: signalrName
+  }
+}
+
+module environmentDeploy 'modules/environment.bicep' = {
+  name: 'environmentDeploy'
+  scope: rg
+  params: {
+    location: location
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    appInsightsName: appInsightsName
+    containerAppEnvName: containerAppEnvName
+    cosmosDbAccountName: cosmosDbAccountName
+    cosmosDbDatabaseName: cosmosDbDatabaseName
+    cosmosDbContainerName: cosmosDbContainerName
+    serviceBusName: serviceBusName
+    gameServiceContainerAppName: gameServiceContainerAppName
   }
 }
 
@@ -126,16 +146,12 @@ module gameServiceDeploy 'modules/game-service.bicep' = {
   scope: rg
   params: {
     location: location
-    resourceBaseName: resourceBaseName
+    containerAppName: gameServiceContainerAppName
     environmentId: environmentDeploy.outputs.environmentId
     containerRegistry: containerRegistry
     containerImage: gameServiceContainerImage
-    cosmosDbAccountName: cosmosDbDeploy.outputs.accountName
-    cosmosDbDatabaseName: cosmosDbDeploy.outputs.databaseName
-    cosmosDbContainerName: cosmosDbDeploy.outputs.containerName
-    appInsightsName: environmentDeploy.outputs.appInsightsName
-    serviceBusName: serviceBusDeploy.outputs.serviceBusName
-    signalRName: createAzureSignalR ? signalRDeploy.outputs.signalRName : ''
+    appInsightsName: appInsightsName
+    signalRName: createAzureSignalR ? signalrName : ''
     minReplicas: gameServiceMinReplicas
     maxReplicas: gameServiceMaxReplicas
     cpuCore: gameServiceCpuCore
@@ -148,12 +164,12 @@ module webBlazorDeploy 'modules/web-blazor.bicep' = {
   scope: rg
   params: {
     location: location
-    resourceBaseName: resourceBaseName
+    containerAppName: webBlazorContainerAppName
     environmentId: environmentDeploy.outputs.environmentId
     containerRegistry: containerRegistry
     containerImage: webBlazorContainerImage
     gameServiceFqdn: gameServiceDeploy.outputs.containerAppFqdn
-    appInsightsName: environmentDeploy.outputs.appInsightsName
+    appInsightsName: appInsightsName
     minReplicas: webBlazorMinReplicas
     maxReplicas: webBlazorMaxReplicas
     cpuCore: webBlazorCpuCore
