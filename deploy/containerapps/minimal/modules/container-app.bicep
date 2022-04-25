@@ -40,6 +40,11 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
             cpu: '0.5'
             memory: '1Gi'
           }
+          command: [
+            '/bin/sh'
+            '-c'
+            'redis-server --requirepass "password"'
+          ]
         }
         {
           image: 'ghcr.io/k-schneider/scrummy-dapr/game.service:main'

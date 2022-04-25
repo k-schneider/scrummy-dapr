@@ -53,7 +53,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       secrets: [
         {
           name: 'redis-password'
-          value: ''
+          value: 'password'
         }
       ]
       metadata: [
@@ -85,7 +85,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       secrets: [
         {
           name: 'redis-password'
-          value: ''
+          value: 'password'
         }
       ]
       metadata: [
