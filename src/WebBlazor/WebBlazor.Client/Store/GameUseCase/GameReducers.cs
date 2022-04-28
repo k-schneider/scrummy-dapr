@@ -347,8 +347,8 @@ public static class GameReducers
         var players = state.Players.Select(p => p with
         {
             IsSpectator = p.PlayerId == action.PlayerId ? action.IsSpectator : p.IsSpectator,
-            Vote = null,
-            HasVoted = false
+            Vote = p.PlayerId == action.PlayerId ? null : p.Vote,
+            HasVoted = p.PlayerId == action.PlayerId ? false : p.HasVoted,
         });
 
         var name = state.PlayerId == action.PlayerId ? "You" : state.Players.First(p => p.PlayerId == action.PlayerId).Nickname;
