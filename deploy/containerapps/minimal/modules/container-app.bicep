@@ -66,6 +66,22 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
             cpu: '0.5'
             memory: '1Gi'
           }
+          probes: [
+            {
+              type: 'liveness'
+              httpGet: {
+                path: '/liveness'
+                port: 80
+              }
+            }
+            {
+              type: 'readiness'
+              httpGet: {
+                path: '/hc'
+                port: 80
+              }
+            }
+          ]
         }
         {
           image: 'ghcr.io/k-schneider/scrummy-dapr/web.blazor:main'
@@ -84,6 +100,22 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
             cpu: '0.5'
             memory: '1Gi'
           }
+          probes: [
+            {
+              type: 'liveness'
+              httpGet: {
+                path: '/liveness'
+                port: 80
+              }
+            }
+            {
+              type: 'readiness'
+              httpGet: {
+                path: '/hc'
+                port: 80
+              }
+            }
+          ]
         }
       ]
       scale: {
