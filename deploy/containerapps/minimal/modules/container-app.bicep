@@ -34,7 +34,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
     template: {
       containers: [
         {
-          image: 'redis:alpine'
+          image: 'docker.io/redis:alpine'
           name: 'redis'
           resources: {
             cpu: '0.5'
@@ -43,7 +43,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
           command: [
             '/bin/sh'
             '-c'
-            'redis-server --requirepass "password"'
+            'redis-server --requirepass "password" --save ""'
           ]
         }
         {
