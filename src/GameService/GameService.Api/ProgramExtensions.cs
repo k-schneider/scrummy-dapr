@@ -86,19 +86,9 @@ public static class ProgramExtensions
 
     public static void UseSignalR(this WebApplication app)
     {
-        var azureSignalRConnectionString = app.Configuration[AzureSignalRConnectionStringKey];
-        if (!string.IsNullOrWhiteSpace(azureSignalRConnectionString))
-        {
-            app.UseAzureSignalR(routes => {
-                routes.MapHub<GameHub>("/hub/gamehub");
-            });
-        }
-        else
-        {
-            app.MapHub<GameHub>("/hub/gamehub", o => {
-                o.Transports = HttpTransportType.WebSockets;
-            });
-        }
+        app.MapHub<GameHub>("/hub/gamehub", o => {
+            o.Transports = HttpTransportType.WebSockets;
+        });
     }
 
     public static void UseCustomSwagger(this WebApplication app)

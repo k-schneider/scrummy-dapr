@@ -16,10 +16,20 @@ var logAnalyticsWorkspaceName = '${resourceBaseName}-logs'
 var appInsightsName = '${resourceBaseName}-appinsights'
 var containerAppEnvName = '${resourceBaseName}-env'
 var containerAppName = '${resourceBaseName}-app'
+var redisName = '${resourceBaseName}-redis'
 
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: '${resourceBaseName}-rg'
   location: location
+}
+
+module redisDeploy 'modules/redis.bicep' = {
+  name: 'redisDeploy'
+  scope: rg
+  params: {
+    location: location
+    redisName: redisName
+  }
 }
 
 module environmentDeploy 'modules/environment.bicep' = {
@@ -31,6 +41,7 @@ module environmentDeploy 'modules/environment.bicep' = {
     appInsightsName: appInsightsName
     containerAppEnvName: containerAppEnvName
     containerAppName: containerAppName
+    redisName: redisName
   }
 }
 

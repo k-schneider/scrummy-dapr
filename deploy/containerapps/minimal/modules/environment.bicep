@@ -3,6 +3,11 @@ param logAnalyticsWorkspaceName string
 param appInsightsName string
 param containerAppEnvName string
 param containerAppName string
+param redisName string
+
+resource redis 'Microsoft.Cache/Redis@2021-06-01' existing = {
+  name: redisName
+}
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-03-01-preview' = {
   name: logAnalyticsWorkspaceName
@@ -43,7 +48,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       }
     }
   }
-  resource redisStateComponent 'daprComponents@2022-01-01-preview' = {
+  resource redisStateComponent 'daprComponents' = {
     name: 'statestore'
     properties: {
       componentType: 'state.redis'
@@ -53,13 +58,13 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       secrets: [
         {
           name: 'redis-password'
-          value: 'password'
+          value: redis.properties.accessKeys.primaryKey
         }
       ]
       metadata: [
         {
           name: 'redisHost'
-          value: 'localhost:6379'
+          value: '${redis.properties.hostName}:6379'
         }
         {
           name: 'redisPassword'
@@ -75,7 +80,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       ]
     }
   }
-  resource redisPubSubComponent 'daprComponents@2022-01-01-preview' = {
+  resource redisPubSubComponent 'daprComponents' = {
     name: 'pubsub'
     properties: {
       componentType: 'pubsub.redis'

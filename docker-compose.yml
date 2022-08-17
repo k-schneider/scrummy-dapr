@@ -34,7 +34,6 @@ services:
 
   webstatus:
     image: xabarilcoding/healthchecksui:5.0.0
-    container_name: webstatus
 
   dapr-placement:
     image: "daprio/dapr:1.5.1"

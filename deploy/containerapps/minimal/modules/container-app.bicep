@@ -34,19 +34,6 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
     template: {
       containers: [
         {
-          image: 'docker.io/redis:alpine'
-          name: 'redis'
-          resources: {
-            cpu: '0.5'
-            memory: '1Gi'
-          }
-          command: [
-            '/bin/sh'
-            '-c'
-            'redis-server --requirepass "password" --save ""'
-          ]
-        }
-        {
           image: 'ghcr.io/k-schneider/scrummy-dapr/game.service:main'
           name: 'game-service'
           args: [
@@ -119,7 +106,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
         }
       ]
       scale: {
-        minReplicas: 1
+        minReplicas: 0
         maxReplicas: 1
       }
     }
