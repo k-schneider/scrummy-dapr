@@ -48,7 +48,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       }
     }
   }
-  resource redisStateComponent 'daprComponents' = {
+  resource statestoreComponent 'daprComponents' = {
     name: 'statestore'
     properties: {
       componentType: 'state.redis'
@@ -80,7 +80,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       ]
     }
   }
-  resource redisPubSubComponent 'daprComponents' = {
+  resource pubsubComponent 'daprComponents' = {
     name: 'pubsub'
     properties: {
       componentType: 'pubsub.redis'

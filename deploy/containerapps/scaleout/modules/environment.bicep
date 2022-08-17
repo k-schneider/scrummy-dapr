@@ -61,7 +61,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       }
     }
   }
-  resource redisStateComponent 'daprComponents@2022-01-01-preview' = {
+  resource statestoreComponent 'daprComponents@2022-01-01-preview' = {
     name: 'statestore'
     properties: {
       componentType: 'state.azure.cosmosdb'
@@ -101,7 +101,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       ]
     }
   }
-  resource redisPubSubComponent 'daprComponents@2022-01-01-preview' = {
+  resource pubsubComponent 'daprComponents@2022-01-01-preview' = {
     name: 'pubsub'
     properties: {
       componentType: 'pubsub.azure.servicebus'
