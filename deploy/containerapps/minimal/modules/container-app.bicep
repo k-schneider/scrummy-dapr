@@ -7,7 +7,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appInsightsName
 }
 
-resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
+resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
   location: location
   properties: {
@@ -34,6 +34,19 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
     template: {
       containers: [
         {
+          image: 'docker.io/redis:alpine'
+          name: 'redis'
+          resources: {
+            cpu: json('0.5')
+            memory: '1Gi'
+          }
+          command: [
+            '/bin/sh'
+            '-c'
+            'redis-server --requirepass "password" --save ""'
+          ]
+        }
+        {
           image: 'ghcr.io/k-schneider/scrummy-dapr/game.service:main'
           name: 'game-service'
           args: [
@@ -50,7 +63,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
             }
           ]
           resources: {
-            cpu: '0.5'
+            cpu: json('0.5')
             memory: '1Gi'
           }
           probes: [
@@ -80,11 +93,11 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
             }
             {
               name: 'GameServiceUrl'
-              value: 'http://localhost:3000'
+              value: 'http://127.0.0.1:3000'
             }
           ]
           resources: {
-            cpu: '0.5'
+            cpu: json('0.5')
             memory: '1Gi'
           }
           probes: [
@@ -106,8 +119,18 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
         }
       ]
       scale: {
-        minReplicas: 0
+        minReplicas: 1
         maxReplicas: 1
+        rules: [
+          {
+            name: 'http-trigger'
+            http: {
+              metadata: {
+                concurrentRequests: '100'
+              }
+            }
+          }
+        ]
       }
     }
   }

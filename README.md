@@ -49,7 +49,8 @@ Use the [bicep templates](https://docs.microsoft.com/en-us/azure/azure-resource-
 
 To deploy using the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) execute the following command:
 
-`az deployment sub create --location canadacentral --template-file main.bicep --parameters @main.parameters.json`
+`az group create --location canadacentral --name scrummy-rg`
+`az deployment group create --resource-group scrummy-rg --template-file main.bicep --parameters main.parameters.json`
 
 You can replace `canadacentral` with any other region that supports Azure Container Apps.
 

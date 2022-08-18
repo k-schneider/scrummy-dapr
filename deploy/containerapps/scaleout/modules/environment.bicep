@@ -107,7 +107,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       componentType: 'pubsub.azure.servicebus'
       version: 'v1'
       ignoreErrors: false
-      initTimeout: '5s'
+      initTimeout: '1m'
       secrets: [
         {
           name: 'sb-connection'

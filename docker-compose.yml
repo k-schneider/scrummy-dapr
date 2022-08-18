@@ -21,7 +21,7 @@ services:
       - dapr-placement
 
   game-service-dapr:
-    image: "daprio/daprd:1.5.1"
+    image: "daprio/daprd:1.8.3"
     depends_on:
       - game-service
     network_mode: "service:game-service"
@@ -36,4 +36,4 @@ services:
     image: xabarilcoding/healthchecksui:5.0.0
 
   dapr-placement:
-    image: "daprio/dapr:1.5.1"
+    image: "daprio/dapr:1.8.3"

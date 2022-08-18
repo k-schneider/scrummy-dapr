@@ -6,7 +6,7 @@
       "value": "canadacentral"
     },
     "resourceBaseName": {
-      "value": "scrummy"
+      "value": "scrummyscale"
     },
     "cosmosEnableFreeTier": {
       "value": true
@@ -20,11 +20,17 @@
     "gameServiceMaxReplicas": {
       "value": 3
     },
+    "gameServiceScaleConcurrentRequests": {
+      "value": "100"
+    },
     "webBlazorContainerImage": {
       "value": "k-schneider/scrummy-dapr/web.blazor:main"
     },
     "webBlazorMaxReplicas": {
       "value": 3
+    },
+    "webBlazorScaleConcurrentRequests": {
+      "value": "100"
     }
   }
 }

@@ -1,11 +1,5 @@
 @description('Specifies the location for all resources.')
-@allowed([
-  'eastus'
-  'northcentralusstage'
-  'northeurope'
-  'canadacentral'
-])
-param location string
+param location string = resourceGroup().location
 
 @description('Base name used when constructing all resources.')
 param resourceBaseName string
@@ -52,6 +46,9 @@ param gameServiceCpuCore string = '0.5'
 @description('Game service required memory size in gigabytes.')
 param gameServiceMemorySize string = '1'
 
+@description('Number of concurrent requests to game service to trigger scaling up.')
+param gameServiceScaleConcurrentRequests string = '100'
+
 @description('Web blazor container image.')
 param webBlazorContainerImage string
 
@@ -71,7 +68,8 @@ param webBlazorCpuCore string = '0.5'
 @description('Web blazor required memory size in gigabytes.')
 param webBlazorMemorySize string = '1'
 
-targetScope = 'subscription'
+@description('Number of concurrent requests to web blazor to trigger scaling up.')
+param webBlazorScaleConcurrentRequests string = '100'
 
 var cosmosDbAccountName = '${resourceBaseName}-cosmos'
 var cosmosDbDatabaseName = resourceBaseName
@@ -84,17 +82,8 @@ var containerAppEnvName = '${resourceBaseName}-env'
 var gameServiceContainerAppName = '${resourceBaseName}-game-service'
 var webBlazorContainerAppName = '${resourceBaseName}-web-blazor'
 
-// If game service has more than one replica then we need Azure SignalR
-var createAzureSignalR = gameServiceMaxReplicas > 1
-
-resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: '${resourceBaseName}-rg'
-  location: location
-}
-
 module cosmosDbDeploy 'modules/cosmos-db.bicep' = {
   name: 'cosmosDbDeploy'
-  scope: rg
   params: {
     location: location
     databaseAccountName: cosmosDbAccountName
@@ -109,16 +98,14 @@ module cosmosDbDeploy 'modules/cosmos-db.bicep' = {
 
 module serviceBusDeploy 'modules/service-bus.bicep' = {
   name: 'serviceBusDeploy'
-  scope: rg
   params: {
     location: location
     serviceBusName: serviceBusName
   }
 }
 
-module signalRDeploy 'modules/signalr.bicep' = if (createAzureSignalR) {
+module signalRDeploy 'modules/signalr.bicep' = {
   name: 'signalRDeploy'
-  scope: rg
   params: {
     location: location
     signalrName: signalrName
@@ -127,7 +114,6 @@ module signalRDeploy 'modules/signalr.bicep' = if (createAzureSignalR) {
 
 module environmentDeploy 'modules/environment.bicep' = {
   name: 'environmentDeploy'
-  scope: rg
   params: {
     location: location
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
@@ -139,11 +125,14 @@ module environmentDeploy 'modules/environment.bicep' = {
     serviceBusName: serviceBusName
     gameServiceContainerAppName: gameServiceContainerAppName
   }
+  dependsOn: [
+    serviceBusDeploy
+    cosmosDbDeploy
+  ]
 }
 
 module gameServiceDeploy 'modules/game-service.bicep' = {
   name: 'gameServiceDeploy'
-  scope: rg
   params: {
     location: location
     containerAppName: gameServiceContainerAppName
@@ -151,17 +140,20 @@ module gameServiceDeploy 'modules/game-service.bicep' = {
     containerRegistry: containerRegistry
     containerImage: gameServiceContainerImage
     appInsightsName: appInsightsName
-    signalRName: createAzureSignalR ? signalrName : ''
+    signalRName: signalrName
     minReplicas: gameServiceMinReplicas
     maxReplicas: gameServiceMaxReplicas
     cpuCore: gameServiceCpuCore
     memorySize: gameServiceMemorySize
+    scaleConcurrentRequests: gameServiceScaleConcurrentRequests
   }
+  dependsOn: [
+    signalRDeploy
+  ]
 }
 
 module webBlazorDeploy 'modules/web-blazor.bicep' = {
   name: 'webBlazorDeploy'
-  scope: rg
   params: {
     location: location
     containerAppName: webBlazorContainerAppName
@@ -174,5 +166,6 @@ module webBlazorDeploy 'modules/web-blazor.bicep' = {
     maxReplicas: webBlazorMaxReplicas
     cpuCore: webBlazorCpuCore
     memorySize: webBlazorMemorySize
+    scaleConcurrentRequests: webBlazorScaleConcurrentRequests
   }
 }

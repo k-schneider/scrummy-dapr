@@ -9,12 +9,13 @@ param cpuCore string
 param memorySize string
 param minReplicas int
 param maxReplicas int
+param scaleConcurrentRequests string
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appInsightsName
 }
 
-resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
+resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
   name: containerAppName
   location: location
   properties: {
@@ -48,7 +49,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
             }
           ]
           resources: {
-            cpu: cpuCore
+            cpu: json(cpuCore)
             memory: '${memorySize}Gi'
           }
           probes: [
@@ -72,6 +73,16 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
       scale: {
         minReplicas: minReplicas
         maxReplicas: maxReplicas
+        rules: [
+          {
+            name: 'http-trigger'
+            http: {
+              metadata: {
+                concurrentRequests: scaleConcurrentRequests
+              }
+            }
+          }
+        ]
       }
     }
   }
