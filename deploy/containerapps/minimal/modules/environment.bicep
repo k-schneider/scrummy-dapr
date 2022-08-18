@@ -59,7 +59,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       metadata: [
         {
           name: 'redisHost'
-          value: '128.0.0.1:6379'
+          value: '127.0.0.1:6379'
         }
         {
           name: 'redisPassword'
@@ -68,6 +68,10 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
         {
           name: 'actorStateStore'
           value: 'true'
+        }
+        {
+          name: 'poolSize'
+          value: '20'
         }
       ]
       scopes: [
@@ -91,11 +95,15 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' 
       metadata: [
         {
           name: 'redisHost'
-          value: '128.0.0.1:6379'
+          value: '127.0.0.1:6379'
         }
         {
           name: 'redisPassword'
           secretRef: 'redis-password'
+        }
+        {
+          name: 'poolSize'
+          value: '20'
         }
       ]
       scopes: [

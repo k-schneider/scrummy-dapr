@@ -3,6 +3,8 @@ param containerAppName string
 param environmentId string
 param appInsightsName string
 
+var gameServicePort = 3000
+
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appInsightsName
 }
@@ -28,7 +30,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
         enabled: true
         appId: containerAppName
         appProtocol: 'http'
-        appPort: 3000
+        appPort: gameServicePort
       }
     }
     template: {
@@ -50,12 +52,12 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
           image: 'ghcr.io/k-schneider/scrummy-dapr/game.service:main'
           name: 'game-service'
           args: [
-            '--expose=3000'
+            '--expose=${gameServicePort}'
           ]
           env: [
             {
               name: 'ASPNETCORE_URLS'
-              value: 'http://0.0.0.0:3000'
+              value: 'http://0.0.0.0:${gameServicePort}'
             }
             {
               name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
@@ -93,7 +95,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
             }
             {
               name: 'GameServiceUrl'
-              value: 'http://127.0.0.1:3000'
+              value: 'http://127.0.0.1:${gameServicePort}'
             }
           ]
           resources: {
@@ -121,16 +123,6 @@ resource containerApp 'Microsoft.App/containerApps@2022-03-01' = {
       scale: {
         minReplicas: 1
         maxReplicas: 1
-        rules: [
-          {
-            name: 'http-trigger'
-            http: {
-              metadata: {
-                concurrentRequests: '100'
-              }
-            }
-          }
-        ]
       }
     }
   }
